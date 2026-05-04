@@ -51,13 +51,19 @@
           }
         }
     */
-    "MultiProjectConfigurations": {
-          "All": {
-            "Projects": {
-              "MasterServer": {},
-              "LoginServer": {},
-			  "WorldServer": {}
-            }
-          }
-        }
+	"MultiProjectConfigurations": {
+		"All": {
+			"Projects": {
+				"MasterServer": {},
+				"LoginServer": {},
+				"WorldServer": {}
+			}
+		},
+		"Limited": {
+			"Projects": {
+				"MasterServer": {},
+				"LoginServer": {}
+			}
+		}
+	}
 }

@@ -22,7 +22,7 @@ namespace LoginServer.Logic.Delegates
 
 			client.ClientInfo.ConnState = Enums.ConnState.CONNECTED;
 
-			var packet = new RSP_Connect2Svr(Encryption.Recv2ndXorSeed, client.ClientInfo.AuthKey, client.ClientInfo.UserId, client.Encryption.RecvXorKeyIdx);
+			var packet = new RSP_Connect2Svr(0, client.ClientInfo.AuthKey, client.ClientInfo.UserId, 0);
 			client.PacketManager.Send(packet);
 		}
 

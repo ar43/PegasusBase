@@ -24,7 +24,7 @@ namespace WorldServer.Logic.Delegates
 
 			client.ConnectionInfo.ConnState = ConnState.AWAITING;
 
-			var packet = new RSP_Connect2Svr(Encryption.Recv2ndXorSeed, client.ConnectionInfo.AuthKey, client.ConnectionInfo.UserId, client.Encryption.RecvXorKeyIdx);
+			var packet = new RSP_Connect2Svr(0, client.ConnectionInfo.AuthKey, client.ConnectionInfo.UserId, 0);
 			client.PacketManager.Send(packet);
 		}
 

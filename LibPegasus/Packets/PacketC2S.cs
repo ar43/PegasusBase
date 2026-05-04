@@ -9,8 +9,6 @@ namespace LibPegasus.Packets
 		protected readonly int _packetLen;
 		protected Queue<byte> _data;
 
-		public static readonly UInt16 HEADER_SIZE = 10;
-
 		public PacketC2S(UInt16 id, Queue<byte> data)
 		{
 			_id = id;
@@ -18,24 +16,25 @@ namespace LibPegasus.Packets
 			_packetLen = data.Count;
 		}
 
-		public bool ReadHeader()
+		public bool ReadHeader(UInt64 recvCounter)
 		{
 			try
 			{
-				var magicKey = PacketReader.ReadUInt16(_data);
-				var len = PacketReader.ReadUInt16(_data);
-				var checksum = PacketReader.ReadUInt32(_data);
+				var len = PacketReader.ReadUInt32(_data);
+				var counter = PacketReader.ReadUInt64(_data);
 				var opcode = PacketReader.ReadUInt16(_data);
 
-				if (magicKey != Encryption.MagicKey)
-				{
-					Log.Error("MagicKey does not match");
-					return false;
-				}
+				//TODO: counter validation
 
 				if (len != _packetLen)
 				{
 					Log.Error("packet len does not match");
+					return false;
+				}
+
+				if (counter != recvCounter)
+				{
+					Log.Error($"counter not in sync: expected {recvCounter} - got {counter}");
 					return false;
 				}
 

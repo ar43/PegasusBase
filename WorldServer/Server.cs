@@ -29,7 +29,6 @@ namespace WorldServer
 		ConcurrentQueue<Client> _awaitingClients = new();
 		List<Client> _clients = new();
 		ConcurrentQueue<SessionChangeData> _pendingSessionChanges = new();
-		XorKeyTable _xorKeyTable = new();
 		SyncManager _syncManager;
 
 		DatabaseManager _databaseManager;
@@ -137,7 +136,7 @@ namespace WorldServer
 					if (tcpClient != null)
 					{
 						Log.Debug("Client connected");
-						_awaitingClients.Enqueue(new Client(tcpClient, _xorKeyTable, _masterRpcChannel, _databaseManager, _world));
+						_awaitingClients.Enqueue(new Client(tcpClient, _masterRpcChannel, _databaseManager, _world));
 					}
 				}
 				catch (SocketException e)

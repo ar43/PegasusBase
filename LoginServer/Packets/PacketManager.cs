@@ -12,7 +12,10 @@ namespace LoginServer.Packets
 		private Queue<Tuple<UInt16, Queue<byte>>> _decryptedInboundPackets = new();
 		private Queue<Deque<byte>> _decryptedOutboundPackets = new();
 		public DanglingPacket? DanglingPacket = null;
-		// Start is called before the first frame update
+
+		private UInt64 _sendCounter = 0;
+		private UInt64 _recvCounter = 0;
+
 		public PacketManager()
 		{
 		}
@@ -34,8 +37,9 @@ namespace LoginServer.Packets
 
 		public void Send(PacketS2C packet)
 		{
-			var p = packet.Send();
+			var p = packet.Send(_sendCounter);
 			_decryptedOutboundPackets.Enqueue(p);
+			_sendCounter++;
 		}
 
 		private PacketC2S<Client> GetPacket(Opcode opcode, Queue<byte> data)
@@ -69,13 +73,15 @@ namespace LoginServer.Packets
 				if (!opcodeDefined)
 				{
 					Log.Warning($"Received undefined opcode {opcodeNum}(len={dataQueue.Count})");
+					_recvCounter++;
 					continue;
 				}
 
 				var packet = GetPacket((Opcode)opcodeNum, dataQueue);
 				Log.Debug($"Processing opcode {opcodeNum}");
 
-				bool verifyHeader = packet.ReadHeader();
+				bool verifyHeader = packet.ReadHeader(_recvCounter);
+				_recvCounter++;
 				if (!verifyHeader)
 				{
 					Log.Warning($"Header for opcode {opcodeNum} is invalid");

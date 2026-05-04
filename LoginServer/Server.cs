@@ -23,7 +23,6 @@ namespace LoginServer
 
 		ConcurrentQueue<Client> _awaitingClients = new();
 		List<Client> _clients = new();
-		XorKeyTable _xorKeyTable = new();
 		ConcurrentQueue<SessionChangeData> _pendingSessionChanges = new();
 
 		DatabaseManager _databaseManager;
@@ -90,7 +89,7 @@ namespace LoginServer
 				if (tcpClient != null)
 				{
 					Log.Debug("Client connected");
-					_awaitingClients.Enqueue(new Client(tcpClient, _xorKeyTable, _masterRpcChannel));
+					_awaitingClients.Enqueue(new Client(tcpClient, _masterRpcChannel));
 				}
 			}
 

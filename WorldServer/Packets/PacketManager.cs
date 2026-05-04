@@ -13,6 +13,9 @@ namespace WorldServer.Packets
 		private Queue<Deque<byte>> _decryptedOutboundPackets = new();
 		public DanglingPacket? DanglingPacket = null;
 
+		private UInt64 _sendCounter = 0;
+		private UInt64 _recvCounter = 0;
+
 		public PacketManager()
 		{
 		}
@@ -34,8 +37,9 @@ namespace WorldServer.Packets
 
 		public void Send(PacketS2C packet)
 		{
-			var p = packet.Send();
+			var p = packet.Send(_sendCounter);
 			_decryptedOutboundPackets.Enqueue(p);
+			_sendCounter++;
 		}
 
 		private PacketC2S<Client> GetPacket(Opcode opcode, Queue<byte> data)
@@ -120,13 +124,15 @@ namespace WorldServer.Packets
 				if (!opcodeDefined)
 				{
 					Log.Warning($"Received undefined opcode {opcodeNum}(len={dataQueue.Count})");
+					_recvCounter++;
 					continue;
 				}
 
 				var packet = GetPacket((Opcode)opcodeNum, dataQueue);
 				Log.Debug($"Processing opcode {opcodeNum} ({packet.GetType().Name})");
 
-				bool verifyHeader = packet.ReadHeader();
+				bool verifyHeader = packet.ReadHeader(_recvCounter);
+				_recvCounter++;
 				if (!verifyHeader)
 				{
 					Log.Warning($"Header for opcode {opcodeNum} is invalid");

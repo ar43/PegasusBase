@@ -69,6 +69,26 @@
 			}
 		}
 
+		public static UInt64 ReadUInt64(Queue<byte> data)
+		{
+			try
+			{
+				var a = ReadByte(data);
+				var b = ReadByte(data);
+				var c = ReadByte(data);
+				var d = ReadByte(data);
+				var e = ReadByte(data);
+				var f = ReadByte(data);
+				var g = ReadByte(data);
+				var h = ReadByte(data);
+				return (UInt64)(a | (b << 8) | (c << 16) | (d << 24) | (e << 32) | (f << 40) | (g << 48) | (h << 56));
+			}
+			catch
+			{
+				throw;
+			}
+		}
+
 		public static Int32 ReadInt32(Queue<byte> data)
 		{
 			try

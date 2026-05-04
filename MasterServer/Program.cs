@@ -1,5 +1,4 @@
 using MasterServer.Channel;
-using MasterServer.Chat;
 using MasterServer.DB;
 using MasterServer.Services;
 using MasterServer.Sync;
@@ -27,15 +26,12 @@ namespace MasterServer
 			builder.Services.AddSingleton<ChannelManager>();
 			builder.Services.AddSingleton<SyncManager>();
 			builder.Services.AddHostedService<TimedChannelService>();
-			builder.Services.AddSingleton<ChatServer>();
-			//builder.Services.AddHostedService<ChatServerService>();
 
 			var app = builder.Build();
 
 			app.MapGrpcService<ChannelMasterService>();
 			app.MapGrpcService<AuthMasterService>();
 			app.MapGrpcService<CharacterMasterService>();
-			app.MapGrpcService<ChatMasterService>();
 			app.MapGet("/", () => "PegasusCabal MasterServer");
 
 			app.Run();

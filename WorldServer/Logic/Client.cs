@@ -48,11 +48,11 @@ namespace WorldServer.Logic
 
 		internal bool Dropped { get; private set; } = false;
 
-		public Client(TcpClient tcpClient, XorKeyTable xorKeyTable, GrpcChannel masterChannel, DatabaseManager databaseManager, World world)
+		public Client(TcpClient tcpClient, GrpcChannel masterChannel, DatabaseManager databaseManager, World world)
 		{
 			TcpClient = tcpClient;
 			PacketManager = new PacketManager();
-			Encryption = new(xorKeyTable);
+			Encryption = new();
 			_masterRpcChannel = masterChannel;
 
 			var remoteEndPoint = TcpClient.Client.RemoteEndPoint as IPEndPoint;
@@ -123,9 +123,14 @@ namespace WorldServer.Logic
 						var packetLen = Encryption.GetPacketSize(span);
 						Log.Debug($"packetLen decrypted: {packetLen}");
 
-						if (packetLen < Encryption.C2S_HEADER_SIZE || packetLen > DanglingPacket.MAX_C2S_PACKET_LEN)
+						if (packetLen > DanglingPacket.MAX_C2S_PACKET_LEN)
 						{
-							throw new OverflowException("ReceiveData - packetLen > MAX_C2S_PACKET_LEN");
+							throw new NotImplementedException("packetLen > DanglingPacket.MAX_C2S_PACKET_LEN");
+						}
+
+						if (packetLen < Encryption.C2S_HEADER_SIZE)
+						{
+							throw new NotImplementedException("packetLen < Encryption.C2S_HEADER_SIZE");
 						}
 
 						if (packetLen > length - i)

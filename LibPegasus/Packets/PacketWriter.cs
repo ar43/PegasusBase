@@ -80,12 +80,44 @@ namespace LibPegasus.Packets
 			data.AddToBack((byte)h);
 		}
 
-		public static void WriteHeader(Deque<byte> data, UInt16 val)
+		public static void WriteHeaderUInt16(Deque<byte> data, UInt16 val)
 		{
 			var a = val & 0xFF;
 			var b = (val & 0xFF00) >> 8;
 			data.AddToFront((byte)b);
 			data.AddToFront((byte)a);
+		}
+
+		public static void WriteHeaderUInt32(Deque<byte> data, UInt32 val)
+		{
+			var a = val & 0xFF;
+			var b = (val & 0xFF00) >> 8;
+			var c = (val & 0xFF0000) >> 16;
+			var d = (val & 0xFF000000) >> 24;
+			data.AddToFront((byte)a);
+			data.AddToFront((byte)b);
+			data.AddToFront((byte)c);
+			data.AddToFront((byte)d);
+		}
+
+		public static void WriteHeaderUInt64(Deque<byte> data, UInt64 val)
+		{
+			var a = val & 0xFF;
+			var b = (val & 0xFF00) >> 8;
+			var c = (val & 0xFF0000) >> 16;
+			var d = (val & 0xFF000000) >> 24;
+			var e = (val & 0xFF00000000) >> 32;
+			var f = (val & 0xFF0000000000) >> 40;
+			var g = (val & 0xFF000000000000) >> 48;
+			var h = (val & 0xFF00000000000000) >> 56;
+			data.AddToFront((byte)a);
+			data.AddToFront((byte)b);
+			data.AddToFront((byte)c);
+			data.AddToFront((byte)d);
+			data.AddToFront((byte)e);
+			data.AddToFront((byte)f);
+			data.AddToFront((byte)g);
+			data.AddToFront((byte)h);
 		}
 
 		public static void WriteNull(Deque<byte> data, int len)
