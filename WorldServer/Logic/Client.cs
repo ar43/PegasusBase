@@ -3,6 +3,7 @@ using LibPegasus.Crypt;
 using LibPegasus.Packets;
 using Serilog;
 using Shared.Protos;
+using Sodium;
 using System.Net;
 using System.Net.Sockets;
 using WorldServer.DB;
@@ -48,11 +49,11 @@ namespace WorldServer.Logic
 
 		internal bool Dropped { get; private set; } = false;
 
-		public Client(TcpClient tcpClient, GrpcChannel masterChannel, DatabaseManager databaseManager, World world)
+		public Client(TcpClient tcpClient, GrpcChannel masterChannel, DatabaseManager databaseManager, World world, KeyPair serverKeyPair)
 		{
 			TcpClient = tcpClient;
 			PacketManager = new PacketManager();
-			Encryption = new();
+			Encryption = new(serverKeyPair);
 			_masterRpcChannel = masterChannel;
 
 			var remoteEndPoint = TcpClient.Client.RemoteEndPoint as IPEndPoint;

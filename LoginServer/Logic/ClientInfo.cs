@@ -15,6 +15,7 @@ namespace LoginServer.Logic
 			RSA = RSA.Create(RSA_KEY_SIZE);
 			Username = "";
 			AccountId = 0;
+			ServerNonce = RandomNumberGenerator.GetBytes(8);
 		}
 
 		public UInt16 UserId { get; private set; }
@@ -22,6 +23,7 @@ namespace LoginServer.Logic
 		public string Username;
 		public ConnState ConnState;
 		public RSA RSA { get; private set; }
+		public byte[] ServerNonce { get; private set; }
 
 		public UInt32 AccountId;
 	}

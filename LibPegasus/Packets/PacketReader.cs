@@ -156,5 +156,25 @@
 
 			return output;
 		}
+
+		public static byte[] ReadArray(Queue<byte> data, int len)
+		{
+			if (data.Count == 0)
+			{
+				throw new IndexOutOfRangeException("Data queue is empty");
+			}
+
+			byte[] output = new byte[data.Count];
+
+			int i = 0;
+			while (data.Count > 0 && i < len)
+			{
+				byte b = ReadByte(data);
+				output[i] = (byte)b;
+				i++;
+			}
+
+			return output;
+		}
 	}
 }

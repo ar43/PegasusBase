@@ -4,9 +4,11 @@ using LibPegasus.JSON;
 using Npgsql;
 using Serilog;
 using Shared.Protos;
+using Sodium;
 using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
+using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
 using WorldServer.DB;
 using WorldServer.DB.Sync;
@@ -36,9 +38,13 @@ namespace WorldServer
 
 		bool[] _clientIndexSpace = new bool[UInt16.MaxValue + 1];
 
+		KeyPair _keyPair;
+
 		public Server()
 		{
 			var cfg = ServerConfig.Get("world1");
+
+			_keyPair = PublicKeyBox.GenerateKeyPair();
 
 			Log.Information($"Channel id: {cfg.GeneralSettings.ChannelId}");
 
@@ -136,7 +142,7 @@ namespace WorldServer
 					if (tcpClient != null)
 					{
 						Log.Debug("Client connected");
-						_awaitingClients.Enqueue(new Client(tcpClient, _masterRpcChannel, _databaseManager, _world));
+						_awaitingClients.Enqueue(new Client(tcpClient, _masterRpcChannel, _databaseManager, _world, _keyPair));
 					}
 				}
 				catch (SocketException e)

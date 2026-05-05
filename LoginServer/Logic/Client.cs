@@ -6,6 +6,7 @@ using LoginServer.Packets;
 using LoginServer.Packets.S2C;
 using Serilog;
 using Shared.Protos;
+using Sodium;
 using System.Net;
 using System.Net.Sockets;
 
@@ -33,11 +34,11 @@ namespace LoginServer.Logic
 
 		internal bool Dropped { get; private set; } = false;
 
-		public Client(TcpClient tcpClient, GrpcChannel masterChannel)
+		public Client(TcpClient tcpClient, GrpcChannel masterChannel, KeyPair serverKeyPair)
 		{
 			TcpClient = tcpClient;
 			PacketManager = new PacketManager();
-			Encryption = new();
+			Encryption = new(serverKeyPair);
 			_masterRpcChannel = masterChannel;
 
 			var remoteEndPoint = TcpClient.Client.RemoteEndPoint as IPEndPoint;

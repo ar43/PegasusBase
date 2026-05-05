@@ -6,9 +6,11 @@ using LoginServer.Logic;
 using Npgsql;
 using Serilog;
 using Shared.Protos;
+using Sodium;
 using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
+using System.Security.Cryptography;
 using System.Text.Json;
 
 namespace LoginServer
@@ -25,13 +27,15 @@ namespace LoginServer
 		List<Client> _clients = new();
 		ConcurrentQueue<SessionChangeData> _pendingSessionChanges = new();
 
-		DatabaseManager _databaseManager;
-
 		bool[] _clientIndexSpace = new bool[UInt16.MaxValue + 1];
+
+		KeyPair _keyPair;
 
 		public Server()
 		{
 			var cfg = ServerConfig.Get();
+
+			_keyPair = PublicKeyBox.GenerateKeyPair();
 
 			Log.Information("Connecting to MasterServer...");
 			var handler = new SocketsHttpHandler
@@ -55,8 +59,6 @@ namespace LoginServer
 
 			var ipEndPoint = new IPEndPoint(IPAddress.Any, cfg.ConnectionSettings.Port);
 			_listener = new(ipEndPoint);
-
-			_databaseManager = new DatabaseManager(cfg.DatabaseSettings.ConnString);
 		}
 
 		UInt16 GetAvailableUserIndex()
@@ -89,7 +91,7 @@ namespace LoginServer
 				if (tcpClient != null)
 				{
 					Log.Debug("Client connected");
-					_awaitingClients.Enqueue(new Client(tcpClient, _masterRpcChannel));
+					_awaitingClients.Enqueue(new Client(tcpClient, _masterRpcChannel, _keyPair));
 				}
 			}
 

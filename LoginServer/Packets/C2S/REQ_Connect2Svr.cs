@@ -14,23 +14,21 @@ namespace LoginServer.Packets.C2S
 
 		public override bool ReadPayload(Queue<Action<Client>> actions)
 		{
+			byte[] clientNonce;
+			byte[] clientPublicKey;
 			try
 			{
-				var reserved = PacketReader.ReadUInt32(_data);
+				clientNonce = PacketReader.ReadArray(_data, 8);
+				clientPublicKey = PacketReader.ReadArray(_data, 32);
 			}
 			catch (IndexOutOfRangeException)
 			{
 				return false;
 			}
 
-			actions.Enqueue((x) => Connection.OnServerConnection(x));
+			actions.Enqueue((x) => Connection.OnServerConnection(x, clientNonce, clientPublicKey));
 
 			return true;
-		}
-
-		public static UInt16 GetSize()
-		{
-			return 14;
 		}
 	}
 }

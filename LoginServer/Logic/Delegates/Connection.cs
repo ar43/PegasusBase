@@ -10,7 +10,7 @@ namespace LoginServer.Logic.Delegates
 {
 	internal static class Connection
 	{
-		public static void OnServerConnection(Client client)
+		public static void OnServerConnection(Client client, byte[] clientNonce, byte[] clientPublicKey)
 		{
 			Serilog.Log.Debug("OnServerConnection called");
 
@@ -22,7 +22,10 @@ namespace LoginServer.Logic.Delegates
 
 			client.ClientInfo.ConnState = Enums.ConnState.CONNECTED;
 
-			var packet = new RSP_Connect2Svr(0, client.ClientInfo.AuthKey, client.ClientInfo.UserId, 0);
+			client.Encryption.GenerateSessionKey(client.ClientInfo.ServerNonce, clientNonce, clientPublicKey);
+
+			var packet = new RSP_Connect2Svr(client.ClientInfo.AuthKey, client.ClientInfo.UserId, 
+				client.ClientInfo.ServerNonce, client.Encryption.KeyPair.PublicKey);
 			client.PacketManager.Send(packet);
 		}
 
