@@ -5,7 +5,7 @@ using WorldServer.Logic.Delegates;
 
 namespace WorldServer.Packets.C2S
 {
-	internal class REQ_QueryCashItem : PacketC2S<Client>
+	internal class REQ_QueryCashItem : Packet<Client>
 	{
 		public REQ_QueryCashItem(Queue<byte> data) : base((UInt16)Opcode.CSC_QUERYCASHITEM, data)
 		{

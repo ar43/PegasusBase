@@ -1,10 +1,11 @@
 ﻿using LibPegasus.Packets;
 using Nito.Collections;
 using WorldServer.Enums;
+using WorldServer.Logic;
 
 namespace WorldServer.Packets.S2C
 {
-	internal class RSP_QuestClsEvt : PacketS2C
+	internal class RSP_QuestClsEvt : Packet<Client>
 	{
 		Byte _rewardType; //maybe this is result
 		UInt16 _invSlot;

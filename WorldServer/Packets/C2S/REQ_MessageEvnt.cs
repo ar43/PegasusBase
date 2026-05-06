@@ -5,7 +5,7 @@ using WorldServer.Logic.Delegates;
 
 namespace WorldServer.Packets.C2S
 {
-	internal class REQ_MessageEvnt : PacketC2S<Client>
+	internal class REQ_MessageEvnt : Packet<Client>
 	{
 		public REQ_MessageEvnt(Queue<byte> data) : base((UInt16)Opcode.REQ_MESSAGEEVNT, data)
 		{

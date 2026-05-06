@@ -1,11 +1,12 @@
 ﻿using LibPegasus.Packets;
 using Nito.Collections;
 using WorldServer.Enums;
+using WorldServer.Logic;
 using WorldServer.Logic.WorldRuntime.ShopRuntime;
 
 namespace WorldServer.Packets.S2C
 {
-	internal class RSP_NpcShopPool : PacketS2C
+	internal class RSP_NpcShopPool : Packet<Client>
 	{
 		ShopPool _pool;
 		public RSP_NpcShopPool(ShopPool pool) : base((UInt16)Opcode.CSC_NPCSHOPPOOL)

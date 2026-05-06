@@ -1,10 +1,11 @@
 ﻿using LibPegasus.Packets;
 using Nito.Collections;
 using WorldServer.Enums;
+using WorldServer.Logic;
 
 namespace WorldServer.Packets.S2C
 {
-	internal class NFY_SystemMessg : PacketS2C
+	internal class NFY_SystemMessg : Packet<Client>
 	{
 		Byte _messageType;
 		ushort _messageLength;

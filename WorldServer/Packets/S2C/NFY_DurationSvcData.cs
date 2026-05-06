@@ -6,11 +6,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WorldServer.Enums;
+using WorldServer.Logic;
 using WorldServer.Logic.AccountData;
 
 namespace WorldServer.Packets.S2C
 {
-	internal class NFY_DurationSvcData : PacketS2C
+	internal class NFY_DurationSvcData : Packet<Client>
 	{
 		List<PremiumService> _premiumServices;
 		public NFY_DurationSvcData(List<PremiumService> premiumServices) : base((UInt16)Opcode.CSC_DURATIONSVCDATA)

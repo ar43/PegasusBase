@@ -5,7 +5,7 @@ using LoginServer.Logic.Delegates;
 
 namespace LoginServer.Packets.C2S
 {
-	internal class REQ_PreServerEnvRequest : PacketC2S<Client>
+	internal class REQ_PreServerEnvRequest : Packet<Client>
 	{
 		public REQ_PreServerEnvRequest(Queue<byte> data) : base((UInt16)Opcode.PRESERVERENVREQUEST, data)
 		{

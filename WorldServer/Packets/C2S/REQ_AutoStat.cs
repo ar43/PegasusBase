@@ -10,7 +10,7 @@ using WorldServer.Enums;
 
 namespace WorldServer.Packets.C2S
 {
-	internal class REQ_AutoStat : PacketC2S<Client>
+	internal class REQ_AutoStat : Packet<Client>
 	{
 		public REQ_AutoStat(Queue<byte> data) : base((UInt16)Opcode.CSC_AUTOSTAT, data)
 		{

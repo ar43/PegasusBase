@@ -5,7 +5,7 @@ using WorldServer.Logic.Delegates;
 
 namespace WorldServer.Packets.C2S
 {
-	internal class REQ_MoveEnded00 : PacketC2S<Client>
+	internal class REQ_MoveEnded00 : Packet<Client>
 	{
 		public REQ_MoveEnded00(Queue<byte> data) : base((UInt16)Opcode.REQ_MOVEENDED00, data)
 		{

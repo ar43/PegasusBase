@@ -6,7 +6,7 @@ using WorldServer.Logic.Delegates;
 
 namespace WorldServer.Packets.C2S
 {
-	internal class REQ_QuestClsEvt : PacketC2S<Client>
+	internal class REQ_QuestClsEvt : Packet<Client>
 	{
 		public REQ_QuestClsEvt(Queue<byte> data) : base((UInt16)Opcode.CSC_QUESTCLSEVT, data)
 		{

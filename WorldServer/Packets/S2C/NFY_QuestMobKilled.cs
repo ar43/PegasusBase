@@ -1,10 +1,11 @@
 ﻿using LibPegasus.Packets;
 using Nito.Collections;
 using WorldServer.Enums;
+using WorldServer.Logic;
 
 namespace WorldServer.Packets.S2C
 {
-	internal class NFY_QuestMobKilled : PacketS2C
+	internal class NFY_QuestMobKilled : Packet<Client>
 	{
 		ushort _speciesId;
 		int _skillId;

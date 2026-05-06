@@ -5,7 +5,7 @@ using WorldServer.Logic.Delegates;
 
 namespace WorldServer.Packets.C2S
 {
-	internal class REQ_ItemSwap : PacketC2S<Client>
+	internal class REQ_ItemSwap : Packet<Client>
 	{
 		public REQ_ItemSwap(Queue<byte> data) : base((UInt16)Opcode.CSC_ITEMSWAP, data)
 		{

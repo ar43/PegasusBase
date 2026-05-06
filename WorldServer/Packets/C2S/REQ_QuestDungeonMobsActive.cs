@@ -10,7 +10,7 @@ using WorldServer.Enums;
 
 namespace WorldServer.Packets.C2S
 {
-	internal class REQ_QuestDungeonMobsActive : PacketC2S<Client>
+	internal class REQ_QuestDungeonMobsActive : Packet<Client>
 	{
 		public REQ_QuestDungeonMobsActive(Queue<byte> data) : base((UInt16)Opcode.REQ_QUESTDUNGEONMOBSACTIVE, data)
 		{

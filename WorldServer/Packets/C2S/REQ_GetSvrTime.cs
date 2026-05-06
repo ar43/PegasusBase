@@ -5,7 +5,7 @@ using WorldServer.Logic.Delegates;
 
 namespace WorldServer.Packets.C2S
 {
-	internal class REQ_GetSvrTime : PacketC2S<Client>
+	internal class REQ_GetSvrTime : Packet<Client>
 	{
 		public REQ_GetSvrTime(Queue<byte> data) : base((UInt16)Opcode.CSC_GETSVRTIME, data)
 		{

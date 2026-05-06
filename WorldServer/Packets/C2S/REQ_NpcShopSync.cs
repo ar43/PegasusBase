@@ -5,7 +5,7 @@ using WorldServer.Logic.Delegates;
 
 namespace WorldServer.Packets.C2S
 {
-	internal class REQ_NpcShopSync : PacketC2S<Client>
+	internal class REQ_NpcShopSync : Packet<Client>
 	{
 		public REQ_NpcShopSync(Queue<byte> data) : base((UInt16)Opcode.REQ_NPCSHOPSYNC, data)
 		{

@@ -1,11 +1,12 @@
 ﻿using LibPegasus.Packets;
 using Nito.Collections;
 using WorldServer.Enums;
+using WorldServer.Logic;
 using WorldServer.Logic.WorldRuntime.InstanceRuntime.MobRuntime;
 
 namespace WorldServer.Packets.S2C
 {
-	internal class NFY_NewMobsList : PacketS2C
+	internal class NFY_NewMobsList : Packet<Client>
 	{
 		List<Mob> _mobs;
 		public NFY_NewMobsList(List<Mob> mobs) : base((UInt16)Opcode.NFY_NEWMOBSLIST)

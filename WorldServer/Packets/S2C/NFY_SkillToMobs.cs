@@ -1,11 +1,12 @@
 ﻿using LibPegasus.Packets;
 using Nito.Collections;
 using WorldServer.Enums;
+using WorldServer.Logic;
 using WorldServer.Packets.S2C.PacketSpecificData;
 
 namespace WorldServer.Packets.S2C
 {
-	internal class NFY_SkillToMobs : PacketS2C
+	internal class NFY_SkillToMobs : Packet<Client>
 	{
 		UInt16 _skillId;
 		int _characterId;

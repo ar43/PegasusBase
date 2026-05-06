@@ -1,10 +1,11 @@
 ﻿using LibPegasus.Packets;
 using Nito.Collections;
 using WorldServer.Enums;
+using WorldServer.Logic;
 
 namespace WorldServer.Packets.S2C
 {
-	internal class RSP_ServerEnv : PacketS2C
+	internal class RSP_ServerEnv : Packet<Client>
 	{
 		Gamesettings _gamesettings;
 		public RSP_ServerEnv(Gamesettings gamesettings) : base((UInt16)Opcode.CSC_SERVERENV)

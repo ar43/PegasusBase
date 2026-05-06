@@ -6,10 +6,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WorldServer.Enums;
+using WorldServer.Logic;
 
 namespace WorldServer.Packets.S2C
 {
-	internal class NFY_QuestDungeonStart : PacketS2C
+	internal class NFY_QuestDungeonStart : Packet<Client>
 	{
 		Int32 _timeLimit1, _timeLimit2, _u0;
 

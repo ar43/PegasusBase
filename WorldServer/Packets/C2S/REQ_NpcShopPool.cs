@@ -5,7 +5,7 @@ using WorldServer.Logic.Delegates;
 
 namespace WorldServer.Packets.C2S
 {
-	internal class REQ_NpcShopPool : PacketC2S<Client>
+	internal class REQ_NpcShopPool : Packet<Client>
 	{
 		public REQ_NpcShopPool(Queue<byte> data) : base((UInt16)Opcode.CSC_NPCSHOPPOOL, data)
 		{

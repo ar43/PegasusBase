@@ -1,12 +1,13 @@
 ﻿using LibPegasus.Packets;
 using LoginServer.Enums;
+using LoginServer.Logic;
 using Nito.Collections;
 using Shared.Protos;
 using System.Net;
 
 namespace LoginServer.Packets.S2C
 {
-	internal class NFY_ServerState : PacketS2C
+	internal class NFY_ServerState : Packet<Client>
 	{
 		ServerStateReply _reply;
 		public NFY_ServerState(ServerStateReply reply) : base((UInt16)Opcode.SERVERSTATE)

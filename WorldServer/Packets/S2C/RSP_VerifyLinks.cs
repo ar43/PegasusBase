@@ -1,10 +1,11 @@
 ﻿using LibPegasus.Packets;
 using Nito.Collections;
 using WorldServer.Enums;
+using WorldServer.Logic;
 
 namespace WorldServer.Packets.S2C
 {
-	internal class RSP_VerifyLinks : PacketS2C
+	internal class RSP_VerifyLinks : Packet<Client>
 	{
 		byte _channelId, _serverId;
 		bool _isVerified;

@@ -1,10 +1,11 @@
 ﻿using LibPegasus.Packets;
 using Nito.Collections;
 using WorldServer.Enums;
+using WorldServer.Logic;
 
 namespace WorldServer.Packets.S2C
 {
-	internal class NFY_LastNationRewardWarResults : PacketS2C
+	internal class NFY_LastNationRewardWarResults : Packet<Client>
 	{
 		Int32 _resultId, _totalRounds, _capellaWins, _procyonWinds;
 		DateTimeOffset _rewardStartDate, _rewardEndDate;

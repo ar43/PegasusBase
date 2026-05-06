@@ -6,10 +6,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WorldServer.Enums;
+using WorldServer.Logic;
 
 namespace WorldServer.Packets.S2C
 {
-	internal class RSP_ItemBuyings : PacketS2C
+	internal class RSP_ItemBuyings : Packet<Client>
 	{
 		int _result, _itemKind, _itemOption, _u0;
 		ushort _u1;

@@ -1,10 +1,11 @@
 ﻿using LibPegasus.Packets;
 using Nito.Collections;
 using WorldServer.Enums;
+using WorldServer.Logic;
 
 namespace WorldServer.Packets.S2C
 {
-	internal class RSP_SubPasswordSet : PacketS2C
+	internal class RSP_SubPasswordSet : Packet<Client>
 	{
 		private UInt32 _result;
 		private UInt32 _changePassword;

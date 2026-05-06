@@ -2,11 +2,12 @@
 using Nito.Collections;
 using System.Diagnostics;
 using WorldServer.Enums;
+using WorldServer.Logic;
 using WorldServer.Packets.S2C.PacketSpecificData;
 
 namespace WorldServer.Packets.S2C
 {
-	internal class RSP_SkillToMobs : PacketS2C
+	internal class RSP_SkillToMobs : Packet<Client>
 	{
 		List<DamageToMobResult> _mobs;
 		private ushort _skillId;

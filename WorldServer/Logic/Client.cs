@@ -381,7 +381,7 @@ namespace WorldServer.Logic
 			return reply;
 		}
 
-		public void BroadcastNearby(PacketS2C packet, bool excludeClient = false)
+		public void BroadcastNearby(Packet<Client> packet, bool excludeClient = false)
 		{
 			Character.Location.Instance.BroadcastNearby(this, packet, excludeClient);
 		}

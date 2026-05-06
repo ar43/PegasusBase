@@ -5,7 +5,7 @@ using WorldServer.Logic.Delegates;
 
 namespace WorldServer.Packets.C2S
 {
-	internal class RSP_Heartbeat : PacketC2S<Client>
+	internal class RSP_Heartbeat : Packet<Client>
 	{
 		public RSP_Heartbeat(Queue<byte> data) : base((UInt16)Opcode.CSC_HEARTBEAT, data)
 		{

@@ -1,11 +1,12 @@
 ﻿using LibPegasus.Packets;
 using Nito.Collections;
 using WorldServer.Enums;
+using WorldServer.Logic;
 using WorldServer.Logic.CharData;
 
 namespace WorldServer.Packets.S2C
 {
-	internal class NFY_ChangeStyle : PacketS2C
+	internal class NFY_ChangeStyle : Packet<Client>
 	{
 		Character _character;
 		public NFY_ChangeStyle(Character character) : base((UInt16)Opcode.NFY_CHANGESTYLE)

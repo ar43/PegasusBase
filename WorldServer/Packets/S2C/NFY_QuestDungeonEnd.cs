@@ -6,10 +6,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WorldServer.Enums;
+using WorldServer.Logic;
 
 namespace WorldServer.Packets.S2C
 {
-	internal class NFY_QuestDungeonEnd : PacketS2C
+	internal class NFY_QuestDungeonEnd : Packet<Client>
 	{
 		Int32 _charId;
 		Byte _success;

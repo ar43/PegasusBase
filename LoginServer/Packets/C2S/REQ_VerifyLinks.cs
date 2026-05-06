@@ -5,7 +5,7 @@ using LoginServer.Logic.Delegates;
 
 namespace LoginServer.Packets.C2S
 {
-	internal class REQ_VerifyLinks : PacketC2S<Client>
+	internal class REQ_VerifyLinks : Packet<Client>
 	{
 		public REQ_VerifyLinks(Queue<byte> data) : base((UInt16)Opcode.VERIFYLINKS, data)
 		{

@@ -3,11 +3,12 @@ using Nito.Collections;
 using System.Net;
 using System.Text;
 using WorldServer.Enums;
+using WorldServer.Logic;
 using WorldServer.Logic.CharData;
 
 namespace WorldServer.Packets.S2C
 {
-	internal class RSP_Initialized : PacketS2C
+	internal class RSP_Initialized : Packet<Client>
 	{
 		Character _character;
 		UInt16 _userCount;

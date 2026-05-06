@@ -7,7 +7,7 @@ using WorldServer.Packets.C2S.PacketSpecificData;
 
 namespace WorldServer.Packets.C2S
 {
-	internal class REQ_SkillToMobs : PacketC2S<Client>
+	internal class REQ_SkillToMobs : Packet<Client>
 	{
 		public REQ_SkillToMobs(Queue<byte> data) : base((UInt16)Opcode.CSC_SKILLTOMOBS, data)
 		{

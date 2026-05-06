@@ -1,11 +1,12 @@
 ﻿using LibPegasus.Packets;
 using Nito.Collections;
 using WorldServer.Enums;
+using WorldServer.Logic;
 using WorldServer.Logic.WorldRuntime.InstanceRuntime.GroundItemRuntime;
 
 namespace WorldServer.Packets.S2C
 {
-	internal class NFY_NewItemList : PacketS2C
+	internal class NFY_NewItemList : Packet<Client>
 	{
 		List<GroundItem> _items;
 		uint _fromIdOverride;

@@ -10,7 +10,7 @@ using WorldServer.Enums;
 
 namespace WorldServer.Packets.C2S
 {
-	internal class REQ_DurationSvcData : PacketC2S<Client>
+	internal class REQ_DurationSvcData : Packet<Client>
 	{
 		public REQ_DurationSvcData(Queue<byte> data) : base((UInt16)Opcode.CSC_DURATIONSVCDATA, data)
 		{

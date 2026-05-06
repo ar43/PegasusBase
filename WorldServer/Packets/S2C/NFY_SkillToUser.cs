@@ -1,13 +1,14 @@
 ﻿using LibPegasus.Packets;
 using Nito.Collections;
 using WorldServer.Enums;
+using WorldServer.Logic;
 using WorldServer.Logic.CharData;
 using WorldServer.Logic.CharData.Styles;
 
 namespace WorldServer.Packets.S2C
 {
 	//TODO: this packet is different, depending on skill group
-	internal class NFY_SkillToUser : PacketS2C
+	internal class NFY_SkillToUser : Packet<Client>
 	{
 		UInt16 _skillId;
 		UInt32 _charId;

@@ -1,10 +1,11 @@
 ﻿using LibPegasus.Packets;
 using LoginServer.Enums;
+using LoginServer.Logic;
 using Nito.Collections;
 
 namespace LoginServer.Packets.S2C
 {
-	internal class RSP_CheckVersion : PacketS2C
+	internal class RSP_CheckVersion : Packet<Client>
 	{
 		private UInt32 _clientVersion;
 

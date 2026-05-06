@@ -5,7 +5,7 @@ using LoginServer.Logic.Delegates;
 
 namespace LoginServer.Packets.C2S
 {
-	internal class REQ_AuthAccount : PacketC2S<Client>
+	internal class REQ_AuthAccount : Packet<Client>
 	{
 		public REQ_AuthAccount(Queue<byte> data) : base((UInt16)Opcode.AUTHACCOUNT, data)
 		{

@@ -11,7 +11,7 @@ using System.Diagnostics;
 
 namespace WorldServer.Packets.C2S
 {
-	internal class REQ_EnterDungeon : PacketC2S<Client>
+	internal class REQ_EnterDungeon : Packet<Client>
 	{
 		public REQ_EnterDungeon(Queue<byte> data) : base((UInt16)Opcode.CSC_ENTERDUNGEON, data)
 		{

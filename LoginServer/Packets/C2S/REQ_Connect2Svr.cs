@@ -5,7 +5,7 @@ using LoginServer.Logic.Delegates;
 
 namespace LoginServer.Packets.C2S
 {
-	internal class REQ_Connect2Svr : PacketC2S<Client>
+	internal class REQ_Connect2Svr : Packet<Client>
 	{
 		public REQ_Connect2Svr(Queue<byte> data) : base((UInt16)Opcode.CONNECT2SVR, data)
 		{

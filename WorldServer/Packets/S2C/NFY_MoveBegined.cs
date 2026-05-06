@@ -1,10 +1,11 @@
 ﻿using LibPegasus.Packets;
 using Nito.Collections;
 using WorldServer.Enums;
+using WorldServer.Logic;
 
 namespace WorldServer.Packets.S2C
 {
-	internal class NFY_MoveBegined : PacketS2C
+	internal class NFY_MoveBegined : Packet<Client>
 	{
 		UInt32 _charId, _timestamp;
 		UInt16 _fromX, _fromY, _toX, _toY;

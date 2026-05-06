@@ -10,7 +10,7 @@ using WorldServer.Enums;
 
 namespace WorldServer.Packets.C2S
 {
-	internal class REQ_DungeonStart : PacketC2S<Client>
+	internal class REQ_DungeonStart : Packet<Client>
 	{
 		public REQ_DungeonStart(Queue<byte> data) : base((UInt16)Opcode.CSC_DUNGEONSTART, data)
 		{

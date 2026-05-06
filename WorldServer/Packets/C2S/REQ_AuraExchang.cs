@@ -10,7 +10,7 @@ using WorldServer.Enums;
 
 namespace WorldServer.Packets.C2S
 {
-	internal class REQ_AuraExchang : PacketC2S<Client>
+	internal class REQ_AuraExchang : Packet<Client>
 	{
 		public REQ_AuraExchang(Queue<byte> data) : base((UInt16)Opcode.CSC_AURAEXCHANG, data)
 		{

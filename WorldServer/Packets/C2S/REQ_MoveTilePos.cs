@@ -5,7 +5,7 @@ using WorldServer.Logic.Delegates;
 
 namespace WorldServer.Packets.C2S
 {
-	internal class REQ_MoveTilePos : PacketC2S<Client>
+	internal class REQ_MoveTilePos : Packet<Client>
 	{
 		public REQ_MoveTilePos(Queue<byte> data) : base((UInt16)Opcode.REQ_MOVETILEPOS, data)
 		{

@@ -2,11 +2,12 @@
 using Nito.Collections;
 using System.Text;
 using WorldServer.Enums;
+using WorldServer.Logic;
 using WorldServer.Logic.CharData;
 
 namespace WorldServer.Packets.S2C
 {
-	internal class NFY_NewUserList : PacketS2C
+	internal class NFY_NewUserList : Packet<Client>
 	{
 		List<Character> _characters;
 		AddObjectType _newUserType;

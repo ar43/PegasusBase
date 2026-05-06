@@ -6,7 +6,7 @@ using WorldServer.Logic.SharedData;
 
 namespace WorldServer.Packets.C2S
 {
-	internal class REQ_ItemLooting : PacketC2S<Client>
+	internal class REQ_ItemLooting : Packet<Client>
 	{
 		public REQ_ItemLooting(Queue<byte> data) : base((UInt16)Opcode.CSC_ITEMLOOTING, data)
 		{

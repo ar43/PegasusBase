@@ -5,7 +5,7 @@ using WorldServer.Logic.Delegates;
 
 namespace WorldServer.Packets.C2S
 {
-	internal class REQ_Uninitalze : PacketC2S<Client>
+	internal class REQ_Uninitalze : Packet<Client>
 	{
 		public REQ_Uninitalze(Queue<byte> data) : base((UInt16)Opcode.CSC_UNINITIALZE, data)
 		{

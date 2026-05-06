@@ -10,7 +10,7 @@ using WorldServer.Logic;
 
 namespace WorldServer.Packets.C2S
 {
-	internal class REQ_QuickLnkSet : PacketC2S<Client>
+	internal class REQ_QuickLnkSet : Packet<Client>
 	{
 		public REQ_QuickLnkSet(Queue<byte> data) : base((UInt16)Opcode.CSC_QUICKLNKSET, data)
 		{

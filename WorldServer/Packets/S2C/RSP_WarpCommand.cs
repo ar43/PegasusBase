@@ -1,11 +1,12 @@
 ﻿using LibPegasus.Packets;
 using Nito.Collections;
 using WorldServer.Enums;
+using WorldServer.Logic;
 using WorldServer.Logic.CharData;
 
 namespace WorldServer.Packets.S2C
 {
-	internal class RSP_WarpCommand : PacketS2C
+	internal class RSP_WarpCommand : Packet<Client>
 	{
 		Character _character;
 		UInt32 _warpType;

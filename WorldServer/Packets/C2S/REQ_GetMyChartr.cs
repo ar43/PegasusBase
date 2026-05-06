@@ -5,7 +5,7 @@ using WorldServer.Logic.Delegates;
 
 namespace WorldServer.Packets.C2S
 {
-	internal class REQ_GetMyChartr : PacketC2S<Client>
+	internal class REQ_GetMyChartr : Packet<Client>
 	{
 		public REQ_GetMyChartr(Queue<byte> data) : base((UInt16)Opcode.CSC_GETMYCHARTR, data)
 		{

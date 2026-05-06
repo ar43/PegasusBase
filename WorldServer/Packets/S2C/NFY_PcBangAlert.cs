@@ -1,10 +1,11 @@
 ﻿using LibPegasus.Packets;
 using Nito.Collections;
 using WorldServer.Enums;
+using WorldServer.Logic;
 
 namespace WorldServer.Packets.S2C
 {
-	internal class NFY_PcBangAlert : PacketS2C
+	internal class NFY_PcBangAlert : Packet<Client>
 	{
 		UInt32 _remainingTime, _remainingPoints;
 

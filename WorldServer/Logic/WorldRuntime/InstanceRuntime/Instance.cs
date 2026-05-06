@@ -77,7 +77,7 @@ namespace WorldServer.Logic.WorldRuntime.InstanceRuntime
 
 		public int NumClients { get; private set; }
 
-		public void Broadcast(PacketS2C packet)
+		public void Broadcast(Packet<Client> packet)
 		{
 			foreach (var cell in _cells)
 			{
@@ -377,7 +377,7 @@ namespace WorldServer.Logic.WorldRuntime.InstanceRuntime
 			return values;
 		}
 
-		public void BroadcastNearby(Client client, PacketS2C packet, bool excludeClient)
+		public void BroadcastNearby(Client client, Packet<Client> packet, bool excludeClient)
 		{
 			var cellX = client.Character.Location.Movement.CellX;
 			var cellY = client.Character.Location.Movement.CellY;
@@ -397,7 +397,7 @@ namespace WorldServer.Logic.WorldRuntime.InstanceRuntime
 				}
 			}
 		}
-		public void BroadcastNearby(Mob mob, PacketS2C packet)
+		public void BroadcastNearby(Mob mob, Packet<Client> packet)
 		{
 			var cellX = mob.Movement.CellX;
 			var cellY = mob.Movement.CellY;
@@ -415,7 +415,7 @@ namespace WorldServer.Logic.WorldRuntime.InstanceRuntime
 				}
 			}
 		}
-		public void BroadcastNearby(GroundItem groundItem, PacketS2C packet)
+		public void BroadcastNearby(GroundItem groundItem, Packet<Client> packet)
 		{
 			var cellX = groundItem.CellX;
 			var cellY = groundItem.CellY;

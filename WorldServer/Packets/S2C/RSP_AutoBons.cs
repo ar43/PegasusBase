@@ -6,10 +6,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WorldServer.Enums;
+using WorldServer.Logic;
 
 namespace WorldServer.Packets.S2C
 {
-	internal class RSP_AutoStat : PacketS2C
+	internal class RSP_AutoStat : Packet<Client>
 	{
 		int _str, _dex, _int;
 

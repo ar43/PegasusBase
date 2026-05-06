@@ -5,7 +5,7 @@ using WorldServer.Logic.Delegates;
 
 namespace WorldServer.Packets.C2S
 {
-	internal class REQ_ChargeInfo : PacketC2S<Client>
+	internal class REQ_ChargeInfo : Packet<Client>
 	{
 		public REQ_ChargeInfo(Queue<byte> data) : base((UInt16)Opcode.CSC_CHARGEINFO, data)
 		{

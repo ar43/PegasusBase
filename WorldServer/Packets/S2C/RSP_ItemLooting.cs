@@ -1,10 +1,11 @@
 ﻿using LibPegasus.Packets;
 using Nito.Collections;
 using WorldServer.Enums;
+using WorldServer.Logic;
 
 namespace WorldServer.Packets.S2C
 {
-	internal class RSP_ItemLooting : PacketS2C
+	internal class RSP_ItemLooting : Packet<Client>
 	{
 		byte _result;
 		uint _itemKind;

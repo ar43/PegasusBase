@@ -1,11 +1,12 @@
 ﻿using LibPegasus.Packets;
 using Nito.Collections;
 using WorldServer.Enums;
+using WorldServer.Logic;
 using WorldServer.Logic.SharedData;
 
 namespace WorldServer.Packets.S2C
 {
-	internal class NFY_MobsChasBgn : PacketS2C
+	internal class NFY_MobsChasBgn : Packet<Client>
 	{
 		ObjectIndexData _id;
 		UInt32 _timestamp;

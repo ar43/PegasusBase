@@ -10,7 +10,7 @@ using WorldServer.Logic;
 
 namespace WorldServer.Packets.C2S
 {
-	internal class REQ_ItemBuyings : PacketC2S<Client>
+	internal class REQ_ItemBuyings : Packet<Client>
 	{
 		public REQ_ItemBuyings(Queue<byte> data) : base((UInt16)Opcode.CSC_ITEMBUYINGS, data)
 		{

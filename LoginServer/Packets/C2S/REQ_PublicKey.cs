@@ -5,7 +5,7 @@ using LoginServer.Logic.Delegates;
 
 namespace LoginServer.Packets.C2S
 {
-	internal class REQ_PublicKey : PacketC2S<Client>
+	internal class REQ_PublicKey : Packet<Client>
 	{
 		public REQ_PublicKey(Queue<byte> data) : base((UInt16)Opcode.PUBLICKEY, data)
 		{

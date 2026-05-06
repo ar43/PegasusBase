@@ -6,10 +6,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WorldServer.Enums;
+using WorldServer.Logic;
 
 namespace WorldServer.Packets.S2C
 {
-	internal class NFY_ItemEquips0 : PacketS2C
+	internal class NFY_ItemEquips0 : Packet<Client>
 	{
 		Int32 _charId;
 		UInt32 _itemKind;

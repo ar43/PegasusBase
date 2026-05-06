@@ -1,11 +1,12 @@
 ﻿using LibPegasus.Packets;
 using Nito.Collections;
 using WorldServer.Enums;
+using WorldServer.Logic;
 using WorldServer.Logic.SharedData;
 
 namespace WorldServer.Packets.S2C
 {
-	internal class NFY_MobsChasEnd : PacketS2C
+	internal class NFY_MobsChasEnd : Packet<Client>
 	{
 		ObjectIndexData _id;
 		UInt16 _x, _y;

@@ -5,7 +5,7 @@ using LoginServer.Logic.Delegates;
 
 namespace LoginServer.Packets.C2S
 {
-	internal class REQ_CheckVersion : PacketC2S<Client>
+	internal class REQ_CheckVersion : Packet<Client>
 	{
 		public REQ_CheckVersion(Queue<byte> data) : base((UInt16)Opcode.CHECKVERSION, data)
 		{

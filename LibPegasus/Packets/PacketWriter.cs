@@ -94,10 +94,10 @@ namespace LibPegasus.Packets
 			var b = (val & 0xFF00) >> 8;
 			var c = (val & 0xFF0000) >> 16;
 			var d = (val & 0xFF000000) >> 24;
-			data.AddToFront((byte)a);
-			data.AddToFront((byte)b);
-			data.AddToFront((byte)c);
 			data.AddToFront((byte)d);
+			data.AddToFront((byte)c);
+			data.AddToFront((byte)b);
+			data.AddToFront((byte)a);
 		}
 
 		public static void WriteHeaderUInt64(Deque<byte> data, UInt64 val)
@@ -110,14 +110,14 @@ namespace LibPegasus.Packets
 			var f = (val & 0xFF0000000000) >> 40;
 			var g = (val & 0xFF000000000000) >> 48;
 			var h = (val & 0xFF00000000000000) >> 56;
-			data.AddToFront((byte)a);
-			data.AddToFront((byte)b);
-			data.AddToFront((byte)c);
-			data.AddToFront((byte)d);
-			data.AddToFront((byte)e);
-			data.AddToFront((byte)f);
-			data.AddToFront((byte)g);
 			data.AddToFront((byte)h);
+			data.AddToFront((byte)g);
+			data.AddToFront((byte)f);
+			data.AddToFront((byte)e);
+			data.AddToFront((byte)d);
+			data.AddToFront((byte)c);
+			data.AddToFront((byte)b);
+			data.AddToFront((byte)a);
 		}
 
 		public static void WriteNull(Deque<byte> data, int len)

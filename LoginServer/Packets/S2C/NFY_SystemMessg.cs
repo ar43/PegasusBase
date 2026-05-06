@@ -1,11 +1,12 @@
 ﻿using LibPegasus.Packets;
 using LoginServer.Enums;
+using LoginServer.Logic;
 using Nito.Collections;
 using System.Text;
 
 namespace LoginServer.Packets.S2C
 {
-	internal class NFY_SystemMessg : PacketS2C
+	internal class NFY_SystemMessg : Packet<Client>
 	{
 		MessageType _msgType;
 		string _msg;

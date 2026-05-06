@@ -2,10 +2,11 @@
 using LibPegasus.Packets;
 using Nito.Collections;
 using WorldServer.Enums;
+using WorldServer.Logic;
 
 namespace WorldServer.Packets.S2C
 {
-	internal class RSP_NewMyChartr : PacketS2C
+	internal class RSP_NewMyChartr : Packet<Client>
 	{
 		private UInt32 _charId;
 		private CharCreateResult _result;

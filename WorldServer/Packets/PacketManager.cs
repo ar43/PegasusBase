@@ -35,14 +35,14 @@ namespace WorldServer.Packets
 			return _decryptedOutboundPackets.Count > 0;
 		}
 
-		public void Send(PacketS2C packet)
+		public void Send(Packet<Client> packet)
 		{
 			var p = packet.Send(_sendCounter);
 			_decryptedOutboundPackets.Enqueue(p);
 			_sendCounter++;
 		}
 
-		private PacketC2S<Client> GetPacket(Opcode opcode, Queue<byte> data)
+		private Packet<Client> GetPacket(Opcode opcode, Queue<byte> data)
 		{
 			return opcode switch
 			{

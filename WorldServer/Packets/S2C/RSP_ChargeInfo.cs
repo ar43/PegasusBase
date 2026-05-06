@@ -1,10 +1,11 @@
 ﻿using LibPegasus.Packets;
 using Nito.Collections;
 using WorldServer.Enums;
+using WorldServer.Logic;
 
 namespace WorldServer.Packets.S2C
 {
-	internal class RSP_ChargeInfo : PacketS2C
+	internal class RSP_ChargeInfo : Packet<Client>
 	{
 		Int32 _payMode, _remainingTime, _serviceKind;
 		public RSP_ChargeInfo(Int32 payMode, Int32 remainingTime, Int32 serviceKind) : base((UInt16)Opcode.CSC_CHARGEINFO)

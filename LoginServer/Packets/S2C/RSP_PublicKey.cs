@@ -1,10 +1,11 @@
 ﻿using LibPegasus.Packets;
 using LoginServer.Enums;
+using LoginServer.Logic;
 using Nito.Collections;
 
 namespace LoginServer.Packets.S2C
 {
-	internal class RSP_PublicKey : PacketS2C
+	internal class RSP_PublicKey : Packet<Client>
 	{
 		private byte[] _key;
 

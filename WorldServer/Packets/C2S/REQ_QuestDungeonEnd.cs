@@ -10,7 +10,7 @@ using WorldServer.Enums;
 
 namespace WorldServer.Packets.C2S
 {
-	internal class REQ_QuestDungeonEnd : PacketC2S<Client>
+	internal class REQ_QuestDungeonEnd : Packet<Client>
 	{
 		public REQ_QuestDungeonEnd(Queue<byte> data) : base((UInt16)Opcode.CSC_QUESTDUNGEONEND, data)
 		{

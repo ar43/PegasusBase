@@ -1,13 +1,14 @@
 ﻿using LibPegasus.Enums;
 using LibPegasus.Packets;
 using LoginServer.Enums;
+using LoginServer.Logic;
 using Nito.Collections;
 using Shared.Protos;
 using System.Text;
 
 namespace LoginServer.Packets.S2C
 {
-	internal class RSP_AuthAccount : PacketS2C
+	internal class RSP_AuthAccount : Packet<Client>
 	{
 		LoginAccountReply _reply;
 

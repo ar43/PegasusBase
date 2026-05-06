@@ -1,10 +1,11 @@
 ﻿using LibPegasus.Packets;
 using Nito.Collections;
 using WorldServer.Enums;
+using WorldServer.Logic;
 
 namespace WorldServer.Packets.S2C
 {
-	internal class RSP_GetSvrTime : PacketS2C
+	internal class RSP_GetSvrTime : Packet<Client>
 	{
 		long _time;
 		Int16 _timezoneOffset;

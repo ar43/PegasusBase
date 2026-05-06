@@ -6,7 +6,7 @@ using WorldServer.Logic.Delegates;
 
 namespace WorldServer.Packets.C2S
 {
-	internal class REQ_SkillToUser : PacketC2S<Client>
+	internal class REQ_SkillToUser : Packet<Client>
 	{
 		public REQ_SkillToUser(Queue<byte> data) : base((UInt16)Opcode.CSC_SKILLTOUSER, data)
 		{

@@ -3,10 +3,11 @@ using Nito.Collections;
 using Shared.Protos;
 using System.Text;
 using WorldServer.Enums;
+using WorldServer.Logic;
 
 namespace WorldServer.Packets.S2C
 {
-	internal class RSP_GetMyChartr : PacketS2C
+	internal class RSP_GetMyChartr : Packet<Client>
 	{
 		GetMyCharactersReply _reply;
 		public RSP_GetMyChartr(GetMyCharactersReply reply) : base((UInt16)Opcode.CSC_GETMYCHARTR)

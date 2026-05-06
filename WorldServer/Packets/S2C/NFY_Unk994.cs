@@ -1,10 +1,11 @@
 ﻿using LibPegasus.Packets;
 using Nito.Collections;
 using WorldServer.Enums;
+using WorldServer.Logic;
 
 namespace WorldServer.Packets.S2C
 {
-	internal class NFY_Unk994 : PacketS2C
+	internal class NFY_Unk994 : Packet<Client>
 	{
 
 		public NFY_Unk994() : base((UInt16)Opcode.NFY_UNK994)
