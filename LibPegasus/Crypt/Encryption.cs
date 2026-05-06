@@ -1,4 +1,5 @@
 ﻿using LibPegasus.Packets;
+using LibPegasus.Utils;
 using Nito.Collections;
 using Serilog;
 using Sodium;
@@ -69,13 +70,15 @@ namespace LibPegasus.Crypt
 			return false;
 		}
 
-		public void GenerateSessionKey(byte[] nonce, Byte[] peerNonce, Byte[] peerPublicKey)
+		public void GenerateSessionKey(byte[] serverNonce, Byte[] clientNonce, Byte[] peerPublicKey)
 		{
 			byte[] sharedSecret = Sodium.ScalarMult.Mult(KeyPair.PrivateKey, peerPublicKey);
-			byte[] combinedNonce = nonce.Concat(peerNonce).ToArray();
+			byte[] combinedNonce = serverNonce.Concat(clientNonce).ToArray();
 			byte[] info = Encoding.UTF8.GetBytes("pegasus");
 
 			_sessionKey = HKDF.DeriveKey(HashAlgorithmName.SHA256, sharedSecret, 32, combinedNonce, info);
+			Utility.PrintByteArray(combinedNonce, combinedNonce.Length, "combinedNonce");
+			Utility.PrintByteArray(_sessionKey, _sessionKey.Length, "sessionKey");
 			var pass = TestEncryption();
 
 			if (!pass)

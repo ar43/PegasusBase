@@ -164,7 +164,7 @@
 				throw new IndexOutOfRangeException("Data queue is empty");
 			}
 
-			byte[] output = new byte[data.Count];
+			byte[] output = new byte[len];
 
 			int i = 0;
 			while (data.Count > 0 && i < len)
