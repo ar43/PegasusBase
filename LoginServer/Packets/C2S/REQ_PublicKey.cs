@@ -5,16 +5,20 @@ using LoginServer.Logic.Delegates;
 
 namespace LoginServer.Packets.C2S
 {
-	internal class REQ_PublicKey : Packet<Client>
+	internal class REQ_PublicKey<ClientClass> : Packet<ClientClass>
 	{
+		public static Action<ClientClass>? OnPublicKeyRequestHandler;
 		public REQ_PublicKey(Queue<byte> data) : base((UInt16)Opcode.PUBLICKEY, data)
 		{
 
 		}
 
-		public override bool ReadPayload(Queue<Action<Client>> actions)
+		public override bool ReadPayload(Queue<Action<ClientClass>> actions)
 		{
-			actions.Enqueue((x) => Connection.OnPublicKeyRequest(x));
+			if (OnPublicKeyRequestHandler == null)
+				throw new InvalidOperationException("Handler not assigned");
+
+			actions.Enqueue((x) => OnPublicKeyRequestHandler?.Invoke(x));
 
 			return true;
 		}

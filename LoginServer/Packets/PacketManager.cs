@@ -1,6 +1,7 @@
 ﻿using LibPegasus.Packets;
 using LoginServer.Enums;
 using LoginServer.Logic;
+using LoginServer.Logic.Delegates;
 using LoginServer.Packets.C2S;
 using Nito.Collections;
 using Serilog;
@@ -18,6 +19,12 @@ namespace LoginServer.Packets
 
 		public PacketManager()
 		{
+			REQ_Connect2Svr<Client>.OnServerConnectionHandler = Connection.OnServerConnection;
+			REQ_AuthAccount<Client>.OnAuthAccountHandler = Connection.OnAuthAccount;
+			REQ_CheckVersion<Client>.OnCheckVersionHandler = Connection.OnCheckVersion;
+			REQ_PreServerEnvRequest<Client>.OnPreServerEnvRequestHandler = Connection.OnPreServerEnvRequest;
+			REQ_PublicKey<Client>.OnPublicKeyRequestHandler = Connection.OnPublicKeyRequest;
+			REQ_VerifyLinks<Client>.OnVerifyLinksHandler = Connection.OnVerifyLinks;
 		}
 
 		public void EnqueuePacket(UInt16 opcode, Queue<byte> packet)
@@ -46,12 +53,12 @@ namespace LoginServer.Packets
 		{
 			return opcode switch
 			{
-				Opcode.CONNECT2SVR => new REQ_Connect2Svr(data),
-				Opcode.CHECKVERSION => new REQ_CheckVersion(data),
-				Opcode.PRESERVERENVREQUEST => new REQ_PreServerEnvRequest(data),
-				Opcode.PUBLICKEY => new REQ_PublicKey(data),
-				Opcode.AUTHACCOUNT => new REQ_AuthAccount(data),
-				Opcode.VERIFYLINKS => new REQ_VerifyLinks(data),
+				Opcode.CONNECT2SVR => new REQ_Connect2Svr<Client>(data),
+				Opcode.CHECKVERSION => new REQ_CheckVersion<Client>(data),
+				Opcode.PRESERVERENVREQUEST => new REQ_PreServerEnvRequest<Client>(data),
+				Opcode.PUBLICKEY => new REQ_PublicKey<Client>(data),
+				Opcode.AUTHACCOUNT => new REQ_AuthAccount<Client>(data),
+				Opcode.VERIFYLINKS => new REQ_VerifyLinks<Client>(data),
 				_ => throw new NotImplementedException($"unimplemented opcode {opcode}"),
 			}; ;
 		}

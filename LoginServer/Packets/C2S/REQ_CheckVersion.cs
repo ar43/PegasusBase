@@ -5,14 +5,15 @@ using LoginServer.Logic.Delegates;
 
 namespace LoginServer.Packets.C2S
 {
-	internal class REQ_CheckVersion : Packet<Client>
+	internal class REQ_CheckVersion<ClientClass> : Packet<ClientClass>
 	{
+		public static Action<ClientClass, UInt32>? OnCheckVersionHandler;
 		public REQ_CheckVersion(Queue<byte> data) : base((UInt16)Opcode.CHECKVERSION, data)
 		{
 
 		}
 
-		public override bool ReadPayload(Queue<Action<Client>> actions)
+		public override bool ReadPayload(Queue<Action<ClientClass>> actions)
 		{
 			UInt32 clientVersion;
 
@@ -26,7 +27,10 @@ namespace LoginServer.Packets.C2S
 				return false;
 			}
 
-			actions.Enqueue((x) => Connection.OnCheckVersion(x, clientVersion));
+			if (OnCheckVersionHandler == null)
+				throw new InvalidOperationException("Handler not assigned");
+
+			actions.Enqueue((x) => OnCheckVersionHandler?.Invoke(x, clientVersion));
 
 			return true;
 		}

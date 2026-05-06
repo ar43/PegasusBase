@@ -5,14 +5,15 @@ using LoginServer.Logic.Delegates;
 
 namespace LoginServer.Packets.C2S
 {
-	internal class REQ_AuthAccount : Packet<Client>
+	internal class REQ_AuthAccount<ClientClass> : Packet<ClientClass>
 	{
+		public static Action<ClientClass, byte[]>? OnAuthAccountHandler;
 		public REQ_AuthAccount(Queue<byte> data) : base((UInt16)Opcode.AUTHACCOUNT, data)
 		{
 
 		}
 
-		public override bool ReadPayload(Queue<Action<Client>> actions)
+		public override bool ReadPayload(Queue<Action<ClientClass>> actions)
 		{
 			byte[] rsaData;
 
@@ -26,7 +27,10 @@ namespace LoginServer.Packets.C2S
 				return false;
 			}
 
-			actions.Enqueue((x) => Connection.OnAuthAccount(x, rsaData));
+			if (OnAuthAccountHandler == null)
+				throw new InvalidOperationException("Handler not assigned");
+
+			actions.Enqueue((x) => OnAuthAccountHandler?.Invoke(x, rsaData));
 
 			return true;
 		}

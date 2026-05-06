@@ -5,14 +5,15 @@ using LoginServer.Logic.Delegates;
 
 namespace LoginServer.Packets.C2S
 {
-	internal class REQ_PreServerEnvRequest : Packet<Client>
+	internal class REQ_PreServerEnvRequest<ClientClass> : Packet<ClientClass>
 	{
+		public static Action<ClientClass, string>? OnPreServerEnvRequestHandler;
 		public REQ_PreServerEnvRequest(Queue<byte> data) : base((UInt16)Opcode.PRESERVERENVREQUEST, data)
 		{
 
 		}
 
-		public override bool ReadPayload(Queue<Action<Client>> actions)
+		public override bool ReadPayload(Queue<Action<ClientClass>> actions)
 		{
 			string username;
 
@@ -25,7 +26,10 @@ namespace LoginServer.Packets.C2S
 				return false;
 			}
 
-			actions.Enqueue((x) => Connection.OnPreServerEnvRequest(x, username));
+			if (OnPreServerEnvRequestHandler == null)
+				throw new InvalidOperationException("Handler not assigned");
+
+			actions.Enqueue((x) => OnPreServerEnvRequestHandler?.Invoke(x, username));
 
 			return true;
 		}
