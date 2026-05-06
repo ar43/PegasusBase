@@ -1,6 +1,8 @@
 ﻿using LibPegasus.Enums;
 using LibPegasus.Packets;
+using Nito.Collections;
 using System.Net.Sockets;
+using System.Reflection.Emit;
 
 namespace LibPegasus.Packets.Login.C2S
 {
@@ -33,6 +35,21 @@ namespace LibPegasus.Packets.Login.C2S
 			actions.Enqueue((x) => OnServerConnectionHandler?.Invoke(x, clientNonce, clientPublicKey));
 
 			return true;
+		}
+
+		private byte[]? _clientNonce;
+		private byte[]? _clientPublicKey;
+
+		public REQ_Connect2Svr(byte[] clientNonce, byte[] clientPublicKey) : base((UInt16)OpcodeLogin.CONNECT2SVR)
+		{
+			_clientNonce = clientNonce;
+			_clientPublicKey = clientPublicKey;
+		}
+
+		public override void WritePayload(Deque<byte> data)
+		{
+			PacketWriter.WriteArray(data, _clientNonce); // 8 byte
+			PacketWriter.WriteArray(data, _clientPublicKey); // 32 byte
 		}
 	}
 }

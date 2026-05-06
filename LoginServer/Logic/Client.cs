@@ -226,8 +226,6 @@ namespace LoginServer.Logic
 				ClientInfo.AccountId = accountId;
 				ClientInfo.ConnState = Enums.ConnState.AUTH_ACCOUNT;
 
-				
-
 				bool isLocalhost = Ip == "127.0.0.1";
 				var replyServerState = await GetServerState(isLocalhost);
 
