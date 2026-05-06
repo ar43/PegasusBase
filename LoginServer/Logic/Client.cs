@@ -3,12 +3,13 @@ using LibPegasus.Crypt;
 using LibPegasus.Packets;
 using LibPegasus.Utils;
 using LoginServer.Packets;
-using LoginServer.Packets.S2C;
 using Serilog;
 using Shared.Protos;
 using Sodium;
 using System.Net;
 using System.Net.Sockets;
+using LibPegasus.Packets.Login.C2S;
+using LibPegasus.Packets.Login.S2C;
 
 namespace LoginServer.Logic
 {
@@ -225,10 +226,15 @@ namespace LoginServer.Logic
 				ClientInfo.AccountId = accountId;
 				ClientInfo.ConnState = Enums.ConnState.AUTH_ACCOUNT;
 
+				
+
 				bool isLocalhost = Ip == "127.0.0.1";
 				var replyServerState = await GetServerState(isLocalhost);
 
-				var packetServerState = new NFY_ServerState(replyServerState);
+				var server = replyServerState.Servers[0];
+
+				//TODO: FIXME
+				var packetServerState = new NFY_ServerState<Client>();
 				PacketManager.Send(packetServerState);
 			}
 			else

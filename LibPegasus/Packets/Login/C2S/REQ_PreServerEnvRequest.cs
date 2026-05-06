@@ -1,14 +1,12 @@
-﻿using LibPegasus.Packets;
-using LoginServer.Enums;
-using LoginServer.Logic;
-using LoginServer.Logic.Delegates;
+﻿using LibPegasus.Enums;
+using LibPegasus.Packets;
 
-namespace LoginServer.Packets.C2S
+namespace LibPegasus.Packets.Login.C2S
 {
-	internal class REQ_PreServerEnvRequest<ClientClass> : Packet<ClientClass>
+	public class REQ_PreServerEnvRequest<ClientClass> : Packet<ClientClass>
 	{
 		public static Action<ClientClass, string>? OnPreServerEnvRequestHandler;
-		public REQ_PreServerEnvRequest(Queue<byte> data) : base((UInt16)Opcode.PRESERVERENVREQUEST, data)
+		public REQ_PreServerEnvRequest(Queue<byte> data) : base((UInt16)OpcodeLogin.PRESERVERENVREQUEST, data)
 		{
 
 		}

@@ -1,18 +1,17 @@
-﻿using LibPegasus.Packets;
-using LoginServer.Enums;
-using LoginServer.Logic;
+﻿using LibPegasus.Enums;
+using LibPegasus.Packets;
 using Nito.Collections;
 
-namespace LoginServer.Packets.S2C
+namespace LibPegasus.Packets.Login.S2C
 {
-	internal class RSP_Connect2Svr : Packet<Client>
+	public class RSP_Connect2Svr<ClientClass> : Packet<ClientClass>
 	{
 		private UInt32 _authKey;
 		private UInt16 _userIdx;
 		private byte[] _serverNonce;
 		private byte[] _publicServerKey;
 
-		public RSP_Connect2Svr(UInt32 authKey, UInt16 userIdx, byte[] serverNonce, byte[] publicServerKey) : base((UInt16)Opcode.CONNECT2SVR)
+		public RSP_Connect2Svr(UInt32 authKey, UInt16 userIdx, byte[] serverNonce, byte[] publicServerKey) : base((UInt16)OpcodeLogin.CONNECT2SVR)
 		{
 			_authKey = authKey;
 			_userIdx = userIdx;

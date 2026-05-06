@@ -2,7 +2,8 @@
 using LoginServer.Enums;
 using LoginServer.Logic;
 using LoginServer.Logic.Delegates;
-using LoginServer.Packets.C2S;
+using LibPegasus.Packets.Login.C2S;
+using LibPegasus.Enums;
 using Nito.Collections;
 using Serilog;
 
@@ -49,16 +50,16 @@ namespace LoginServer.Packets
 			_sendCounter++;
 		}
 
-		private Packet<Client> GetPacket(Opcode opcode, Queue<byte> data)
+		private Packet<Client> GetPacket(OpcodeLogin opcode, Queue<byte> data)
 		{
 			return opcode switch
 			{
-				Opcode.CONNECT2SVR => new REQ_Connect2Svr<Client>(data),
-				Opcode.CHECKVERSION => new REQ_CheckVersion<Client>(data),
-				Opcode.PRESERVERENVREQUEST => new REQ_PreServerEnvRequest<Client>(data),
-				Opcode.PUBLICKEY => new REQ_PublicKey<Client>(data),
-				Opcode.AUTHACCOUNT => new REQ_AuthAccount<Client>(data),
-				Opcode.VERIFYLINKS => new REQ_VerifyLinks<Client>(data),
+				OpcodeLogin.CONNECT2SVR => new REQ_Connect2Svr<Client>(data),
+				OpcodeLogin.CHECKVERSION => new REQ_CheckVersion<Client>(data),
+				OpcodeLogin.PRESERVERENVREQUEST => new REQ_PreServerEnvRequest<Client>(data),
+				OpcodeLogin.PUBLICKEY => new REQ_PublicKey<Client>(data),
+				OpcodeLogin.AUTHACCOUNT => new REQ_AuthAccount<Client>(data),
+				OpcodeLogin.VERIFYLINKS => new REQ_VerifyLinks<Client>(data),
 				_ => throw new NotImplementedException($"unimplemented opcode {opcode}"),
 			}; ;
 		}
@@ -76,7 +77,7 @@ namespace LoginServer.Packets
 				var opcodeNum = packetInfo.Item1;
 				var dataQueue = packetInfo.Item2;
 
-				bool opcodeDefined = Enum.IsDefined(typeof(Opcode), opcodeNum);
+				bool opcodeDefined = Enum.IsDefined(typeof(OpcodeLogin), opcodeNum);
 				if (!opcodeDefined)
 				{
 					Log.Warning($"Received undefined opcode {opcodeNum}(len={dataQueue.Count})");
@@ -84,7 +85,7 @@ namespace LoginServer.Packets
 					continue;
 				}
 
-				var packet = GetPacket((Opcode)opcodeNum, dataQueue);
+				var packet = GetPacket((OpcodeLogin)opcodeNum, dataQueue);
 				Log.Debug($"Processing opcode {opcodeNum}");
 
 				bool verifyHeader = packet.ReadHeader(_recvCounter);

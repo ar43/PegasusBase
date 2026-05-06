@@ -1,16 +1,15 @@
-﻿using LibPegasus.Packets;
-using LoginServer.Enums;
-using LoginServer.Logic;
+﻿using LibPegasus.Enums;
+using LibPegasus.Packets;
 using Nito.Collections;
 using System.Text;
 
-namespace LoginServer.Packets.S2C
+namespace LibPegasus.Packets.Login.S2C
 {
-	internal class NFY_SystemMessg : Packet<Client>
+	public class NFY_SystemMessg<ClientClass> : Packet<ClientClass>
 	{
-		MessageType _msgType;
+		LoginMessageType _msgType;
 		string _msg;
-		public NFY_SystemMessg(MessageType msgType, String msg) : base((UInt16)Opcode.SYSTEMMESSG)
+		public NFY_SystemMessg(LoginMessageType msgType, String msg) : base((UInt16)OpcodeLogin.SYSTEMMESSG)
 		{
 			_msgType = msgType;
 			_msg = msg;

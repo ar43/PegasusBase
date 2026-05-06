@@ -1,16 +1,14 @@
-﻿using LibPegasus.Packets;
-using LoginServer.Enums;
-using LoginServer.Logic;
-using LoginServer.Logic.Delegates;
+﻿using LibPegasus.Enums;
+using LibPegasus.Packets;
 using System.Net.Sockets;
 
-namespace LoginServer.Packets.C2S
+namespace LibPegasus.Packets.Login.C2S
 {
-	internal class REQ_Connect2Svr<ClientClass> : Packet<ClientClass>
+	public class REQ_Connect2Svr<ClientClass> : Packet<ClientClass>
 	{
 		public static Action<ClientClass, byte[], byte[]>? OnServerConnectionHandler;
 
-		public REQ_Connect2Svr(Queue<byte> data) : base((UInt16)Opcode.CONNECT2SVR, data)
+		public REQ_Connect2Svr(Queue<byte> data) : base((UInt16)OpcodeLogin.CONNECT2SVR, data)
 		{
 
 		}

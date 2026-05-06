@@ -1,6 +1,6 @@
-﻿namespace LoginServer.Enums
+﻿namespace LibPegasus.Enums
 {
-	internal enum MessageType
+	public enum LoginMessageType
 	{
 		Normal = 0,
 		LoginDuplicate,

@@ -1,15 +1,14 @@
-﻿using LibPegasus.Packets;
-using LoginServer.Enums;
-using LoginServer.Logic;
+﻿using LibPegasus.Enums;
+using LibPegasus.Packets;
 using Nito.Collections;
 
-namespace LoginServer.Packets.S2C
+namespace LibPegasus.Packets.Login.S2C
 {
-	internal class RSP_VerifyLinks : Packet<Client>
+	public class RSP_VerifyLinks<ClientClass> : Packet<ClientClass>
 	{
 		byte _channelId, _serverId;
 		bool _isVerified;
-		public RSP_VerifyLinks(byte channelId, byte serverId, bool isVerified) : base((UInt16)Opcode.VERIFYLINKS)
+		public RSP_VerifyLinks(byte channelId, byte serverId, bool isVerified) : base((UInt16)OpcodeLogin.VERIFYLINKS)
 		{
 			_channelId = channelId;
 			_serverId = serverId;

@@ -1,7 +1,7 @@
 ﻿using LibPegasus.Crypt;
 using LibPegasus.Enums;
 using LibPegasus.Utils;
-using LoginServer.Packets.S2C;
+using LibPegasus.Packets.Login.S2C;
 using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
@@ -24,7 +24,7 @@ namespace LoginServer.Logic.Delegates
 
 			client.Encryption.GenerateSessionKey(client.ClientInfo.ServerNonce, clientNonce, clientPublicKey);
 
-			var packet = new RSP_Connect2Svr(client.ClientInfo.AuthKey, client.ClientInfo.UserId, 
+			var packet = new RSP_Connect2Svr<Client>(client.ClientInfo.AuthKey, client.ClientInfo.UserId, 
 				client.ClientInfo.ServerNonce, client.Encryption.KeyPair.PublicKey);
 			client.PacketManager.Send(packet);
 		}
@@ -51,7 +51,7 @@ namespace LoginServer.Logic.Delegates
 			if (client.ClientInfo.ConnState != Enums.ConnState.AUTH_ACCOUNT)
 				client.ClientInfo.ConnState = Enums.ConnState.VERSION_CHECKED;
 
-			var packet = new RSP_CheckVersion((uint)serverConfig.GeneralSettings.ClientVersion);
+			var packet = new RSP_CheckVersion<Client>((uint)serverConfig.GeneralSettings.ClientVersion);
 			client.PacketManager.Send(packet);
 		}
 
@@ -72,7 +72,7 @@ namespace LoginServer.Logic.Delegates
 			//client.ClientInfo.Username = username;
 			client.ClientInfo.ConnState = Enums.ConnState.PRE_ENV;
 
-			var packet = new RSP_PreServerEnvRequest();
+			var packet = new RSP_PreServerEnvRequest<Client>();
 			client.PacketManager.Send(packet);
 		}
 
@@ -88,7 +88,7 @@ namespace LoginServer.Logic.Delegates
 			Serilog.Log.Debug($"publicKey with len {publicKey.Length} copied");
 			client.ClientInfo.ConnState = Enums.ConnState.PUBLIC_KEY_REQUESTED;
 
-			var packet = new RSP_PublicKey(publicKey);
+			var packet = new RSP_PublicKey<Client>(publicKey);
 			client.PacketManager.Send(packet);
 		}
 
@@ -130,16 +130,18 @@ namespace LoginServer.Logic.Delegates
 				Debug.Assert(reply.AuthKey.Length == 32);
 				var replyServerState = await client.GetServerState(isLocalhost);
 
-				var packetServerState = new NFY_ServerState(replyServerState);
+				//TODO: FIXME
+				var packetServerState = new NFY_ServerState<Client>();
 				client.PacketManager.Send(packetServerState);
 
-				var packetUrlToClient = new NFY_UrlToClient();
+				var packetUrlToClient = new NFY_UrlToClient<Client>();
 				client.PacketManager.Send(packetUrlToClient);
 
-				var packetAuth = new RSP_AuthAccount(reply);
+				//TODO: FIXME
+				var packetAuth = new RSP_AuthAccount<Client>();
 				client.PacketManager.Send(packetAuth);
 
-				var packetMsg = new NFY_SystemMessg(Enums.MessageType.Normal2, "");
+				var packetMsg = new NFY_SystemMessg<Client>(LoginMessageType.Normal2, "");
 				client.PacketManager.Send(packetMsg);
 				client.ClientInfo.ConnState = Enums.ConnState.AUTH_ACCOUNT;
 				client.ClientInfo.AccountId = reply.AccountId;
@@ -147,7 +149,8 @@ namespace LoginServer.Logic.Delegates
 			}
 			else
 			{
-				var packet = new RSP_AuthAccount(reply);
+				//TODO: FIXME
+				var packet = new RSP_AuthAccount<Client>();
 				client.PacketManager.Send(packet);
 				client.Disconnect("bad auth");
 			}
@@ -171,7 +174,7 @@ namespace LoginServer.Logic.Delegates
 			//TODO: check if authKey expired (5 sec?)
 			var reply = await client.SendSessionRequest(authKey, userId, channelId, serverId);
 			bool success = reply.Result == (uint)SessionResult.OK || reply.Result == (uint)SessionResult.REPLACED;
-			var packet = new RSP_VerifyLinks(channelId, serverId, success);
+			var packet = new RSP_VerifyLinks<Client>(channelId, serverId, success);
 			client.PacketManager.Send(packet);
 
 			if (success)

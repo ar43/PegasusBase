@@ -1,6 +1,8 @@
-﻿namespace LoginServer.Enums
+﻿
+namespace LibPegasus.Enums
 {
-	internal enum Opcode : UInt16
+	
+	public enum OpcodeLogin : UInt16
 	{
 		CONNECT2SVR = 101,
 		VERIFYLINKS = 102,
@@ -12,4 +14,5 @@
 		PUBLICKEY = 2001,
 		PRESERVERENVREQUEST = 2002
 	}
+
 }

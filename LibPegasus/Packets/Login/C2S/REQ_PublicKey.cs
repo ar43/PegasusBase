@@ -1,14 +1,12 @@
-﻿using LibPegasus.Packets;
-using LoginServer.Enums;
-using LoginServer.Logic;
-using LoginServer.Logic.Delegates;
+﻿using LibPegasus.Enums;
+using LibPegasus.Packets;
 
-namespace LoginServer.Packets.C2S
+namespace LibPegasus.Packets.Login.C2S
 {
-	internal class REQ_PublicKey<ClientClass> : Packet<ClientClass>
+	public class REQ_PublicKey<ClientClass> : Packet<ClientClass>
 	{
 		public static Action<ClientClass>? OnPublicKeyRequestHandler;
-		public REQ_PublicKey(Queue<byte> data) : base((UInt16)Opcode.PUBLICKEY, data)
+		public REQ_PublicKey(Queue<byte> data) : base((UInt16)OpcodeLogin.PUBLICKEY, data)
 		{
 
 		}

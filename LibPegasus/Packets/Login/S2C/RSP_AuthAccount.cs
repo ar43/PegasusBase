@@ -1,24 +1,20 @@
 ﻿using LibPegasus.Enums;
 using LibPegasus.Packets;
-using LoginServer.Enums;
-using LoginServer.Logic;
 using Nito.Collections;
-using Shared.Protos;
 using System.Text;
 
-namespace LoginServer.Packets.S2C
+namespace LibPegasus.Packets.Login.S2C
 {
-	internal class RSP_AuthAccount : Packet<Client>
+	public class RSP_AuthAccount<ClientClass> : Packet<ClientClass>
 	{
-		LoginAccountReply _reply;
 
-		public RSP_AuthAccount(LoginAccountReply reply) : base((UInt16)Opcode.AUTHACCOUNT)
+		public RSP_AuthAccount() : base((UInt16)OpcodeLogin.AUTHACCOUNT)
 		{
-			_reply = reply;
 		}
 
 		public override void WritePayload(Deque<byte> data)
 		{
+			/*
 			if ((byte)_reply.Status == (byte)AuthResult.Normal)
 			{
 				PacketWriter.WriteByte(data, (byte)_reply.Status);
@@ -41,6 +37,8 @@ namespace LoginServer.Packets.S2C
 				PacketWriter.WriteByte(data, (byte)_reply.Status);
 				PacketWriter.WriteNull(data, 70);
 			}
+			*/
+			throw new NotImplementedException();
 
 		}
 	}

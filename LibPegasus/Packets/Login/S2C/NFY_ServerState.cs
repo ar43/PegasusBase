@@ -1,22 +1,19 @@
-﻿using LibPegasus.Packets;
-using LoginServer.Enums;
-using LoginServer.Logic;
+﻿using LibPegasus.Enums;
+using LibPegasus.Packets;
 using Nito.Collections;
-using Shared.Protos;
 using System.Net;
 
-namespace LoginServer.Packets.S2C
+namespace LibPegasus.Packets.Login.S2C
 {
-	internal class NFY_ServerState : Packet<Client>
+	public class NFY_ServerState<ClientClass> : Packet<ClientClass>
 	{
-		ServerStateReply _reply;
-		public NFY_ServerState(ServerStateReply reply) : base((UInt16)Opcode.SERVERSTATE)
+		public NFY_ServerState() : base((UInt16)OpcodeLogin.SERVERSTATE)
 		{
-			_reply = reply;
 		}
 
 		public override void WritePayload(Deque<byte> data)
 		{
+			/*
 			PacketWriter.WriteByte(data, (byte)_reply.ServerCount);
 			for (int i = 0; i < _reply.ServerCount; i++)
 			{
@@ -39,6 +36,8 @@ namespace LoginServer.Packets.S2C
 					PacketWriter.WriteUInt32(data, chan.Type);
 				}
 			}
+			*/
+			throw new NotImplementedException();
 		}
 	}
 }

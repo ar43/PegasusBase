@@ -1,15 +1,14 @@
-﻿using LibPegasus.Packets;
-using LoginServer.Enums;
-using LoginServer.Logic;
+﻿using LibPegasus.Enums;
+using LibPegasus.Packets;
 using Nito.Collections;
 
-namespace LoginServer.Packets.S2C
+namespace LibPegasus.Packets.Login.S2C
 {
-	internal class RSP_PublicKey : Packet<Client>
+	public class RSP_PublicKey<ClientClass> : Packet<ClientClass>
 	{
 		private byte[] _key;
 
-		public RSP_PublicKey(byte[] key) : base((UInt16)Opcode.PUBLICKEY)
+		public RSP_PublicKey(byte[] key) : base((UInt16)OpcodeLogin.PUBLICKEY)
 		{
 			_key = key;
 		}

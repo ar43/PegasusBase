@@ -1,14 +1,12 @@
-﻿using LibPegasus.Packets;
-using LoginServer.Enums;
-using LoginServer.Logic;
-using LoginServer.Logic.Delegates;
+﻿using LibPegasus.Enums;
+using LibPegasus.Packets;
 
-namespace LoginServer.Packets.C2S
+namespace LibPegasus.Packets.Login.C2S
 {
-	internal class REQ_VerifyLinks<ClientClass> : Packet<ClientClass>
+	public class REQ_VerifyLinks<ClientClass> : Packet<ClientClass>
 	{
 		public static Action<ClientClass, UInt32, UInt16, byte, byte, UInt32>? OnVerifyLinksHandler;
-		public REQ_VerifyLinks(Queue<byte> data) : base((UInt16)Opcode.VERIFYLINKS, data)
+		public REQ_VerifyLinks(Queue<byte> data) : base((UInt16)OpcodeLogin.VERIFYLINKS, data)
 		{
 
 		}
