@@ -103,7 +103,7 @@ namespace WorldServer.Logic
 							var packetLen = PacketManager.DanglingPacket.PacketLen;
 							byte[] packetBytes = new byte[packetLen];
 							Array.Copy(PacketManager.DanglingPacket.DanglingData, 0, packetBytes, 0, packetLen);
-							var opcode = Encryption.Decrypt(packetBytes);
+							var opcode = Encryption.Decrypt(ref packetBytes);
 
 							PacketManager.EnqueuePacket(opcode, new Queue<byte>(packetBytes));
 
@@ -145,7 +145,7 @@ namespace WorldServer.Logic
 							Array.Copy(bytes, i, packetBytes, 0, packetLen);
 							i += packetLen;
 
-							var opcode = Encryption.Decrypt(packetBytes);
+							var opcode = Encryption.Decrypt(ref packetBytes);
 
 							PacketManager.EnqueuePacket(opcode, new Queue<byte>(packetBytes));
 

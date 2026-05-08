@@ -39,11 +39,23 @@ namespace LibPegasus.Packets
 
 				//TODO: counter validation
 
-				if (len != _packetLen)
+				if(counter == 0)
 				{
-					Log.Error("packet len does not match");
-					return false;
+					if (len != _packetLen)
+					{
+						Log.Error("packet len does not match");
+						return false;
+					}
 				}
+				else
+				{
+					if (len-16 != _packetLen)
+					{
+						Log.Error("packet len does not match");
+						return false;
+					}
+				}
+
 
 				if (counter != recvCounter)
 				{
@@ -81,7 +93,10 @@ namespace LibPegasus.Packets
 			var size = (UInt16)(HEADER_SIZE + data.Count);
 			PacketWriter.WriteHeaderUInt16(data, (UInt16)_id);
 			PacketWriter.WriteHeaderUInt64(data, (UInt64)counter);
-			PacketWriter.WriteHeaderUInt32(data, size);
+			if(counter == 0)
+				PacketWriter.WriteHeaderUInt32(data, size);
+			else
+				PacketWriter.WriteHeaderUInt32(data, size+(uint)16);
 		}
 
 		public Deque<byte> Send(UInt64 counter)

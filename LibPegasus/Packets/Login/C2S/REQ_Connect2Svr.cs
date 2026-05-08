@@ -8,6 +8,9 @@ namespace LibPegasus.Packets.Login.C2S
 {
 	public class REQ_Connect2Svr<ClientClass> : Packet<ClientClass>
 	{
+		private byte[]? _clientNonce;
+		private byte[]? _clientPublicKey;
+
 		public static Action<ClientClass, byte[], byte[]>? OnServerConnectionHandler;
 
 		public REQ_Connect2Svr(Queue<byte> data) : base((UInt16)OpcodeLogin.CONNECT2SVR, data)
@@ -17,12 +20,10 @@ namespace LibPegasus.Packets.Login.C2S
 
 		public override bool ReadPayload(Queue<Action<ClientClass>> actions) 
 		{
-			byte[] clientNonce;
-			byte[] clientPublicKey;
 			try
 			{
-				clientNonce = PacketReader.ReadArray(_data, 8);
-				clientPublicKey = PacketReader.ReadArray(_data, 32);
+				_clientNonce = PacketReader.ReadArray(_data, 8);
+				_clientPublicKey = PacketReader.ReadArray(_data, 32);
 			}
 			catch (IndexOutOfRangeException)
 			{
@@ -32,13 +33,10 @@ namespace LibPegasus.Packets.Login.C2S
 			if (OnServerConnectionHandler == null)
 				throw new InvalidOperationException("Handler not assigned");
 
-			actions.Enqueue((x) => OnServerConnectionHandler?.Invoke(x, clientNonce, clientPublicKey));
+			actions.Enqueue((x) => OnServerConnectionHandler?.Invoke(x, _clientNonce, _clientPublicKey));
 
 			return true;
 		}
-
-		private byte[]? _clientNonce;
-		private byte[]? _clientPublicKey;
 
 		public REQ_Connect2Svr(byte[] clientNonce, byte[] clientPublicKey) : base((UInt16)OpcodeLogin.CONNECT2SVR)
 		{

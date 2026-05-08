@@ -14,6 +14,7 @@ namespace LibPegasus.Crypt
 	public class Encryption
 	{
 		public static readonly UInt16 C2S_HEADER_SIZE = 14;
+		public static readonly UInt16 UNENCRYPTED_SIZE = 12;
 		public readonly KeyPair KeyPair;
 		private byte[]? _sessionKey;
 
@@ -32,16 +33,61 @@ namespace LibPegasus.Crypt
 		public byte[] Encrypt(Deque<byte> byteQueue)
 		{
 			var packetLen = byteQueue.Count;
-			byte[] outputBytes = byteQueue.ToArray();
-			return outputBytes;
+			byte[] fullArray = byteQueue.ToArray();
+			var counterSpan = new Span<byte>(fullArray, 4, 8);
+			var headerSpan = new Span<byte>(fullArray, 0, UNENCRYPTED_SIZE);
+			var counter = BinaryPrimitives.ReadUInt64LittleEndian(counterSpan);
+
+			if (counter == 0)
+			{
+				return fullArray;
+			}
+			else
+			{
+				if (_sessionKey == null)
+					throw new NullReferenceException();
+
+				
+
+				var toEncryptSpan = new Span<byte>(fullArray, UNENCRYPTED_SIZE, fullArray.Length - UNENCRYPTED_SIZE);
+				var encrypted = SecretAeadChaCha20Poly1305.Encrypt(toEncryptSpan.ToArray(), BitConverter.GetBytes(counter), _sessionKey);
+				byte[] result = new byte[encrypted.Length + UNENCRYPTED_SIZE];
+				headerSpan.CopyTo(result);
+				encrypted.CopyTo(result, headerSpan.Length);
+				return result;
+			}
 		}
 
-		public UInt16 Decrypt(byte[] data)
+		public UInt16 Decrypt(ref byte[] data)
 		{
-			var span = new Span<byte>(data, 12, 2);
-			var opcode = BinaryPrimitives.ReadUInt16LittleEndian(span);
+			var packetLen = data.Length;
+			byte[] fullArray = data;
+			var counterSpan = new Span<byte>(fullArray, 4, 8);
+			var headerSpan = new Span<byte>(fullArray, 0, UNENCRYPTED_SIZE);
+			var counter = BinaryPrimitives.ReadUInt64LittleEndian(counterSpan);
 
-			return opcode;
+			if (counter == 0)
+			{
+				var span = new Span<byte>(data, UNENCRYPTED_SIZE, 2);
+				var opcode = BinaryPrimitives.ReadUInt16LittleEndian(span);
+				return opcode;
+			}
+			else
+			{
+				if (_sessionKey == null)
+					throw new NullReferenceException();
+
+				var encrypted = new Span<byte>(data, UNENCRYPTED_SIZE, data.Length - UNENCRYPTED_SIZE);
+				var decrypted = SecretAeadChaCha20Poly1305.Decrypt(encrypted.ToArray(), BitConverter.GetBytes(counter), _sessionKey);
+				byte[] result = new byte[decrypted.Length + UNENCRYPTED_SIZE];
+				headerSpan.CopyTo(result);
+				decrypted.CopyTo(result, headerSpan.Length);
+				data = result;
+
+				var span = new Span<byte>(data, UNENCRYPTED_SIZE, 2);
+				var opcode = BinaryPrimitives.ReadUInt16LittleEndian(span);
+				return opcode;
+			}
 		}
 
 		private bool TestEncryption()

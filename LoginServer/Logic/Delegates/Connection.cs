@@ -51,6 +51,8 @@ namespace LoginServer.Logic.Delegates
 			if (client.ClientInfo.ConnState != Enums.ConnState.AUTH_ACCOUNT)
 				client.ClientInfo.ConnState = Enums.ConnState.VERSION_CHECKED;
 
+			Serilog.Log.Debug($"OnCheckVersion: received version from client: {clientVersion}");
+
 			var packet = new RSP_CheckVersion<Client>((uint)serverConfig.GeneralSettings.ClientVersion);
 			client.PacketManager.Send(packet);
 		}
