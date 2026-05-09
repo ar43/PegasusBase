@@ -1,0 +1,202 @@
+﻿<#@ template debug="false" hostspecific="true" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="System.Memory" #>
+<#@ assembly name="System.Text.Json" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text.Json" #>
+<#@ import namespace="System.Text.Json.Nodes" #>
+<#@ output extension=".log" #>
+<#
+#nullable enable
+#pragma warning disable CS8618
+#pragma warning disable CS1702
+    // ── Helpers ────────────────────────────────────────────────────────────────
+
+    string CsType(string t) => t switch {
+        "uint32" or "UInt32" => "UInt32",
+        "uint16" or "UInt16" => "UInt16",
+        "byte[]"             => "byte[]",
+        _                    => t
+    };
+
+    string ReaderCall(string csType, int? size) => csType switch {
+        "UInt32" => "PacketReader.ReadUInt32(_data)",
+        "UInt16" => "PacketReader.ReadUInt16(_data)",
+        "byte[]" => $"PacketReader.ReadArray(_data, {size})",
+        _        => $"PacketReader.Read{csType}(_data)"
+    };
+
+    string WriterCall(string csType, string fieldName, int? size) => csType switch {
+        "UInt32" => $"PacketWriter.WriteUInt32(data, {fieldName})",
+        "UInt16" => $"PacketWriter.WriteUInt16(data, {fieldName})",
+        "byte[]" => $"PacketWriter.WriteArray(data, {fieldName})",
+        _        => $"PacketWriter.Write{csType}(data, {fieldName})"
+    };
+
+    string ActionType(string clientClass, JsonArray fields) {
+        var parts = new List<string> { clientClass };
+        foreach (var f in fields)
+            parts.Add(CsType(f!["type"]!.GetValue<string>()));
+        return $"Action<{string.Join(", ", parts)}>";
+    }
+
+    string FieldMember(string name) =>
+        "_" + char.ToLower(name[0]) + name.Substring(1);
+
+    // Writes one .cs file to disk, creating subdirectories as needed
+    void WriteFile(string relativePath, string content) {
+        string templateDir = Path.GetDirectoryName(Host.TemplateFile)!;
+        string fullPath    = Path.Combine(templateDir, relativePath);
+        Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
+        File.WriteAllText(fullPath, content, Encoding.UTF8);
+    }
+
+    // ── Load packets.json ──────────────────────────────────────────────────────
+    string jsonPath = Host.ResolvePath("Login.json");
+    string jsonText = File.ReadAllText(jsonPath);
+    JsonNode root   = JsonNode.Parse(jsonText)!;
+
+    string namespaceName = root["namespace"]!.GetValue<string>();
+    string opcodeEnum    = root["opcodeEnum"]!.GetValue<string>();
+	string outputPath    = root["outputPath"]!.GetValue<string>();
+    JsonArray packets    = root["packets"]!.AsArray();
+
+    // ── Generate one file per packet × direction ───────────────────────────────
+    int filesWritten = 0;
+
+    foreach (JsonNode? pktNode in packets)
+    {
+        string packetName = pktNode!["name"]!.GetValue<string>();
+        string opcode     = pktNode["opcode"]!.GetValue<string>();
+        JsonArray dirs    = pktNode["directions"]!.AsArray();
+
+        foreach (JsonNode? dirNode in dirs)
+        {
+            string direction   = dirNode!["direction"]!.GetValue<string>();
+            string handlerName = dirNode["handlerName"]!.GetValue<string>();
+            JsonArray fields   = dirNode["fields"]!.AsArray();
+
+            bool isC2S = direction == "C2S";
+
+            // Determine prefix
+            string prefix;
+            if (isC2S)
+            {
+                prefix = "REQ";
+            }
+            else
+            {
+                prefix = dirNode["prefix"]?.GetValue<string>()
+                    ?? throw new InvalidOperationException(
+                        $"S2C direction of '{packetName}' is missing a \"prefix\" field (expected \"RSP\" or \"NFY\").");
+
+                if (prefix != "RSP" && prefix != "NFY")
+                    throw new InvalidOperationException(
+                        $"Invalid prefix \"{prefix}\" on S2C packet '{packetName}'. Allowed: \"RSP\", \"NFY\".");
+            }
+
+            string className = $"{prefix}_{packetName}";
+            string nsDir     = isC2S ? "C2S" : "S2C";
+            string fullNs    = $"{namespaceName}.{nsDir}";
+
+            // Collect field metadata
+            var fieldList = new List<(string csType, string name, string member, int? size)>();
+            foreach (JsonNode? f in fields)
+            {
+                string ft  = CsType(f!["type"]!.GetValue<string>());
+                string fn  = f["name"]!.GetValue<string>();
+                int?   fsz = f["size"] is not null ? f["size"]!.GetValue<int>() : (int?)null;
+                fieldList.Add((ft, fn, FieldMember(fn), fsz));
+            }
+
+            string actionType = ActionType("ClientClass", fields);
+            string ctorParams = string.Join(", ",
+                fieldList.ConvertAll(f => $"{f.csType} {f.member.Substring(1)}"));
+
+            // ── Build file content into a StringBuilder ────────────────────────
+            var sb = new StringBuilder();
+            sb.AppendLine("// <auto-generated>");
+            sb.AppendLine("//   Generated by LoginPacketGenerator.tt from Login.json — do NOT edit manually.");
+            sb.AppendLine("// </auto-generated>");
+			sb.AppendLine("#nullable enable");
+            sb.AppendLine("using LibPegasus.Enums;");
+            sb.AppendLine("using LibPegasus.Packets;");
+            sb.AppendLine("using Nito.Collections;");
+            sb.AppendLine();
+            sb.AppendLine($"namespace {fullNs}");
+            sb.AppendLine("{");
+            sb.AppendLine($"\tpublic class {className}<ClientClass> : Packet<ClientClass>");
+            sb.AppendLine("\t{");
+
+            // Fields
+            sb.AppendLine("\t\t// ── Fields ──────────────────────────────────────────────────────────");
+            foreach (var f in fieldList)
+                sb.AppendLine($"\t\tprivate {f.csType}{(f.csType == "byte[]" ? "?" : "")} {f.member};");
+
+            sb.AppendLine();
+
+            // Handler
+            sb.AppendLine("\t\t// ── Handler ─────────────────────────────────────────────────────────");
+            sb.AppendLine($"\t\tpublic static {actionType}? {handlerName};");
+            sb.AppendLine();
+
+            // Deserialising ctor
+            sb.AppendLine("\t\t// ── Deserialising constructor (reads from wire) ──────────────────────");
+            sb.AppendLine($"\t\tpublic {className}(Queue<byte> data)");
+            sb.AppendLine($"\t\t\t: base((UInt16){opcodeEnum}.{opcode}, data) {{ }}");
+            sb.AppendLine();
+
+            // ReadPayload
+            sb.AppendLine("\t\tpublic override bool ReadPayload(Queue<Action<ClientClass>> actions)");
+            sb.AppendLine("\t\t{");
+            sb.AppendLine("\t\t\ttry");
+            sb.AppendLine("\t\t\t{");
+            foreach (var f in fieldList)
+                sb.AppendLine($"\t\t\t\t{f.member} = {ReaderCall(f.csType, f.size)};");
+            sb.AppendLine("\t\t\t}");
+            sb.AppendLine("\t\t\tcatch (IndexOutOfRangeException)");
+            sb.AppendLine("\t\t\t{");
+            sb.AppendLine("\t\t\t\treturn false;");
+            sb.AppendLine("\t\t\t}");
+            sb.AppendLine();
+            sb.AppendLine($"\t\t\tif ({handlerName} == null)");
+            if (isC2S)
+                sb.AppendLine("\t\t\t\tthrow new InvalidOperationException(\"Handler not assigned\");");
+            else
+                sb.AppendLine("\t\t\t\treturn false;");
+            sb.AppendLine();
+            string invokeArgs = string.Join("", fieldList.ConvertAll(f => ", " + f.member));
+            sb.AppendLine($"\t\t\tactions.Enqueue((x) => {handlerName}?.Invoke(x{invokeArgs}));");
+            sb.AppendLine("\t\t\treturn true;");
+            sb.AppendLine("\t\t}");
+            sb.AppendLine();
+
+            // Serialising ctor
+            sb.AppendLine("\t\t// ── Serialising constructor (writes to wire) ─────────────────────────");
+            sb.AppendLine($"\t\tpublic {className}({ctorParams})");
+            sb.AppendLine($"\t\t\t: base((UInt16){opcodeEnum}.{opcode})");
+            sb.AppendLine("\t\t{");
+            foreach (var f in fieldList)
+                sb.AppendLine($"\t\t\t{f.member} = {f.member.Substring(1)};");
+            sb.AppendLine("\t\t}");
+            sb.AppendLine();
+
+            // WritePayload
+            sb.AppendLine("\t\tpublic override void WritePayload(Deque<byte> data)");
+            sb.AppendLine("\t\t{");
+            foreach (var f in fieldList)
+                sb.AppendLine($"\t\t\t{WriterCall(f.csType, f.member, f.size)};{(f.size.HasValue ? $" // {f.size} byte" : "")}");
+            sb.AppendLine("\t\t}");
+
+            sb.AppendLine("\t}");
+            sb.AppendLine("}");
+
+            // ── Write to disk ──────────────────────────────────────────────────
+            WriteFile($"{outputPath}/{nsDir}/{className}.cs", sb.ToString());
+            filesWritten++;
+        }
+    }
+#>
+Packets.tt ran successfully — <#= filesWritten #> file(s) written.

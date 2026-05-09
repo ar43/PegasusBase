@@ -1,0 +1,81 @@
+{
+	"namespace": "LibPegasus.Packets.Login",
+	"opcodeEnum": "OpcodeLogin",
+	"outputPath": "../../Packets/Login",
+	"packets": [
+		{
+			"name": "CheckVersion",
+			"opcode": "CHECKVERSION",
+			"directions": [
+				{
+					"direction": "C2S",
+					"handlerName": "OnCheckVersionHandler",
+					"fields": [
+						{
+							"name": "ClientVersion",
+							"type": "UInt32"
+						}
+					]
+				},
+				{
+					"direction": "S2C",
+					"prefix": "RSP",
+					"handlerName": "OnCheckVersionHandler",
+					"fields": [
+						{
+							"name": "ServerVersion",
+							"type": "UInt32"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Connect2Svr",
+			"opcode": "CONNECT2SVR",
+			"directions": [
+				{
+					"direction": "C2S",
+					"handlerName": "OnServerConnectionHandler",
+					"fields": [
+						{
+							"name": "ClientNonce",
+							"type": "byte[]",
+							"size": 8
+						},
+						{
+							"name": "ClientPublicKey",
+							"type": "byte[]",
+							"size": 32
+						}
+					]
+				},
+				{
+					"direction": "S2C",
+					"prefix": "RSP",
+					"handlerName": "OnServerConnectionHandler",
+					"fields": [
+						{
+							"name": "AuthKey",
+							"type": "UInt32"
+						},
+						{
+							"name": "UserIdx",
+							"type": "UInt16"
+						},
+						{
+							"name": "ServerNonce",
+							"type": "byte[]",
+							"size": 8
+						},
+						{
+							"name": "PublicServerKey",
+							"type": "byte[]",
+							"size": 32
+						}
+					]
+				}
+			]
+		}
+	]
+}
