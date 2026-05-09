@@ -10,6 +10,7 @@ using System.Net;
 using System.Net.Sockets;
 using LibPegasus.Packets.Login.C2S;
 using LibPegasus.Packets.Login.S2C;
+using Google.Protobuf;
 
 namespace LoginServer.Logic
 {
@@ -106,7 +107,7 @@ namespace LoginServer.Logic
 							PacketManager.EnqueuePacket(opcode, new Queue<byte>(packetBytes));
 
 							PacketManager.DanglingPacket = null;
-							Utility.PrintByteArray(packetBytes, packetLen, "received decrypted");
+							//Utility.PrintByteArray(packetBytes, packetLen, "received decrypted");
 						}
 
 					}
@@ -147,7 +148,7 @@ namespace LoginServer.Logic
 
 							PacketManager.EnqueuePacket(opcode, new Queue<byte>(packetBytes));
 
-							Utility.PrintByteArray(packetBytes, packetLen, "decrypted");
+							//Utility.PrintByteArray(packetBytes, packetLen, "decrypted");
 						}
 					}
 				}
@@ -232,7 +233,7 @@ namespace LoginServer.Logic
 				var server = replyServerState.Servers[0];
 
 				//TODO: FIXME
-				var packetServerState = new NFY_ServerState<Client>();
+				var packetServerState = new NFY_ServerState<Client>(replyServerState.ToByteArray());
 				PacketManager.Send(packetServerState);
 			}
 			else

@@ -23,8 +23,6 @@ namespace LoginServer.Packets
 			REQ_Connect2Svr<Client>.OnServerConnectionHandler = Connection.OnServerConnection;
 			REQ_AuthAccount<Client>.OnAuthAccountHandler = Connection.OnAuthAccount;
 			REQ_CheckVersion<Client>.OnCheckVersionHandler = Connection.OnCheckVersion;
-			REQ_PreServerEnvRequest<Client>.OnPreServerEnvRequestHandler = Connection.OnPreServerEnvRequest;
-			REQ_PublicKey<Client>.OnPublicKeyRequestHandler = Connection.OnPublicKeyRequest;
 			REQ_VerifyLinks<Client>.OnVerifyLinksHandler = Connection.OnVerifyLinks;
 		}
 
@@ -56,8 +54,6 @@ namespace LoginServer.Packets
 			{
 				OpcodeLogin.CONNECT2SVR => new REQ_Connect2Svr<Client>(data),
 				OpcodeLogin.CHECKVERSION => new REQ_CheckVersion<Client>(data),
-				OpcodeLogin.PRESERVERENVREQUEST => new REQ_PreServerEnvRequest<Client>(data),
-				OpcodeLogin.PUBLICKEY => new REQ_PublicKey<Client>(data),
 				OpcodeLogin.AUTHACCOUNT => new REQ_AuthAccount<Client>(data),
 				OpcodeLogin.VERIFYLINKS => new REQ_VerifyLinks<Client>(data),
 				_ => throw new NotImplementedException($"unimplemented opcode {opcode}"),

@@ -31,6 +31,64 @@
 			]
 		},
 		{
+			"name": "AuthAccount",
+			"opcode": "AUTHACCOUNT",
+			"directions": [
+				{
+					"direction": "C2S",
+					"handlerName": "OnAuthAccountHandler",
+					"fields": [
+						{
+							"name": "UsernameLen",
+							"type": "byte"
+						},
+						{
+							"name": "Username",
+							"type": "string",
+							"param": "UsernameLen"
+						},
+						{
+							"name": "PasswordLen",
+							"type": "byte"
+						},
+						{
+							"name": "Password",
+							"type": "string",
+							"param": "PasswordLen"
+						}
+					]
+				},
+				{
+					"direction": "S2C",
+					"prefix": "RSP",
+					"handlerName": "OnAuthAccountHandler",
+					"fields": [
+						{
+							"name": "AuthAccountReply",
+							"type": "byte[]"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "ServerState",
+			"opcode": "SERVERSTATE",
+			"directions": [
+				{
+					"direction": "S2C",
+					"prefix": "NFY",
+					"handlerName": "OnServerStateHandler",
+					"fields": [
+						{
+							"name": "ServerStateReply",
+							"type": "byte[]"
+						}
+					]
+				}
+			]
+		},
+		{
 			"name": "Connect2Svr",
 			"opcode": "CONNECT2SVR",
 			"directions": [

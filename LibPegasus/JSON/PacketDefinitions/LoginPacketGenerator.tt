@@ -18,20 +18,26 @@
         "uint32" or "UInt32" => "UInt32",
         "uint16" or "UInt16" => "UInt16",
         "byte[]"             => "byte[]",
+		"byte"               => "Byte",
+		"string"             => "String",
         _                    => t
     };
 
-    string ReaderCall(string csType, int? size) => csType switch {
+    string ReaderCall(string csType, int? size, string? param) => csType switch {
         "UInt32" => "PacketReader.ReadUInt32(_data)",
         "UInt16" => "PacketReader.ReadUInt16(_data)",
-        "byte[]" => $"PacketReader.ReadArray(_data, {size})",
+		"Byte"   => "PacketReader.ReadByte(_data)",
+        "byte[]" => size.HasValue ? $"PacketReader.ReadArray(_data, {size})" : "PacketReader.ReadArray(_data)",
+		"String" => $"PacketReader.ReadString(_data, {param})",
         _        => $"PacketReader.Read{csType}(_data)"
     };
 
     string WriterCall(string csType, string fieldName, int? size) => csType switch {
         "UInt32" => $"PacketWriter.WriteUInt32(data, {fieldName})",
         "UInt16" => $"PacketWriter.WriteUInt16(data, {fieldName})",
+		"Byte"   => $"PacketWriter.WriteByte(data, {fieldName})",
         "byte[]" => $"PacketWriter.WriteArray(data, {fieldName})",
+		"String" => $"PacketWriter.WriteString(data, {fieldName})",
         _        => $"PacketWriter.Write{csType}(data, {fieldName})"
     };
 
@@ -102,13 +108,14 @@
             string fullNs    = $"{namespaceName}.{nsDir}";
 
             // Collect field metadata
-            var fieldList = new List<(string csType, string name, string member, int? size)>();
+            var fieldList = new List<(string csType, string name, string member, int? size, string? param)>();
             foreach (JsonNode? f in fields)
             {
                 string ft  = CsType(f!["type"]!.GetValue<string>());
                 string fn  = f["name"]!.GetValue<string>();
                 int?   fsz = f["size"] is not null ? f["size"]!.GetValue<int>() : (int?)null;
-                fieldList.Add((ft, fn, FieldMember(fn), fsz));
+				string? fp = f["param"] is not null ? FieldMember(f["param"]!.GetValue<string>()) : (string?)null;
+                fieldList.Add((ft, fn, FieldMember(fn), fsz, fp));
             }
 
             string actionType = ActionType("ClientClass", fields);
@@ -133,7 +140,7 @@
             // Fields
             sb.AppendLine("\t\t// ── Fields ──────────────────────────────────────────────────────────");
             foreach (var f in fieldList)
-                sb.AppendLine($"\t\tprivate {f.csType}{(f.csType == "byte[]" ? "?" : "")} {f.member};");
+                sb.AppendLine($"\t\tprivate {f.csType}{((f.csType == "byte[]") || (f.csType == "String") ? "?" : "")} {f.member};");
 
             sb.AppendLine();
 
@@ -154,7 +161,7 @@
             sb.AppendLine("\t\t\ttry");
             sb.AppendLine("\t\t\t{");
             foreach (var f in fieldList)
-                sb.AppendLine($"\t\t\t\t{f.member} = {ReaderCall(f.csType, f.size)};");
+                sb.AppendLine($"\t\t\t\t{f.member} = {ReaderCall(f.csType, f.size, f.param)};");
             sb.AppendLine("\t\t\t}");
             sb.AppendLine("\t\t\tcatch (IndexOutOfRangeException)");
             sb.AppendLine("\t\t\t{");

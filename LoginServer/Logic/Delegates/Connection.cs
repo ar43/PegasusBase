@@ -5,6 +5,7 @@ using LibPegasus.Packets.Login.S2C;
 using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
+using Google.Protobuf;
 
 namespace LoginServer.Logic.Delegates
 {
@@ -57,70 +58,13 @@ namespace LoginServer.Logic.Delegates
 			client.PacketManager.Send(packet);
 		}
 
-		public static void OnPreServerEnvRequest(Client client, string username)
+		public static async void OnAuthAccount(Client client, byte usernameLen, string username, byte passwordLen, string password)
 		{
 			if (client.ClientInfo.ConnState != Enums.ConnState.VERSION_CHECKED)
 			{
 				//TODO: Close connection
 				throw new NotImplementedException();
 			}
-
-			if (username.Length < 1 || username.Length > 16)
-			{
-				//TODO: Close connection
-				throw new NotImplementedException();
-			}
-
-			//client.ClientInfo.Username = username;
-			client.ClientInfo.ConnState = Enums.ConnState.PRE_ENV;
-
-			var packet = new RSP_PreServerEnvRequest<Client>();
-			client.PacketManager.Send(packet);
-		}
-
-		public static void OnPublicKeyRequest(Client client)
-		{
-			if (client.ClientInfo.ConnState != Enums.ConnState.PRE_ENV)
-			{
-				//TODO: Close connection
-				throw new NotImplementedException();
-			}
-
-			var publicKey = client.ClientInfo.RSA.ExportRSAPublicKey();
-			Serilog.Log.Debug($"publicKey with len {publicKey.Length} copied");
-			client.ClientInfo.ConnState = Enums.ConnState.PUBLIC_KEY_REQUESTED;
-
-			var packet = new RSP_PublicKey<Client>(publicKey);
-			client.PacketManager.Send(packet);
-		}
-
-		public static async void OnAuthAccount(Client client, byte[] rsaData)
-		{
-			if (client.ClientInfo.ConnState != Enums.ConnState.PUBLIC_KEY_REQUESTED)
-			{
-				//TODO: Close connection
-				throw new NotImplementedException();
-			}
-
-			var decryptedRSA = client.ClientInfo.RSA.Decrypt(rsaData, RSAEncryptionPadding.OaepSHA1);
-
-			Utility.PrintCharArray(decryptedRSA, decryptedRSA.Length, "rsa output");
-
-			var usernameLen = Array.IndexOf(decryptedRSA, (byte)0, 0, 33);
-			if (usernameLen <= 0)
-			{
-				//TODO: Close connection
-				throw new NotImplementedException();
-			}
-			var username = Encoding.ASCII.GetString(decryptedRSA, 0, usernameLen);
-
-			var passwordLen = Array.IndexOf(decryptedRSA, (byte)0, 33) - 33;
-			if (passwordLen <= 0)
-			{
-				//TODO: Close connection
-				throw new NotImplementedException();
-			}
-			var password = Encoding.ASCII.GetString(decryptedRSA, 33, passwordLen);
 
 			//Serilog.Log.Debug($"username extracted: {username} (len: {username.Length})");
 			//Serilog.Log.Debug($"password extracted: {password} (len: {password.Length})");
@@ -132,27 +76,23 @@ namespace LoginServer.Logic.Delegates
 				Debug.Assert(reply.AuthKey.Length == 32);
 				var replyServerState = await client.GetServerState(isLocalhost);
 
-				//TODO: FIXME
-				var packetServerState = new NFY_ServerState<Client>();
+				var loginAccountReplyBytes = reply.ToByteArray();
+				var serverStateReplyBytes = replyServerState.ToByteArray();
+
+				var packetServerState = new NFY_ServerState<Client>(serverStateReplyBytes);
 				client.PacketManager.Send(packetServerState);
 
-				var packetUrlToClient = new NFY_UrlToClient<Client>();
-				client.PacketManager.Send(packetUrlToClient);
-
-				//TODO: FIXME
-				var packetAuth = new RSP_AuthAccount<Client>();
+				var packetAuth = new RSP_AuthAccount<Client>(loginAccountReplyBytes);
 				client.PacketManager.Send(packetAuth);
 
-				var packetMsg = new NFY_SystemMessg<Client>(LoginMessageType.Normal2, "");
-				client.PacketManager.Send(packetMsg);
 				client.ClientInfo.ConnState = Enums.ConnState.AUTH_ACCOUNT;
 				client.ClientInfo.AccountId = reply.AccountId;
 
+				Serilog.Log.Debug($"{username} logged in");
 			}
 			else
 			{
-				//TODO: FIXME
-				var packet = new RSP_AuthAccount<Client>();
+				var packet = new RSP_AuthAccount<Client>(reply.ToByteArray());
 				client.PacketManager.Send(packet);
 				client.Disconnect("bad auth");
 			}

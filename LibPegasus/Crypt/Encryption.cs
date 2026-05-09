@@ -123,8 +123,8 @@ namespace LibPegasus.Crypt
 			byte[] info = Encoding.UTF8.GetBytes("pegasus");
 
 			_sessionKey = HKDF.DeriveKey(HashAlgorithmName.SHA256, sharedSecret, 32, combinedNonce, info);
-			Utility.PrintByteArray(combinedNonce, combinedNonce.Length, "combinedNonce");
-			Utility.PrintByteArray(_sessionKey, _sessionKey.Length, "sessionKey");
+			//Utility.PrintByteArray(combinedNonce, combinedNonce.Length, "combinedNonce");
+			//Utility.PrintByteArray(_sessionKey, _sessionKey.Length, "sessionKey");
 			var pass = TestEncryption();
 
 			if (!pass)

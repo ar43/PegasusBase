@@ -147,9 +147,12 @@ namespace LibPegasus.Packets
 			}
 		}
 
-		public static void WriteString(Deque<Byte> data, String message)
+		public static void WriteString(Deque<Byte> data, String? message)
 		{
-			WriteArray(data, Encoding.ASCII.GetBytes(message));
+			if(message != null)
+			{
+				WriteArray(data, Encoding.ASCII.GetBytes(message));
+			}
 		}
 	}
 }
