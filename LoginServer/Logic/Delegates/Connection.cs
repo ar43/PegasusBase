@@ -33,6 +33,7 @@ namespace LoginServer.Logic.Delegates
 		public static void OnCheckVersion(Client client, UInt32 clientVersion)
 		{
 			var serverConfig = ServerConfig.Get();
+			var expectedVersion = LibPegasus.Packets.Login.LoginPacketVersion.Revision;
 
 			if (client.ClientInfo.ConnState != Enums.ConnState.CONNECTED && client.ClientInfo.ConnState != Enums.ConnState.AUTH_ACCOUNT)
 			{
@@ -40,13 +41,11 @@ namespace LoginServer.Logic.Delegates
 				throw new NotImplementedException();
 			}
 
-			if (serverConfig.GeneralSettings.VerifyClientVersion)
+			if (clientVersion != expectedVersion)
 			{
-				if (clientVersion != (uint)serverConfig.GeneralSettings.ClientVersion)
-				{
-					//TODO: check what happens if clientVersion is bogus
-					throw new NotImplementedException();
-				}
+				Serilog.Log.Debug($"OnCheckVersion: received version from client: {clientVersion}, expected {expectedVersion}");
+				client.Disconnect("invalid version");
+				return;
 			}
 
 			if (client.ClientInfo.ConnState != Enums.ConnState.AUTH_ACCOUNT)
@@ -54,7 +53,7 @@ namespace LoginServer.Logic.Delegates
 
 			Serilog.Log.Debug($"OnCheckVersion: received version from client: {clientVersion}");
 
-			var packet = new RSP_CheckVersion<Client>((uint)serverConfig.GeneralSettings.ClientVersion);
+			var packet = new RSP_CheckVersion<Client>((uint)expectedVersion);
 			client.PacketManager.Send(packet);
 		}
 
