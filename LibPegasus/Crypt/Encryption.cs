@@ -6,7 +6,6 @@ using Sodium;
 using Sodium.Exceptions;
 using System.Buffers.Binary;
 using System.Diagnostics;
-using System.Security.Cryptography;
 using System.Text;
 
 namespace LibPegasus.Crypt
@@ -98,7 +97,7 @@ namespace LibPegasus.Crypt
 			UInt64 tempCounter = 1;
 			var nonce = BitConverter.GetBytes(tempCounter);
 			Debug.Assert(nonce.Length == 8);
-			byte[] plaintext = RandomNumberGenerator.GetBytes(10);
+			byte[] plaintext = SodiumCore.GetRandomBytes(10);
 
 			var encrypted = SecretAeadChaCha20Poly1305.Encrypt(plaintext, nonce, _sessionKey);
 			var decrypted = SecretAeadChaCha20Poly1305.Decrypt(encrypted, nonce, _sessionKey);
@@ -120,9 +119,8 @@ namespace LibPegasus.Crypt
 		{
 			byte[] sharedSecret = Sodium.ScalarMult.Mult(KeyPair.PrivateKey, peerPublicKey);
 			byte[] combinedNonce = serverNonce.Concat(clientNonce).ToArray();
-			byte[] info = Encoding.UTF8.GetBytes("pegasus");
 
-			_sessionKey = HKDF.DeriveKey(HashAlgorithmName.SHA256, sharedSecret, 32, combinedNonce, info);
+			_sessionKey = GenericHash.Hash(sharedSecret, combinedNonce, 32);
 			//Utility.PrintByteArray(combinedNonce, combinedNonce.Length, "combinedNonce");
 			//Utility.PrintByteArray(_sessionKey, _sessionKey.Length, "sessionKey");
 			var pass = TestEncryption();
