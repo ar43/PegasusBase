@@ -41,7 +41,7 @@ namespace LoginServer.Logic.Delegates
 				throw new NotImplementedException();
 			}
 
-			if (clientVersion != expectedVersion)
+			if (clientVersion != expectedVersion && serverConfig.GeneralSettings.VerifyClientVersion)
 			{
 				Serilog.Log.Debug($"OnCheckVersion: received version from client: {clientVersion}, expected {expectedVersion}");
 				client.Disconnect("invalid version");
@@ -106,11 +106,6 @@ namespace LoginServer.Logic.Delegates
 				throw new NotImplementedException();
 			}
 
-			if (clientMagicKey != cfg.GeneralSettings.ClientMagicKey)
-			{
-				//TODO: Close connection
-				throw new NotImplementedException();
-			}
 			client.ClientInfo.ConnState = Enums.ConnState.VERIFYING;
 			//TODO: check if authKey expired (5 sec?)
 			var reply = await client.SendSessionRequest(authKey, userId, channelId, serverId);

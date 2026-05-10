@@ -34,8 +34,6 @@ namespace LoginServer
 	public class Generalsettings
 	{
 		public bool VerifyClientVersion { get; set; }
-		public int ClientVersion { get; set; }
-		public int ClientMagicKey { get; set; }
 	}
 
 	public class Connectionsettings
