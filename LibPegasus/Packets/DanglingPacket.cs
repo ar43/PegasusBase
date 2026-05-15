@@ -23,6 +23,11 @@
 			return PacketLen - _currentPosition;
 		}
 
+		public void Print()
+		{
+			Utils.Utility.PrintByteArray(DanglingData, _currentPosition, "Current Dangling");
+		}
+
 		public int Add(byte[] data, int amountToCopy)
 		{
 			Array.Copy(data, 0, DanglingData, _currentPosition, amountToCopy);

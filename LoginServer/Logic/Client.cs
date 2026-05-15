@@ -11,6 +11,7 @@ using System.Net.Sockets;
 using LibPegasus.Packets.Login.C2S;
 using LibPegasus.Packets.Login.S2C;
 using Google.Protobuf;
+using System.Diagnostics;
 
 namespace LoginServer.Logic
 {
@@ -34,7 +35,7 @@ namespace LoginServer.Logic
 
 		private bool _busy = false;
 
-		private Byte[] _recvBytes = new Byte[1024];
+		CurrentData _currentData = new();
 
 		internal bool Dropped { get; private set; } = false;
 
@@ -82,9 +83,10 @@ namespace LoginServer.Logic
 
 			if (stream != null && stream.CanRead && stream.DataAvailable)
 			{
-				var length = stream.Read(_recvBytes, 0, _recvBytes.Length);
+				var length = stream.Read(_currentData.NewData, 0, _currentData.NewData.Length);
 				if (length != 0)
 				{
+					length = _currentData.Update(length);
 					//PrintByteArray(bytes, length, "received encrypted");
 					var i = 0;
 
@@ -94,9 +96,11 @@ namespace LoginServer.Logic
 
 						var amountToCopy = Math.Min(remaining, length);
 
-						remaining = PacketManager.DanglingPacket.Add(_recvBytes, amountToCopy);
+						remaining = PacketManager.DanglingPacket.Add(_currentData.RecvData, amountToCopy);
 
 						i += amountToCopy;
+
+						PacketManager.DanglingPacket.Print();
 
 						if (remaining == 0)
 						{
@@ -108,7 +112,7 @@ namespace LoginServer.Logic
 							PacketManager.EnqueuePacket(opcode, new Queue<byte>(packetBytes));
 
 							PacketManager.DanglingPacket = null;
-							//Utility.PrintByteArray(packetBytes, packetLen, "received decrypted");
+							Utility.PrintByteArray(packetBytes, packetLen, "received decrypted (COMPOSED)");
 						}
 
 					}
@@ -117,12 +121,14 @@ namespace LoginServer.Logic
 					{
 						if (length - i < 4)
 						{
-							throw new NotImplementedException("length-i < 4 on packet read");
+							_currentData.SetUnknownData(_currentData.RecvData, i, length - i);
+							Utility.PrintByteArray(_currentData.UnknownData, length - i, "received encrypted (UNDERFLOW)");
+							return;
 						}
 
-						var span = new Span<byte>(_recvBytes, i, length - i);
+						var span = new Span<byte>(_currentData.RecvData, i, length - i);
 						var packetLen = Encryption.GetPacketSize(span);
-						Log.Debug($"packetLen decrypted: {packetLen}");
+						Log.Debug($"packetLen of next packet: {packetLen}");
 
 						if (packetLen > DanglingPacket.MAX_C2S_PACKET_LEN)
 						{
@@ -136,13 +142,14 @@ namespace LoginServer.Logic
 
 						if (packetLen > length - i)
 						{
-							PacketManager.DanglingPacket = new(_recvBytes, i, length, packetLen);
+							PacketManager.DanglingPacket = new(_currentData.RecvData, i, length, packetLen);
+							PacketManager.DanglingPacket.Print();
 							break;
 						}
 						else
 						{
 							byte[] packetBytes = new byte[packetLen];
-							Array.Copy(_recvBytes, i, packetBytes, 0, packetLen);
+							Array.Copy(_currentData.RecvData, i, packetBytes, 0, packetLen);
 							i += packetLen;
 
 							var opcode = Encryption.Decrypt(ref packetBytes);
