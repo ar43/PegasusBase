@@ -34,6 +34,8 @@ namespace LoginServer.Logic
 
 		private bool _busy = false;
 
+		private Byte[] _recvBytes = new Byte[1024];
+
 		internal bool Dropped { get; private set; } = false;
 
 		public Client(TcpClient tcpClient, GrpcChannel masterChannel, KeyPair serverKeyPair)
@@ -80,8 +82,7 @@ namespace LoginServer.Logic
 
 			if (stream != null && stream.CanRead && stream.DataAvailable)
 			{
-				Byte[] bytes = new Byte[1024];
-				var length = stream.Read(bytes, 0, bytes.Length);
+				var length = stream.Read(_recvBytes, 0, _recvBytes.Length);
 				if (length != 0)
 				{
 					//PrintByteArray(bytes, length, "received encrypted");
@@ -93,7 +94,7 @@ namespace LoginServer.Logic
 
 						var amountToCopy = Math.Min(remaining, length);
 
-						remaining = PacketManager.DanglingPacket.Add(bytes, amountToCopy);
+						remaining = PacketManager.DanglingPacket.Add(_recvBytes, amountToCopy);
 
 						i += amountToCopy;
 
@@ -119,7 +120,7 @@ namespace LoginServer.Logic
 							throw new NotImplementedException("length-i < 4 on packet read");
 						}
 
-						var span = new Span<byte>(bytes, i, length - i);
+						var span = new Span<byte>(_recvBytes, i, length - i);
 						var packetLen = Encryption.GetPacketSize(span);
 						Log.Debug($"packetLen decrypted: {packetLen}");
 
@@ -135,13 +136,13 @@ namespace LoginServer.Logic
 
 						if (packetLen > length - i)
 						{
-							PacketManager.DanglingPacket = new(bytes, i, length, packetLen);
+							PacketManager.DanglingPacket = new(_recvBytes, i, length, packetLen);
 							break;
 						}
 						else
 						{
 							byte[] packetBytes = new byte[packetLen];
-							Array.Copy(bytes, i, packetBytes, 0, packetLen);
+							Array.Copy(_recvBytes, i, packetBytes, 0, packetLen);
 							i += packetLen;
 
 							var opcode = Encryption.Decrypt(ref packetBytes);
