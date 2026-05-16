@@ -29,4 +29,11 @@
     </None>
   </ItemGroup>
 
+	<Target Name="CopyToUnity" AfterTargets="Build" Condition="'$(TargetFramework)' == 'netstandard2.0'">
+		<Copy
+			SourceFiles="$(OutputPath)LibPegasus.dll"
+			DestinationFolder="D:\Coding\Eclipse_Client\Eclipse\Assets\Plugins"
+			SkipUnchangedFiles="true" />
+	</Target>
+
 </Project>
