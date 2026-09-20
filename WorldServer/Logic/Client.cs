@@ -1,6 +1,7 @@
 ﻿using Grpc.Net.Client;
 using LibPegasus.Crypt;
 using LibPegasus.Packets;
+using LibPegasus.Utils;
 using Serilog;
 using Shared.Protos;
 using Sodium;
@@ -41,6 +42,8 @@ namespace WorldServer.Logic
 		public LibPegasus.Utils.Timer? TimerHeartbeatTimeout = null; //set this to null on successfull heartbeat
 		public LibPegasus.Utils.Timer? TimerDbSync = null;
 
+		CurrentData _currentData = new();
+
 		DateTime timeClientAccepted;
 
 		private bool _busy = false;
@@ -79,10 +82,10 @@ namespace WorldServer.Logic
 
 			if (stream != null && stream.CanRead && stream.DataAvailable)
 			{
-				Byte[] bytes = new Byte[1024];
-				var length = stream.Read(bytes, 0, bytes.Length);
+				var length = stream.Read(_currentData.NewData, 0, _currentData.NewData.Length);
 				if (length != 0)
 				{
+					length = _currentData.Update(length);
 					//PrintByteArray(bytes, length, "received encrypted");
 					var i = 0;
 
@@ -92,9 +95,11 @@ namespace WorldServer.Logic
 
 						var amountToCopy = Math.Min(remaining, length);
 
-						remaining = PacketManager.DanglingPacket.Add(bytes, amountToCopy);
+						remaining = PacketManager.DanglingPacket.Add(_currentData.RecvData, amountToCopy);
 
 						i += amountToCopy;
+
+						PacketManager.DanglingPacket.Print();
 
 						if (remaining == 0)
 						{
@@ -106,7 +111,7 @@ namespace WorldServer.Logic
 							PacketManager.EnqueuePacket(opcode, new Queue<byte>(packetBytes));
 
 							PacketManager.DanglingPacket = null;
-							//Utility.PrintByteArray(packetBytes, packetLen, "received decrypted");
+							Utility.PrintByteArray(packetBytes, packetLen, "received decrypted (COMPOSED)");
 						}
 
 					}
@@ -115,12 +120,14 @@ namespace WorldServer.Logic
 					{
 						if (length - i < 4)
 						{
-							throw new NotImplementedException("length-i < 4 on packet read");
+							_currentData.SetUnknownData(_currentData.RecvData, i, length - i);
+							Utility.PrintByteArray(_currentData.UnknownData, length - i, "received encrypted (UNDERFLOW)");
+							return;
 						}
 
-						var span = new Span<byte>(bytes, i, length - i);
+						var span = new Span<byte>(_currentData.RecvData, i, length - i);
 						var packetLen = Encryption.GetPacketSize(span);
-						Log.Debug($"packetLen decrypted: {packetLen}");
+						Log.Debug($"packetLen of next packet: {packetLen}");
 
 						if (packetLen > DanglingPacket.MAX_C2S_PACKET_LEN)
 						{
@@ -134,13 +141,14 @@ namespace WorldServer.Logic
 
 						if (packetLen > length - i)
 						{
-							PacketManager.DanglingPacket = new(bytes, i, length, packetLen);
+							PacketManager.DanglingPacket = new(_currentData.RecvData, i, length, packetLen);
+							PacketManager.DanglingPacket.Print();
 							break;
 						}
 						else
 						{
 							byte[] packetBytes = new byte[packetLen];
-							Array.Copy(bytes, i, packetBytes, 0, packetLen);
+							Array.Copy(_currentData.RecvData, i, packetBytes, 0, packetLen);
 							i += packetLen;
 
 							var opcode = Encryption.Decrypt(ref packetBytes);
@@ -151,17 +159,9 @@ namespace WorldServer.Logic
 						}
 					}
 				}
-				else if (length == 0)
-				{
-					throw new NotImplementedException();
-				}
 			}
 		}
 
-		//internal async Task<(Character?, int)> LoadCharacter(UInt32 characterId)
-		//{
-		//	return await _databaseManager.CharacterManager.GetCharacter(characterId);
-		//}
 		internal void SendData()
 		{
 			if (!TcpClient.Connected || !PacketManager.OutputQueued())
@@ -184,9 +184,12 @@ namespace WorldServer.Logic
 					{
 						Disconnect("Disconnect - cannot send data", ConnState.DISCONNECTED);
 					}
+					
 					//PrintByteArray(send, send.Length, "encrypted sent");
 				}
 			}
+
+
 		}
 
 		internal void OnLogin(UInt32 authKey, UInt32 accountId)
