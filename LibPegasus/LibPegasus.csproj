@@ -27,13 +27,24 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>LoginPacketGenerator.log</LastGenOutput>
     </None>
+    <None Update="JSON\PacketDefinitions\WorldPacketGenerator.log">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>WorldPacketGenerator.tt</DependentUpon>
+    </None>
+    <None Update="JSON\PacketDefinitions\WorldPacketGenerator.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>WorldPacketGenerator.log</LastGenOutput>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Packets\World\C2S\" />
+    <Folder Include="Packets\World\S2C\" />
   </ItemGroup>
 
 	<Target Name="CopyToUnity" AfterTargets="Build" Condition="'$(TargetFramework)' == 'netstandard2.0'">
-		<Copy
-			SourceFiles="$(OutputPath)LibPegasus.dll"
-			DestinationFolder="D:\Coding\Eclipse_Client\Eclipse\Assets\Plugins"
-			SkipUnchangedFiles="true" />
+		<Copy SourceFiles="$(OutputPath)LibPegasus.dll" DestinationFolder="D:\Coding\Eclipse_Client\Eclipse\Assets\Plugins" SkipUnchangedFiles="true" />
 	</Target>
 
 </Project>

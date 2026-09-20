@@ -9,7 +9,6 @@ using WorldServer.Logic.WorldRuntime.InstanceRuntime.MobRuntime;
 using WorldServer.Logic.WorldRuntime.MapDataRuntime;
 using WorldServer.Logic.WorldRuntime.MissionDungeonDataRuntime;
 using WorldServer.Logic.WorldRuntime.WarpsRuntime;
-using WorldServer.Packets.S2C;
 
 namespace WorldServer.Logic.WorldRuntime.InstanceRuntime
 {
@@ -36,10 +35,10 @@ namespace WorldServer.Logic.WorldRuntime.InstanceRuntime
 			_tileAttributes = new Dictionary<int, TileAttributeData>();
 			_random = new Random();
 
-			AddFieldInstance(MapId.BLOODY_ICE, InstanceDuration.PERMANENT);
-			AddFieldInstance(MapId.GREEN_DESPAIR, InstanceDuration.PERMANENT);
-			AddFieldInstance(MapId.DESERT_SCREAM, InstanceDuration.PERMANENT);
-			AddFieldInstance(MapId.WARP_CENTER, InstanceDuration.PERMANENT);
+			//AddFieldInstance(MapId.MAP1, InstanceDuration.PERMANENT);
+			//AddFieldInstance(MapId.GREEN_DESPAIR, InstanceDuration.PERMANENT);
+			//AddFieldInstance(MapId.DESERT_SCREAM, InstanceDuration.PERMANENT);
+			//AddFieldInstance(MapId.WARP_CENTER, InstanceDuration.PERMANENT);
 		}
 
 		private void WarpClient(Client client, Instance newInstance, UInt32 warpType, int newX, int newY)
@@ -66,29 +65,29 @@ namespace WorldServer.Logic.WorldRuntime.InstanceRuntime
 			var dgId = newInstance.Type == InstanceType.FIELD ? 0 : newInstance.MissionDungeonManager.GetDungeonId();
 			warpType = (UInt32)(newInstance.Type == InstanceType.FIELD ? 8 : 2);
 
-			//todo: send ChargeInfo
+			//todo: send packet
 
-			var response = new RSP_WarpCommand(client.Character, warpType, (UInt32)newInstance.MapId, (uint)dgId);
-			client.PacketManager.Send(response);
+			//var response = new RSP_WarpCommand(client.Character, warpType, (UInt32)newInstance.MapId, (uint)dgId);
+			//client.PacketManager.Send(response);
 
 			AddClient(client, newInstance.Id, AddObjectType.NEWWARP);
 		}
 
-		public bool WarpClientReturn(Client client)
-		{
-			var instance = client.Character.Location.Instance;
+		//public bool WarpClientReturn(Client client)
+		//{
+		//	var instance = client.Character.Location.Instance;
 
-			var warpId = instance.MapData.TerrainInfo.WarpIdxForRetn;
-			var warp = _warpManager.Get(warpId);
-			if (warp == null)
-			{
-				return false;
-			}
+		//	var warpId = instance.MapData.TerrainInfo.WarpIdxForRetn;
+		//	var warp = _warpManager.Get(warpId);
+		//	if (warp == null)
+		//	{
+		//		return false;
+		//	}
 
-			//TODO: Nation checking
-			WarpClient(client, instance, 8, warp.PosXPnt, warp.PosYPnt);
-			return true;
-		}
+		//	//TODO: Nation checking
+		//	WarpClient(client, instance, 8, warp.PosXPnt, warp.PosYPnt);
+		//	return true;
+		//}
 
 		public bool WarpClientAbsolute(Client client, int x, int y)
 		{
@@ -128,63 +127,63 @@ namespace WorldServer.Logic.WorldRuntime.InstanceRuntime
 			return true;
 		}
 
-		public bool WarpClientByNpcId(Client client, int npcId, uint extraParams)
-		{
-			var instance = client.Character.Location.Instance;
+		//public bool WarpClientByNpcId(Client client, int npcId, uint extraParams)
+		//{
+		//	var instance = client.Character.Location.Instance;
 
-			if (!instance.MapData.NpcData.TryGetValue(npcId, out var npc))
-				return false;
-			if (!npc.NpcWarpData.TryGetValue((Int32)extraParams, out var npcWarp))
-				return false;
+		//	if (!instance.MapData.NpcData.TryGetValue(npcId, out var npc))
+		//		return false;
+		//	if (!npc.NpcWarpData.TryGetValue((Int32)extraParams, out var npcWarp))
+		//		return false;
 			
 
-			if(npcWarp.Type == 0)
-			{
-				var warpId = npcWarp.TargetId;
-				var warp = _warpManager.Get(warpId);
-				if (warp == null) return false;
-				//TODO: Nation checking
-				if (_instances.TryGetValue((UInt64)warp.WorldIdx, out var newInstance))
-				{
-					if (newInstance.DurationType != InstanceDuration.PERMANENT)
-						return false;
-					WarpClient(client, newInstance, 8, warp.PosXPnt, warp.PosYPnt);
-					return true;
-				}
-				else if (warp.WorldIdx == (int)instance.MapId)
-				{
-					WarpClient(client, instance, 8, warp.PosXPnt, warp.PosYPnt);
-					return true;
-				}
-			}
-			else
-			{
-				Debug.Assert(npcWarp.Type == 1 || npcWarp.Type == 2);
-				var dgId = client.Character.Location.PendingDungeon.DungeonId;
-				var instanceId = client.Character.Location.PendingDungeon.DungeonInstanceId;
-				var warpDungeon = npcWarp.TargetId;
+		//	if(npcWarp.Type == 0)
+		//	{
+		//		var warpId = npcWarp.TargetId;
+		//		var warp = _warpManager.Get(warpId);
+		//		if (warp == null) return false;
+		//		//TODO: Nation checking
+		//		if (_instances.TryGetValue((UInt64)warp.WorldIdx, out var newInstance))
+		//		{
+		//			if (newInstance.DurationType != InstanceDuration.PERMANENT)
+		//				return false;
+		//			WarpClient(client, newInstance, 8, warp.PosXPnt, warp.PosYPnt);
+		//			return true;
+		//		}
+		//		else if (warp.WorldIdx == (int)instance.MapId)
+		//		{
+		//			WarpClient(client, instance, 8, warp.PosXPnt, warp.PosYPnt);
+		//			return true;
+		//		}
+		//	}
+		//	else
+		//	{
+		//		Debug.Assert(npcWarp.Type == 1 || npcWarp.Type == 2);
+		//		var dgId = client.Character.Location.PendingDungeon.DungeonId;
+		//		var instanceId = client.Character.Location.PendingDungeon.DungeonInstanceId;
+		//		var warpDungeon = npcWarp.TargetId;
 
-				if (instanceId == 0 || dgId != warpDungeon)
-					return false;
+		//		if (instanceId == 0 || dgId != warpDungeon)
+		//			return false;
 
 				
-				if (_instances.TryGetValue((ulong)instanceId, out var newInstance))
-				{
-					if (newInstance.DurationType != InstanceDuration.TEMP || newInstance.Type != InstanceType.DUNGEON)
-						return false;
+		//		if (_instances.TryGetValue((ulong)instanceId, out var newInstance))
+		//		{
+		//			if (newInstance.DurationType != InstanceDuration.TEMP || newInstance.Type != InstanceType.DUNGEON)
+		//				return false;
 
-					var warpId = newInstance.MissionDungeonManager.GetStartWarpId();
-					var warp = _warpManager.Get(warpId);
+		//			var warpId = newInstance.MissionDungeonManager.GetStartWarpId();
+		//			var warp = _warpManager.Get(warpId);
 
-					WarpClient(client, newInstance, 2, warp.PosXPnt, warp.PosYPnt);
-					client.Character.Location.PendingDungeon.Clear();
-					return true;
-				}
-			}
+		//			WarpClient(client, newInstance, 2, warp.PosXPnt, warp.PosYPnt);
+		//			client.Character.Location.PendingDungeon.Clear();
+		//			return true;
+		//		}
+		//	}
 			
 
-			return false;
-		}
+		//	return false;
+		//}
 
 		public Instance AddFieldInstance(MapId mapId, InstanceDuration instanceDuration)
 		{
@@ -231,7 +230,8 @@ namespace WorldServer.Logic.WorldRuntime.InstanceRuntime
 			
 		}
 
-		private TileAttributeData GetTileAttributeData(int mapId) //this needs to be async probably
+		//todo: remake this
+		private TileAttributeData GetTileAttributeData(int mapId)
 		{
 			if (_tileAttributes.ContainsKey(mapId))
 			{
@@ -239,17 +239,18 @@ namespace WorldServer.Logic.WorldRuntime.InstanceRuntime
 			}
 			else
 			{
-				var mapIdString = MapDataManager.MapIdToMcl[(MapId)mapId].ToString("00");
-				if(mapIdString == null)
-					throw new Exception($"{mapId} not defined in dictionary.");
+				//var mapIdString = MapDataManager.MapIdToMcl[(MapId)mapId].ToString("00");
+				//if(mapIdString == null)
+				//	throw new Exception($"{mapId} not defined in dictionary.");
 
-				string workingDirectory = Environment.CurrentDirectory;
-				string projectDirectory = Directory.GetParent(workingDirectory).Parent.Parent.Parent.FullName;
-				var path = $"{projectDirectory}\\LibPegasus\\Data\\Maps\\mcl\\world_{mapIdString}.mcl";
-				Serilog.Log.Information($"Loading map {path}");
-				MclParser mclParser = new MclParser();
-				mclParser.Parse(path);
-				_tileAttributes.Add(mapId, mclParser.AttributeData);
+				//string workingDirectory = Environment.CurrentDirectory;
+				//string projectDirectory = Directory.GetParent(workingDirectory).Parent.Parent.Parent.FullName;
+				//var path = $"{projectDirectory}\\LibPegasus\\Data\\Maps\\mcl\\world_{mapIdString}.mcl";
+				//Serilog.Log.Information($"Loading map {path}");
+				//MclParser mclParser = new MclParser();
+				//mclParser.Parse(path);
+				TileAttributeData tileAttributeData = new TileAttributeData();
+				_tileAttributes.Add(mapId, tileAttributeData);
 				return _tileAttributes[mapId];
 			}
 		}
@@ -264,26 +265,30 @@ namespace WorldServer.Logic.WorldRuntime.InstanceRuntime
 			var otherCharacters = client.Character.Location.Instance.GetNearbyCharacters(client);
 			if (otherCharacters.Count > 0)
 			{
-				var packetNewListOtherPlayers = new NFY_NewUserList(otherCharacters, AddObjectType.OTHERPLAYERS);
-				client.PacketManager.Send(packetNewListOtherPlayers);
+				//todo: send a packet that informs the user of other players nearby
+				//var packetNewListOtherPlayers = new NFY_NewUserList(otherCharacters, AddObjectType.OTHERPLAYERS);
+				//client.PacketManager.Send(packetNewListOtherPlayers);
 			}
 
 			var mobList = client.Character.Location.Instance.GetNearbyMobs(client);
 			if (mobList.Count > 0)
 			{
-				var packetMobs = new NFY_NewMobsList(mobList);
-				client.PacketManager.Send(packetMobs);
+				//todo: send a packet that informs the user of other mobs nearby
+				//var packetMobs = new NFY_NewMobsList(mobList);
+				//client.PacketManager.Send(packetMobs);
 			}
 
 			var groundItemList = client.Character.Location.Instance.GetNearbyGroundItems(client);
 			if (groundItemList.Count > 0)
 			{
-				var packetItems = new NFY_NewItemList(groundItemList, 0, 0xFFFFFFFF);
-				client.PacketManager.Send(packetItems);
+				//todo: send a packet that informs the user of other ground items nearby
+				//var packetItems = new NFY_NewItemList(groundItemList, 0, 0xFFFFFFFF);
+				//client.PacketManager.Send(packetItems);
 			}
 
-			var packet_new_list_this = new NFY_NewUserList(new List<Character>() { client.Character }, type);
-			client.BroadcastNearby(packet_new_list_this, true);
+			//todo: send a packet informing OTHER players of this new user
+			//var packet_new_list_this = new NFY_NewUserList(new List<Character>() { client.Character }, type);
+			//client.BroadcastNearby(packet_new_list_this, true);
 		}
 
 		internal void Update()
@@ -318,27 +323,5 @@ namespace WorldServer.Logic.WorldRuntime.InstanceRuntime
 				return instance;
 		}
 
-		internal Boolean WarpClientGPS(Client client, UInt16 slot, UInt32 extraParams)
-		{
-			if (slot != 9) // what is this
-				throw new NotImplementedException();
-
-			var warpId = extraParams;
-			var warp = _warpManager.Get((Int32)warpId);
-			if (warp == null)
-			{
-				return false;
-			}
-
-			var instance = GetFieldInstance((UInt64)warp.WorldIdx);
-			if (instance == null)
-				return false;
-
-			
-
-			//TODO: Nation checking
-			WarpClient(client, instance, 8, warp.PosXPnt, warp.PosYPnt);
-			return true;
-		}
 	}
 }

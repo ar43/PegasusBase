@@ -8,7 +8,6 @@ using WorldServer.Logic.CharData.Quests;
 using WorldServer.Logic.WorldRuntime.InstanceRuntime.MobRuntime;
 using WorldServer.Logic.WorldRuntime.MissionDungeonDataRuntime;
 using WorldServer.Logic.WorldRuntime.MobDataRuntime;
-using WorldServer.Packets.S2C;
 using Timer = LibPegasus.Utils.Timer;
 
 namespace WorldServer.Logic.WorldRuntime.InstanceRuntime.MissionDungeonRuntime
@@ -89,13 +88,14 @@ namespace WorldServer.Logic.WorldRuntime.InstanceRuntime.MissionDungeonRuntime
 
 		private void SpawnStartingMobs()
 		{
-			foreach(var mobSpawnInfo in MissionDungeonData.MissionDungeonMMap.Values)
-			{
-				if(mobSpawnInfo.MobSpawnData.SpawnDefault > 0)
-				{
-					_mobManager.SpawnDungeonMob(mobSpawnInfo);
-				}
-			}
+			//todo
+			//foreach(var mobSpawnInfo in MissionDungeonData.MissionDungeonMMap.Values)
+			//{
+			//	if(mobSpawnInfo.MobSpawnData.SpawnDefault > 0)
+			//	{
+			//		_mobManager.SpawnDungeonMob(mobSpawnInfo);
+			//	}
+			//}
 		}
 
 		private void ExecuteActGroup(MissionDungeonActGroup actGroup)
@@ -116,7 +116,8 @@ namespace WorldServer.Logic.WorldRuntime.InstanceRuntime.MissionDungeonRuntime
 				}
 				case TriggerAction.TA_SPAWN:
 				{
-					_mobManager.SpawnDungeonMob(MissionDungeonData.MissionDungeonMMap[actGroup.TgtMMapIdx]);
+					//todo
+					//_mobManager.SpawnDungeonMob(MissionDungeonData.MissionDungeonMMap[actGroup.TgtMMapIdx]);
 					break;
 				}
 				default:
@@ -192,8 +193,9 @@ namespace WorldServer.Logic.WorldRuntime.InstanceRuntime.MissionDungeonRuntime
 			
 			if(sendPacket)
 			{
-				var nfy = new NFY_QdppComplet(0);
-				_instance.Broadcast(nfy); // TODO: questionable, maybe it has to depend on quest Slot, figure it out
+				//todo
+				//var nfy = new NFY_QdppComplet(0);
+				//_instance.Broadcast(nfy); // TODO: questionable, maybe it has to depend on quest Slot, figure it out
 			}
 		}
 
@@ -217,12 +219,12 @@ namespace WorldServer.Logic.WorldRuntime.InstanceRuntime.MissionDungeonRuntime
 			else if(missionNpc != 0 && client != null)
 			{
 				var npcData = _instance.MapData.NpcData;
-				var npcPosX = npcData[missionNpc].PosX;
-				var npcPosY = npcData[missionNpc].PosY;
+				//var npcPosX = npcData[missionNpc].PosX;
+				//var npcPosY = npcData[missionNpc].PosY;
 				var posData = client.Character.Location;
 
-				if (npcPosX != 0 && npcPosY != 0 && !posData.Movement.VerifyDistanceToNpc(npcPosX, npcPosY))
-					throw new Exception("char too far away from npc");
+				//if (npcPosX != 0 && npcPosY != 0 && !posData.Movement.VerifyDistanceToNpc(npcPosX, npcPosY))
+				//	throw new Exception("char too far away from npc");
 
 				End(false);
 			}
@@ -256,8 +258,9 @@ namespace WorldServer.Logic.WorldRuntime.InstanceRuntime.MissionDungeonRuntime
 			if (success == 1 && cause == DungeonEndCause.Success && MissionDungeonStatus == MissionDungeonStatus.FINISHED)
 			{
 				MissionDungeonStatus = MissionDungeonStatus.READY_TO_EXIT;
-				var rsp = new RSP_QuestDungeonEnd(0, 1);
-				client.PacketManager.Send(rsp);
+				//todo: packet
+				//var rsp = new RSP_QuestDungeonEnd(0, 1);
+				//client.PacketManager.Send(rsp);
 				
 				_instance.NotifyAllDungeonEnd(success, cause);
 			}

@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using WorldServer.Enums;
 using WorldServer.Logic.CharData.Items;
-using WorldServer.Logic.SharedData;
 
 namespace WorldServer.Logic.WorldRuntime.InstanceRuntime.GroundItemRuntime
 {
@@ -10,7 +9,7 @@ namespace WorldServer.Logic.WorldRuntime.InstanceRuntime.GroundItemRuntime
 		Dictionary<int, GroundItem> _groundItems;
 		private readonly Instance _instance;
 		private BitArray _takenIds;
-		private UInt16 _groundItemIdGenerator = 1;
+		private int _groundItemIdGenerator = 1;
 		public GroundItemManager(Instance instance)
 		{
 			_instance = instance;
@@ -18,7 +17,7 @@ namespace WorldServer.Logic.WorldRuntime.InstanceRuntime.GroundItemRuntime
 			_groundItems = new();
 		}
 
-		private UInt16 GetNextId()
+		private int GetNextId()
 		{
 			_groundItemIdGenerator++;
 			if (_takenIds[_groundItemIdGenerator] == false)
@@ -36,10 +35,9 @@ namespace WorldServer.Logic.WorldRuntime.InstanceRuntime.GroundItemRuntime
 		public void AddGroundItem(Item item, UInt32 fromId, UInt16 X, UInt16 Y, ItemContextType itemContextType)
 		{
 			UInt16 newKey = (UInt16)_instance.Rng.Next(0xFFFF + 1);
-			ObjectIndexData oid = new(GetNextId(), (Byte)_instance.MapId, ObjectType.ITEM);
 
-			GroundItem groundItem = new(oid, item, X, Y, itemContextType, newKey, fromId);
-			_groundItems[oid.ObjectId] = groundItem;
+			GroundItem groundItem = new(GetNextId(), item, X, Y, itemContextType, newKey, fromId);
+			_groundItems[groundItem.ObjectId] = groundItem;
 			_instance.AddGroundItemToCell(groundItem, groundItem.CellX, groundItem.CellY, true);
 		}
 
@@ -47,12 +45,14 @@ namespace WorldServer.Logic.WorldRuntime.InstanceRuntime.GroundItemRuntime
 		{
 			groundItem.Delete();
 			_instance.RemoveGroundItemFromCell(groundItem, true);
-			_groundItems.Remove(groundItem.ObjectIndexData.ObjectId);
+			_groundItems.Remove(groundItem.ObjectId);
 		}
 
-		internal Item? OnLootRequest(Client client, ObjectIndexData objectIndexData, UInt16 key, UInt32 itemKind, UInt16 slot)
+		internal Item? OnLootRequest(Client client, int objectId, UInt16 key, UInt32 itemKind, UInt16 slot)
 		{
-			var groundItem = _groundItems[objectIndexData.ObjectId];
+			throw new NotImplementedException();
+			/*
+			var groundItem = _groundItems[objectId];
 			var questLootInfo = (0, 0, 0);
 
 			if (groundItem == null)
@@ -97,6 +97,7 @@ namespace WorldServer.Logic.WorldRuntime.InstanceRuntime.GroundItemRuntime
 			{
 				throw new Exception("instance mismatch");
 			}
+			*/
 		}
 	}
 }

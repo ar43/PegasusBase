@@ -12,11 +12,9 @@ using WorldServer.Enums;
 using WorldServer.Logic.AccountData;
 using WorldServer.Logic.CharData;
 using WorldServer.Logic.CharData.DbSyncData;
-using WorldServer.Logic.CharData.Styles;
 using WorldServer.Logic.ClientData;
 using WorldServer.Logic.WorldRuntime;
 using WorldServer.Packets;
-using WorldServer.Packets.S2C;
 
 namespace WorldServer.Logic
 {
@@ -160,10 +158,10 @@ namespace WorldServer.Logic
 			}
 		}
 
-		internal async Task<(Character?, int)> LoadCharacter(UInt32 characterId)
-		{
-			return await _databaseManager.CharacterManager.GetCharacter(characterId);
-		}
+		//internal async Task<(Character?, int)> LoadCharacter(UInt32 characterId)
+		//{
+		//	return await _databaseManager.CharacterManager.GetCharacter(characterId);
+		//}
 		internal void SendData()
 		{
 			if (!TcpClient.Connected || !PacketManager.OutputQueued())
@@ -243,8 +241,8 @@ namespace WorldServer.Logic
 			{
 				if (Character != null)
 				{
-					var heartbeatPacket = new REQ_Heartbeat();
-					PacketManager.Send(heartbeatPacket);
+					//var heartbeatPacket = new REQ_Heartbeat();
+					//PacketManager.Send(heartbeatPacket);
 					TimerHeartbeatTimeout = new LibPegasus.Utils.Timer(DateTime.UtcNow, 10000.0, false);
 				}
 				else
@@ -275,6 +273,7 @@ namespace WorldServer.Logic
 
 		private void UpdateInWorld()
 		{
+			/*
 			if (Character.Location.Movement.IsDeadReckoning)
 			{
 				var oldX = Character.Location.Movement.X;
@@ -304,6 +303,7 @@ namespace WorldServer.Logic
 				var packet_nfy = new NFY_ChartrEvent(CharEvent.EVT_LEVELUP, Character.Id);
 				this.BroadcastNearby(packet_nfy);
 			}
+			*/
 		}
 
 		internal void Error(string funcName, string message)
@@ -331,13 +331,13 @@ namespace WorldServer.Logic
 			return reply;
 		}
 
-		internal async Task<CreateCharacterReply> SendCharCreationRequest(Style style, string name, byte slot)
-		{
-			var client = new CharacterMaster.CharacterMasterClient(_masterRpcChannel);
-			var serverId = ServerConfig.Get().GeneralSettings.ServerId;
-			var reply = await client.CreateCharacterAsync(new CreateCharacterRequest { Style = style.Serialize(), Slot = slot, AccountId = ConnectionInfo.AccountId, ServerId = (UInt32)serverId, JoinNoviceGuild = false, Name = name });
-			return reply;
-		}
+		//internal async Task<CreateCharacterReply> SendCharCreationRequest(Style style, string name, byte slot)
+		//{
+		//	var client = new CharacterMaster.CharacterMasterClient(_masterRpcChannel);
+		//	var serverId = ServerConfig.Get().GeneralSettings.ServerId;
+		//	var reply = await client.CreateCharacterAsync(new CreateCharacterRequest { Style = style.Serialize(), Slot = slot, AccountId = ConnectionInfo.AccountId, ServerId = (UInt32)serverId, JoinNoviceGuild = false, Name = name });
+		//	return reply;
+		//}
 
 		internal async Task<GetChatServerInfoReply> RequestChatServerInfo()
 		{
@@ -363,24 +363,6 @@ namespace WorldServer.Logic
 			return reply;
 		}
 
-		internal async Task<(string, DateTime?)> GetSubPasswordData()
-		{
-			var reply = await _databaseManager.SubpassManager.GetSubPasswordData((Int32)ConnectionInfo.AccountId);
-			return reply;
-		}
-
-		internal async Task<bool> SetSubPassword(string subpass)
-		{
-			var reply = await _databaseManager.SubpassManager.SetSubpass((Int32)ConnectionInfo.AccountId, subpass);
-			return reply;
-		}
-
-		internal async Task<bool> SetSubPasswordVerificationDate()
-		{
-			var reply = await _databaseManager.SubpassManager.SetSubPasswordVerificationDate((Int32)ConnectionInfo.AccountId, DateTime.UtcNow);
-			return reply;
-		}
-
 		public void BroadcastNearby(Packet<Client> packet, bool excludeClient = false)
 		{
 			Character.Location.Instance.BroadcastNearby(this, packet, excludeClient);
@@ -402,69 +384,13 @@ namespace WorldServer.Logic
 					DBSyncPriority highestPrio = DBSyncPriority.NONE;
 					bool isFinal = Dropped || Character.UninitOnSync;
 
-					DbSyncEquipment? dbSyncEquipment = null;
-					DbSyncInventory? dbSyncInventory = null;
 					DbSyncLocation? dbSyncLocation = null;
-					DbSyncQuickSlotBar? dbSyncQuickSlotBar = null;
-					DbSyncSkills? dbSyncSkills = null;
-					DbSyncStats? dbSyncStats = null;
-					DbSyncStatus? dbSyncStatus = null;
-					DbSyncQuest? dbSyncQuest = null;
-					DbSyncStyle? dbSyncStyle = null;
 
-					if (Character.Inventory.SyncPending > DBSyncPriority.NONE || globalPrio > DBSyncPriority.NONE)
-					{
-						if (Character.Inventory.SyncPending > highestPrio)
-							highestPrio = Character.Inventory.SyncPending;
-						dbSyncInventory = new(Character.Inventory.GetProtobuf(), Character.Inventory.Alz);
-					}
-					if (Character.Equipment.SyncPending > DBSyncPriority.NONE || globalPrio > DBSyncPriority.NONE)
-					{
-						if (Character.Equipment.SyncPending > highestPrio)
-							highestPrio = Character.Equipment.SyncPending;
-						dbSyncEquipment = new(Character.Equipment.GetProtobuf());
-					}
 					if (Character.Location.SyncPending > DBSyncPriority.NONE || globalPrio > DBSyncPriority.NONE)
 					{
 						if (Character.Location.SyncPending > highestPrio)
 							highestPrio = Character.Location.SyncPending;
 						dbSyncLocation = Character.Location.GetDB();
-					}
-					if (Character.QuickSlotBar.SyncPending > DBSyncPriority.NONE || globalPrio > DBSyncPriority.NONE)
-					{
-						if (Character.QuickSlotBar.SyncPending > highestPrio)
-							highestPrio = Character.QuickSlotBar.SyncPending;
-						dbSyncQuickSlotBar = new(Character.QuickSlotBar.GetProtobuf());
-					}
-					if (Character.Skills.SyncPending > DBSyncPriority.NONE || globalPrio > DBSyncPriority.NONE)
-					{
-						if (Character.Skills.SyncPending > highestPrio)
-							highestPrio = Character.Skills.SyncPending;
-						dbSyncSkills = new(Character.Skills.GetProtobuf());
-					}
-					if (Character.Stats.SyncPending > DBSyncPriority.NONE || globalPrio > DBSyncPriority.NONE)
-					{
-						if (Character.Stats.SyncPending > highestPrio)
-							highestPrio = Character.Stats.SyncPending;
-						dbSyncStats = Character.Stats.GetDB();
-					}
-					if (Character.Status.SyncPending > DBSyncPriority.NONE || globalPrio > DBSyncPriority.NONE)
-					{
-						if (Character.Status.SyncPending > highestPrio)
-							highestPrio = Character.Status.SyncPending;
-						dbSyncStatus = Character.Status.GetDB();
-					}
-					if (Character.QuestManager.SyncPending > DBSyncPriority.NONE || globalPrio > DBSyncPriority.NONE)
-					{
-						if (Character.QuestManager.SyncPending > highestPrio)
-							highestPrio = Character.QuestManager.SyncPending;
-						dbSyncQuest = Character.QuestManager.GetDB();
-					}
-					if (Character.Style.SyncPending > DBSyncPriority.NONE || globalPrio > DBSyncPriority.NONE)
-					{
-						if (Character.Style.SyncPending > highestPrio)
-							highestPrio = Character.Style.SyncPending;
-						dbSyncStyle = Character.Style.GetDB();
 					}
 
 					if (highestPrio > DBSyncPriority.NONE || globalPrio > DBSyncPriority.NONE)
@@ -472,15 +398,7 @@ namespace WorldServer.Logic
 						if (globalPrio > DBSyncPriority.NONE)
 							highestPrio = globalPrio;
 						DbSyncRequest dbSyncRequest = new(highestPrio, Character.Id, isFinal);
-						dbSyncRequest.DbSyncInventory = dbSyncInventory;
-						dbSyncRequest.DbSyncQuickSlotBar = dbSyncQuickSlotBar;
-						dbSyncRequest.DbSyncSkills = dbSyncSkills;
-						dbSyncRequest.DbSyncStats = dbSyncStats;
-						dbSyncRequest.DbSyncStatus = dbSyncStatus;
-						dbSyncRequest.DbSyncEquipment = dbSyncEquipment;
 						dbSyncRequest.DbSyncLocation = dbSyncLocation;
-						dbSyncRequest.DbSyncQuest = dbSyncQuest;
-						dbSyncRequest.DbSyncStyle = dbSyncStyle;
 						Log.Information($"Sent sync request (prio: {highestPrio}, char: {Character.Id}, final: {isFinal})");
 						syncManager.AddToQueue(dbSyncRequest, highestPrio);
 						Character.ClearSync();
@@ -491,12 +409,9 @@ namespace WorldServer.Logic
 			}
 		}
 
-		public void SendServerMessage(string message, NewLoudMsgType messageType = NewLoudMsgType.INFO)
+		public void SendServerMessage(string message)
 		{
-			if (message.Length > 0xFFFF)
-				return;
-			NFY_NewLoudMsg msg = new((int)messageType, this.Character.Id, 3, message, "[Server]");
-			PacketManager.Send(msg);
+			throw new NotImplementedException();
 		}
 
 		public bool isGm()

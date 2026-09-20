@@ -10,9 +10,6 @@ using WorldServer.Logic.WorldRuntime.InstanceRuntime.MissionDungeonRuntime;
 using WorldServer.Logic.WorldRuntime.InstanceRuntime.MobRuntime;
 using WorldServer.Logic.WorldRuntime.MapDataRuntime;
 using WorldServer.Logic.WorldRuntime.MissionDungeonDataRuntime;
-using WorldServer.Packets.C2S.PacketSpecificData;
-using WorldServer.Packets.S2C;
-using WorldServer.Packets.S2C.PacketSpecificData;
 
 namespace WorldServer.Logic.WorldRuntime.InstanceRuntime
 {
@@ -94,10 +91,10 @@ namespace WorldServer.Logic.WorldRuntime.InstanceRuntime
 			{
 				foreach (var client in cell.LocalClients)
 				{
-					var nfy = new NFY_QuestDungeonEnd(client.Character.Id, success, cause);
-					client.PacketManager.Send(nfy);
+					//var nfy = new NFY_QuestDungeonEnd(client.Character.Id, success, cause);
+					//client.PacketManager.Send(nfy);
 
-					client.Character.QuestManager.OnDungeonCompleted(MissionDungeonManager.GetDungeonId());
+					//client.Character.QuestManager.OnDungeonCompleted(MissionDungeonManager.GetDungeonId());
 				}
 			}
 		}
@@ -114,7 +111,8 @@ namespace WorldServer.Logic.WorldRuntime.InstanceRuntime
 			if (notifyAround)
 			{
 				//possibly optimize this... no need to broadcast to empty instance for example
-				BroadcastNearby(mob, new NFY_NewMobsList(new List<Mob> { mob }));
+				//todo: packet
+				//BroadcastNearby(mob, new NFY_NewMobsList(new List<Mob> { mob }));
 			}
 		}
 
@@ -124,7 +122,8 @@ namespace WorldServer.Logic.WorldRuntime.InstanceRuntime
 			if (notifyAround)
 			{
 				//possibly optimize this... no need to broadcast to empty instance for example
-				BroadcastNearby(mob, new NFY_DelMobsList(mob.ObjectIndexData, type));
+				//todo: packet
+				//BroadcastNearby(mob, new NFY_DelMobsList(mob.ObjectIndexData, type));
 			}
 		}
 
@@ -134,7 +133,8 @@ namespace WorldServer.Logic.WorldRuntime.InstanceRuntime
 			if (notifyAround)
 			{
 				//possibly optimize this... no need to broadcast to empty instance for example
-				BroadcastNearby(groundItem, new NFY_NewItemList(new List<GroundItem> { groundItem }, (Byte)MapId));
+				//todo: packet
+				//BroadcastNearby(groundItem, new NFY_NewItemList(new List<GroundItem> { groundItem }, (Byte)MapId));
 			}
 		}
 
@@ -144,7 +144,7 @@ namespace WorldServer.Logic.WorldRuntime.InstanceRuntime
 			if (notifyAround)
 			{
 				//possibly optimize this... no need to broadcast to empty instance for example
-				BroadcastNearby(groundItem, new NFY_DelItemList(groundItem.ObjectIndexData, type));
+				//BroadcastNearby(groundItem, new NFY_DelItemList(groundItem.Id, type));
 			}
 		}
 
@@ -170,8 +170,9 @@ namespace WorldServer.Logic.WorldRuntime.InstanceRuntime
 
 		public void RemoveClient(Client client, DelObjectType reason)
 		{
-			var packet_del = new NFY_DelUserList(client.Character.Id, reason);
-			BroadcastNearby(client, packet_del, false);
+			//todo: packet
+			//var packet_del = new NFY_DelUserList(client.Character.Id, reason);
+			//BroadcastNearby(client, packet_del, false);
 
 			foreach (var cell in _cells)
 			{
@@ -238,8 +239,9 @@ namespace WorldServer.Logic.WorldRuntime.InstanceRuntime
 					if (c.Character == null)
 						throw new Exception("Character should not be null here");
 
-					var packetNewUser = new NFY_NewMobsList(new List<Mob>() { mob });
-					c.PacketManager.Send(packetNewUser);
+					//todo: packet
+					//var packetNewUser = new NFY_NewMobsList(new List<Mob>() { mob });
+					//c.PacketManager.Send(packetNewUser);
 				}
 			}
 
@@ -286,8 +288,9 @@ namespace WorldServer.Logic.WorldRuntime.InstanceRuntime
 						throw new Exception("Character should not be null here");
 
 					newChars.Add(c.Character);
-					var packetNewUser = new NFY_NewUserList(new List<Character>() { client.Character }, cellMoveType);
-					c.PacketManager.Send(packetNewUser);
+					//todo: packet
+					//var packetNewUser = new NFY_NewUserList(new List<Character>() { client.Character }, cellMoveType);
+					//c.PacketManager.Send(packetNewUser);
 				}
 
 				foreach (var m in _cells[cellPos.Item1, cellPos.Item2].LocalMobs)
@@ -317,20 +320,23 @@ namespace WorldServer.Logic.WorldRuntime.InstanceRuntime
 
 			if (newChars.Count > 0)
 			{
-				var packetOtherPlayers = new NFY_NewUserList(newChars, AddObjectType.OTHERPLAYERS);
-				client.PacketManager.Send(packetOtherPlayers);
+				//todo: packet
+				//var packetOtherPlayers = new NFY_NewUserList(newChars, AddObjectType.OTHERPLAYERS);
+				//client.PacketManager.Send(packetOtherPlayers);
 			}
 
 			if (newMobs.Count > 0)
 			{
-				var packetNewMobs = new NFY_NewMobsList(newMobs);
-				client.PacketManager.Send(packetNewMobs);
+				//todo: packet
+				//var packetNewMobs = new NFY_NewMobsList(newMobs);
+				//client.PacketManager.Send(packetNewMobs);
 			}
 
 			if (newItems.Count > 0)
 			{
-				var packetNewItems = new NFY_NewItemList(newItems, 0, 0xFFFFFFFF);
-				client.PacketManager.Send(packetNewItems);
+				//todo: packet
+				//var packetNewItems = new NFY_NewItemList(newItems, 0, 0xFFFFFFFF);
+				//client.PacketManager.Send(packetNewItems);
 			}
 
 			currentCell.LocalClients.Remove(client);
@@ -512,201 +518,6 @@ namespace WorldServer.Logic.WorldRuntime.InstanceRuntime
 
 			MobManager.UpdateAll();
 			MissionDungeonManager?.Update();
-		}
-
-		internal bool OnUserSkillAttacksMob(Client attacker, List<MobTarget> defenders, int x, int y, int skillSlot)
-		{
-			bool combo = false;
-			if (defenders.Count == 0)
-			{
-				Serilog.Log.Error("empty defenders");
-				return false;
-			}
-			var defenderTargetInfo = defenders[0]; //TODO
-
-			Mob defenderTarget;
-			try
-			{
-				defenderTarget = MobManager.GetMob(defenderTargetInfo.Id.ObjectId);
-			}
-			catch
-			{
-				Serilog.Log.Error("cant find defender");
-				return false;
-			}
-
-			if (defenderTarget == null)
-			{
-				Serilog.Log.Error("defender is null");
-				return false;
-			}
-
-			if (defenderTarget.IsDead)
-			{
-				Serilog.Log.Warning("defender is dead");
-				return false;
-			}
-
-			if (attacker.Character.Location.Movement.IsMoving)
-			{
-				Serilog.Log.Warning("attacker is moving");
-				return false;
-			}
-
-			if (CheckTileTown((UInt16)attacker.Character.Location.Movement.X, (UInt16)attacker.Character.Location.Movement.Y))
-			{
-				Serilog.Log.Warning("attacker is in town");
-				return false;
-			}
-
-			if (defenders.Count > 255)
-			{
-				//hard cap, but there should be an even lower cap, TODO, also kick the client
-				Serilog.Log.Warning("abnormal mob list");
-				return false;
-			}
-
-			//todo, cooldown check 
-			//todo, position check
-
-			var skill = attacker.Character.Skills.Get(skillSlot);
-			if (skill == null)
-				return false;
-
-			var battleStats = attacker.Character.CalculateBattleStats();
-			var skillAttackRate = skill.CalculateAttackRate(battleStats.AttackRate);
-			var skillAttack = skill.CalculateAttack(battleStats.Attack, battleStats.SwordSkillAmp, battleStats.MagicAttack, battleStats.MagicSkillAmp);
-			var skillCriticalRate = skill.CalculateCritRate(battleStats.CriticalRate, battleStats.MaxCriticalRate);
-			var skillCriticalDamage = skill.CalculateCritDamage(battleStats.CriticalDamage);
-			var mobDmgReport = new List<DamageToMobResult>();
-
-			int skillExp = 0;
-
-			foreach (var defenderInfo in defenders)
-			{
-				var defender = MobManager.GetMob(defenderInfo.Id.ObjectId);
-				var lvlDiffOrg = (int)(attacker.Character.Stats.Level - defender.Level);
-				var lvlDiff = BattleFormula.GetLvlDiff(attacker.Character.Stats.Level, defender.Level);
-				int roll = Rng.Next(100);
-
-				int damage = 0;
-				AttackResult attackResult;
-				int exp = 0;
-
-				//TODO: check if defender is in range of defenderTarget / attacker
-
-				if (roll < skillCriticalRate)
-				{
-					Serilog.Log.Debug($"CRIT calculated skillAttack: {skillAttack} roll: {roll} final CR: {skillCriticalRate} finalCD: {skillCriticalDamage}");
-					damage = defender.CalculateCriticalDamageTaken(attacker.Character, skill, skillAttack, skillCriticalDamage);
-					attackResult = AttackResult.SR_CRITICAL;
-				}
-				else
-				{
-					skillAttackRate = (Int32)(skillAttackRate + 16 * lvlDiffOrg / 10);
-					if (skillAttackRate < 0)
-						skillAttackRate = 0;
-
-					var defenderDefenseRate = defender.GetDefenseRate();
-					int hitRate = 0;
-
-					if (skillAttackRate + defenderDefenseRate == 0)
-					{
-						hitRate = 0;
-					}
-					else
-					{
-						hitRate = BattleFormula.GetHR(skillAttackRate, defenderDefenseRate);
-					}
-
-					hitRate = BattleFormula.AdjustHR(hitRate, 30, 95 - defender.GetEvasion());
-					hitRate = (100 - skillCriticalRate) * hitRate / 100 + skillCriticalRate;
-					Serilog.Log.Debug($"calculated skillAttack: {skillAttack} hitRate: {hitRate} roll: {roll} final CR: {skillCriticalRate}");
-
-					if (combo || roll < hitRate)
-					{
-						damage = defender.CalculateNormalDamageTaken(attacker.Character, skill, skillAttack);
-						attackResult = AttackResult.SR_NORMALAK;
-					}
-					else
-					{
-						attackResult = AttackResult.SR_MISSINGS;
-					}
-				}
-
-				if (attackResult != AttackResult.SR_MISSINGS)
-				{
-					if (damage < 1)
-						damage = 1;
-				}
-
-				if (damage > 0)
-				{
-					//TODO: absorb
-				}
-
-				if (attackResult != AttackResult.SR_MISSINGS)
-				{
-					int expModifier = attacker.Character.RestExpCheck();
-					//TODO: exp
-					if (defender.GetMaxHP() == 0)
-					{
-						exp = 0;
-						skillExp = 0;
-					}
-					else
-					{
-						exp = BattleFormula.GetEXP(damage, defender.GetMaxHP(), defender.GetExp(), lvlDiff, 1); //this is 25% too much cuz of EP8 settings
-
-						if (attackResult == AttackResult.SR_CRITICAL)
-						{
-							skillExp = skill.GetSkillExp(2);
-						}
-						else
-						{
-							skillExp = skill.GetSkillExp(1);
-						}
-					}
-				}
-
-				exp = (400 - 600 / (1 + 1)) * exp / 100 / 1; //what is this? some kind of scrapped aoe diminishing returns for exp??
-
-				defender.TakeDamage(damage);
-				defender.AggroTable.Add(damage, attacker, defender.CurrentDefender);
-				defender.SetAttacker(attacker);
-
-
-				var dmgResult = new DamageToMobResult(defender.ObjectIndexData);
-				dmgResult.HasBFX = 1;
-				dmgResult.DamageReceived = (UInt16)damage;
-				dmgResult.AttackResult = attackResult;
-				dmgResult.Type = defenderInfo.Type; //what is this TODO
-				dmgResult.HPLeft = (UInt32)defender.HP;
-				mobDmgReport.Add(dmgResult);
-
-				defender.DeathCheck(attacker, skill.Id);
-
-				if(exp > 1)
-				{
-					//TODO: recalc Exp for bonuses and blah blah
-					attacker.Character.Stats.AddExp((UInt64)exp);
-				}
-			}
-
-			
-			//also skill exp
-
-			
-			//addSkillExp
-
-			var rsp = new RSP_SkillToMobs(mobDmgReport, skill.Id, (UInt16)attacker.Character.Status.Hp, (UInt16)attacker.Character.Status.Mp,
-				(UInt16)attacker.Character.Status.Sp, attacker.Character.Stats.Exp, (UInt32)skillExp, 0, 0, 0);
-			attacker.PacketManager.Send(rsp);
-
-			var nfy = new NFY_SkillToMobs(mobDmgReport, skill.Id, attacker.Character.Id, (UInt16)x, (UInt16)y);
-			BroadcastNearby(attacker, nfy, false);
-
-			return true;
 		}
 	}
 }

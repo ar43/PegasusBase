@@ -1,0 +1,58 @@
+{
+	"namespace": "LibPegasus.Packets.World",
+	"opcodeEnum": "OpcodeWorld",
+	"outputPath": "../../Packets/World",
+	"packets": [
+		{
+			"name": "Connect2Svr",
+			"opcode": "CONNECT2SVR",
+			"directions": [
+				{
+					"direction": "C2S",
+					"handlerName": "OnServerConnectionHandler",
+					"fields": [
+						{
+							"name": "ClientVersion",
+							"type": "UInt32"
+						},
+						{
+							"name": "ClientNonce",
+							"type": "byte[]",
+							"size": 8
+						},
+						{
+							"name": "ClientPublicKey",
+							"type": "byte[]",
+							"size": 32
+						}
+					]
+				},
+				{
+					"direction": "S2C",
+					"prefix": "RSP",
+					"handlerName": "OnServerConnectionHandler",
+					"fields": [
+						{
+							"name": "AuthKey",
+							"type": "UInt32"
+						},
+						{
+							"name": "UserIdx",
+							"type": "UInt16"
+						},
+						{
+							"name": "ServerNonce",
+							"type": "byte[]",
+							"size": 8
+						},
+						{
+							"name": "PublicServerKey",
+							"type": "byte[]",
+							"size": 32
+						}
+					]
+				}
+			]
+		}
+	]
+}

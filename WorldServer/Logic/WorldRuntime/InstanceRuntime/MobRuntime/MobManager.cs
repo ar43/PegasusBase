@@ -59,26 +59,26 @@ namespace WorldServer.Logic.WorldRuntime.InstanceRuntime.MobRuntime
 			foreach (var mSpawn in _instance.MapData.MobSpawnData.Values)
 			{
 				var mobId = GetNextMobId();
-				Mob mob = new Mob(mSpawn.MobData, mSpawn, _instance, mobId, _instance.Rng, null);
+				Mob mob = new Mob(mSpawn.MobData, mSpawn, _instance, mobId, _instance.Rng);
 				_mobs.Add(mobId, mob);
 				mob.Spawn(time);
 			}
 		}
 
-		public void SpawnDungeonMob(MissionDungeonMMapEntry spawnInfo)
-		{
-			Debug.Assert(_instance.Type == Enums.InstanceType.DUNGEON);
+		//public void SpawnDungeonMob(MissionDungeonMMapEntry spawnInfo)
+		//{
+		//	Debug.Assert(_instance.Type == Enums.InstanceType.DUNGEON);
 
-			ushort mobId = (UInt16)spawnInfo.ExtraMobInfo.MobIdx;
-			Mob mob = new Mob(spawnInfo.MobSpawnData.MobData, spawnInfo.MobSpawnData, _instance, mobId, _instance.Rng, spawnInfo.ExtraMobInfo);
+		//	ushort mobId = (UInt16)spawnInfo.ExtraMobInfo.MobIdx;
+		//	Mob mob = new Mob(spawnInfo.MobSpawnData.MobData, spawnInfo.MobSpawnData, _instance, mobId, _instance.Rng, spawnInfo.ExtraMobInfo);
 
-			if (_mobs.ContainsKey(mobId)) //TODO: figure out if overwrite or ignore
-				return;
+		//	if (_mobs.ContainsKey(mobId)) //TODO: figure out if overwrite or ignore
+		//		return;
 
-			_mobs.Add(mobId, mob);
-			mob.Spawn(DateTime.UtcNow);
+		//	_mobs.Add(mobId, mob);
+		//	mob.Spawn(DateTime.UtcNow);
 
-		}
+		//}
 
 		public void UpdateAll()
 		{

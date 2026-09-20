@@ -2,7 +2,7 @@
 {
 	internal enum ConnState : UInt16
 	{
-		UNCONNECTED,
+		INITIAL,
 		AWAITING,
 		AUTHORIZING,
 		CONNECTED,

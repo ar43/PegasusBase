@@ -23,6 +23,8 @@
 
   <ItemGroup>
     <Folder Include="JSON\" />
+    <Folder Include="Logic\SharedData\" />
+    <Folder Include="Logic\WorldRuntime\LootDataRuntime\" />
     <Folder Include="Protos\" />
   </ItemGroup>
 

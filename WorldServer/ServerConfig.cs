@@ -45,7 +45,6 @@ namespace WorldServer
 	{
 		public int ServerId { get; set; }
 		public int ChannelId { get; set; }
-		public long ClientMagicKey { get; set; }
 	}
 
 	public class Connectionsettings
@@ -61,32 +60,6 @@ namespace WorldServer
 
 	public class Gamesettings
 	{
-		public int MaxLevel { get; set; }
-		public bool DummyEnabled { get; set; }
-		public bool CashShopEnabled { get; set; }
-		public bool NetcafePointsEnabled { get; set; }
-		public int MaxRank { get; set; }
-		public int LimitLoudCharLv { get; set; }
-		public int LimitLoudMasteryLv { get; set; }
-		public long LimitInvAlzSave { get; set; }
-		public long LimitWhAlzSave { get; set; }
-		public long LimitTradeAlz { get; set; }
-		public bool AllowDuplicatedPCBangPremium { get; set; }
-		public bool GuildBoardEnabled { get; set; }
-		public int PCBangPremiumPrioType { get; set; }
-		public int UseTradeChannelRestriction { get; set; }
-		public bool AgentShopEnabled { get; set; }
-		public int UseLordBroadCastCoolTimeSec { get; set; }
-		public int DummyLimitLv { get; set; }
-		public int AgentShopRestrictionLv { get; set; }
-		public int PersonalShopRestrictionLv { get; set; }
-		public bool UseTPoint { get; set; }
-		public bool UseGuildExpansion { get; set; }
-		public bool IgnorePartyInviteDistance { get; set; }
-		public bool LimitedBroadCastByLord { get; set; }
-		public int LimitNormalChatLev { get; set; }
-		public int LimitTradeChatLev { get; set; }
-		public int MaxDPLimit { get; set; }
 	}
 
 

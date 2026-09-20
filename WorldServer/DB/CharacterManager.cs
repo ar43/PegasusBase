@@ -5,7 +5,6 @@ using WorldServer.Logic.CharData;
 using WorldServer.Logic.CharData.DbSyncData;
 using WorldServer.Logic.CharData.Quests;
 using WorldServer.Logic.CharData.Skills;
-using WorldServer.Logic.CharData.Styles;
 
 namespace WorldServer.DB
 {
@@ -32,6 +31,8 @@ namespace WorldServer.DB
 				return parser.ParseFrom(ms);
 			}
 		}
+
+/*
 
 		public async Task<int> SyncEquipment(int charId, EquipmentData equipmentData)
 		{
@@ -369,6 +370,7 @@ namespace WorldServer.DB
 
 			return (null, 0);
 		}
+*/
 	}
 
 }

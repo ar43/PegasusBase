@@ -1,4 +1,5 @@
-﻿using WorldServer.Enums;
+﻿using System.Security.Cryptography;
+using WorldServer.Enums;
 
 namespace WorldServer.Logic.ClientData
 {
@@ -8,8 +9,9 @@ namespace WorldServer.Logic.ClientData
 		{
 			UserId = userId;
 			AuthKey = authKey;
-			ConnState = ConnState.UNCONNECTED;
+			ConnState = ConnState.INITIAL;
 			AccountId = 0;
+			ServerNonce = RandomNumberGenerator.GetBytes(8);
 		}
 
 		public UInt16 UserId { get; private set; }
@@ -28,6 +30,8 @@ namespace WorldServer.Logic.ClientData
 		private bool _accIdLock = false;
 
 		public bool SubPasswordAuthenticated = false;
+
+		public byte[] ServerNonce { get; private set; }
 
 		public void SetAccountId(UInt32 accountId)
 		{

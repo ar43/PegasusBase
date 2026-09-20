@@ -65,8 +65,8 @@ namespace LoginServer.Logic.Delegates
 				throw new NotImplementedException();
 			}
 
-			//Serilog.Log.Debug($"username extracted: {username} (len: {username.Length})");
-			//Serilog.Log.Debug($"password extracted: {password} (len: {password.Length})");
+			Serilog.Log.Debug($"username extracted: {username} (len: {username.Length})");
+			Serilog.Log.Debug($"password extracted: {password} (len: {password.Length})");
 
 			var reply = await client.SendLoginRequest(username, password);
 			if ((AuthResult)reply.Status == AuthResult.Normal)

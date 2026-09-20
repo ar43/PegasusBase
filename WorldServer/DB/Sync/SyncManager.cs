@@ -65,7 +65,7 @@ namespace WorldServer.DB.Sync
 					oldTimestamps = new SyncTimestamps();
 					_syncTimestamps.TryAdd(charId, oldTimestamps);
 				}
-
+				/*
 				if (request.DbSyncEquipment != null)
 				{
 					if (oldTimestamps.Equipment.Ticks < newTimestamps.Ticks)
@@ -138,6 +138,7 @@ namespace WorldServer.DB.Sync
 						_databaseManager.CharacterManager.SyncStyle(charId, request.DbSyncStyle).ExecuteDbSync(isFinal, _masterRpcChannel, SyncFlags.STYLE, charId);
 					}
 				}
+				*/
 
 				//todo: tell master server to release lock, but when....
 				//have to do SOMETHING when all of the Sync* functions are done, SOMEHOW
