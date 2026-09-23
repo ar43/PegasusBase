@@ -35,29 +35,23 @@ namespace MasterServer.DB
 				}
 			}
 		}
-		private async Task<(string hash, uint accountId)> AccountVerify(string username, string password)
+		private async Task<(string hash, uint accountId)> GetAccountInfo(string username)
 		{
-			using var conn = await _dataSource.OpenConnectionAsync();
+			await using var conn = await _dataSource.OpenConnectionAsync();
 
-			await using (var cmd = new NpgsqlCommand("SELECT password, id FROM main.accounts WHERE username=@p", conn))
+			await using var cmd = new NpgsqlCommand("SELECT password, id FROM main.accounts WHERE username=@p", conn);
+			cmd.Parameters.AddWithValue("p", username);
+
+			await using var reader = await cmd.ExecuteReaderAsync();
+			if (await reader.ReadAsync())
 			{
-				cmd.Parameters.AddWithValue("p", username);
-				await using (var reader = await cmd.ExecuteReaderAsync())
-				{
-					bool found = await reader.ReadAsync();
-					if (found)
-					{
-						var hash = reader.GetString(0);
-						var id = reader.GetInt32(1);
-						Debug.Assert(hash != String.Empty);
-						return (hash, (uint)id);
-					}
-					else
-					{
-						return (String.Empty, 0);
-					}
-				}
+				var hash = reader.GetString(0);
+				var id = reader.GetInt32(1);
+				Debug.Assert(hash != String.Empty);
+				return (hash, (uint)id);
 			}
+
+			return (String.Empty, 0);
 		}
 		private async Task<bool> RegisterAccount(string username, string password)
 		{
@@ -104,29 +98,22 @@ namespace MasterServer.DB
 		}
 		public async Task<UInt32> RequestLogin(string username, string password)
 		{
-			var accountInfo = await AccountVerify(username, password);
+			var accountInfo = await GetAccountInfo(username);
 
-			if (accountInfo.hash == String.Empty)
+			if (string.IsNullOrEmpty(accountInfo.hash))
 			{
 				return 0;
 			}
-			else
-			{
-				var valid = Task.Factory.StartNew(() =>
-				{
-					var validation = BCrypt.Net.BCrypt.Verify(password, accountInfo.hash);
-					return validation;
-				});
 
-				if (valid.Result)
-				{
-					return accountInfo.accountId;
-				}
-				else
-				{
-					return 0;
-				}
+			// Offload CPU-heavy BCrypt hashing properly without thread blocking
+			bool isValid = await Task.Run(() => BCrypt.Net.BCrypt.Verify(password, accountInfo.hash));
+
+			if (isValid)
+			{
+				return accountInfo.accountId;
 			}
+
+			return 0;
 		}
 
 	}

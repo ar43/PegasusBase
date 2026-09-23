@@ -37,6 +37,8 @@ namespace LoginServer.Logic
 
 		CurrentData _currentData = new();
 
+		private readonly AuthMaster.AuthMasterClient _authRpcClient;
+
 		internal bool Dropped { get; private set; } = false;
 
 		public Client(TcpClient tcpClient, GrpcChannel masterChannel, KeyPair serverKeyPair)
@@ -45,6 +47,7 @@ namespace LoginServer.Logic
 			PacketManager = new PacketManager();
 			Encryption = new(serverKeyPair);
 			_masterRpcChannel = masterChannel;
+			_authRpcClient = new AuthMaster.AuthMasterClient(_masterRpcChannel);
 
 			var remoteEndPoint = TcpClient.Client.RemoteEndPoint as IPEndPoint;
 			Ip = remoteEndPoint.Address.ToString();
@@ -60,15 +63,13 @@ namespace LoginServer.Logic
 
 		internal async Task<LoginAccountReply> SendLoginRequest(string username, string password)
 		{
-			var client = new AuthMaster.AuthMasterClient(_masterRpcChannel);
-			var reply = await client.LoginAsync(new LoginAccountRequest { Username = username, Password = password });
+			var reply = await _authRpcClient.LoginAsync(new LoginAccountRequest { Username = username, Password = password });
 			return reply;
 		}
 
 		internal async Task<SessionReply> SendSessionRequest(UInt32 authKey, UInt16 userId, Byte channelId, Byte serverId)
 		{
-			var client = new AuthMaster.AuthMasterClient(_masterRpcChannel);
-			var reply = await client.CreateSessionAsync(new SessionRequest { AuthKey = authKey, UserId = userId, ChannelId = channelId, ServerId = serverId, AccountId = ClientInfo.AccountId });
+			var reply = await _authRpcClient.CreateSessionAsync(new SessionRequest { AuthKey = authKey, UserId = userId, ChannelId = channelId, ServerId = serverId, AccountId = ClientInfo.AccountId });
 			return reply;
 		}
 
@@ -214,6 +215,7 @@ namespace LoginServer.Logic
 		internal void Disconnect(string reason)
 		{
 			Dropped = true;
+			Serilog.Log.Debug($"Disconnected client {ClientInfo?.Username}. Reason: {reason}");
 			//todo - send session timeout
 		}
 

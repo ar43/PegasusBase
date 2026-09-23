@@ -93,7 +93,7 @@ namespace LoginServer.Logic.Delegates
 			{
 				var packet = new RSP_AuthAccount<Client>(reply.ToByteArray());
 				client.PacketManager.Send(packet);
-				client.Disconnect("bad auth");
+				client.Disconnect($"{username} bad auth");
 			}
 		}
 

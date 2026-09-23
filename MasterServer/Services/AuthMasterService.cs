@@ -3,6 +3,7 @@ using Grpc.Core;
 using LibPegasus.Enums;
 using MasterServer.Channel;
 using MasterServer.DB;
+using Microsoft.AspNetCore.RateLimiting;
 using Shared.Protos;
 
 namespace MasterServer.Services
@@ -53,28 +54,29 @@ namespace MasterServer.Services
 			});
 		}
 
-		public override Task<LoginAccountReply> Login(LoginAccountRequest request, ServerCallContext context)
+		[EnableRateLimiting("LoginConcurrencyQueue")]
+		public override async Task<LoginAccountReply> Login(LoginAccountRequest request, ServerCallContext context)
 		{
 			Serilog.Log.Information("Called Login");
 			AuthResult status = AuthResult.None;
-			var accountId = _databaseManager.AccountManager.RequestLogin(request.Username, request.Password);
+			var accountId = await _databaseManager.AccountManager.RequestLogin(request.Username, request.Password);
 			//Serilog.Log.Information("Login return code: " + success.Result);
 
 			var serverData = _channelManager.GetSerializedServerData();
 			var serverCount = 0;
 
 			//TODO: send bad result if acc is already logged in
-			if (accountId.Result > 0)
+			if (accountId > 0)
 			{
 				status = AuthResult.Normal;
 
-				var charCountData = _databaseManager.CharacterManager.GetCharacterCount((int)accountId.Result);
+				var charCountData = await _databaseManager.CharacterManager.GetCharacterCount((int)accountId);
 				if (serverData != null)
 				{
 					serverCount = serverData.Length / 2;
 					for (int i = 0; i < serverData.Length; i += 2)
 					{
-						charCountData.Result.TryGetValue(serverData[i], out int charCount);
+						charCountData.TryGetValue(serverData[i], out int charCount);
 						serverData[i + 1] = (Byte)charCount;
 					}
 				}
@@ -84,10 +86,10 @@ namespace MasterServer.Services
 				status = AuthResult.Incorrect;
 			}
 
-			return Task.FromResult(new LoginAccountReply
+			return new LoginAccountReply
 			{
 				Status = (uint)status,
-				AccountId = accountId.Result,
+				AccountId = accountId,
 				ServerCount = (uint)serverCount,
 				SubPassSet = false, //TODO
 				CharData = ByteString.CopyFrom(serverData),
@@ -95,7 +97,7 @@ namespace MasterServer.Services
 				PremServExpired = 0,
 				Language = 0,
 				AuthKey = "46385170829535025841897130667207"
-			});
+			};
 		}
 	}
 }
