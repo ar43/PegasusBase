@@ -69,7 +69,7 @@ namespace LoginServer.Logic.Delegates
 			Serilog.Log.Debug($"password extracted: {password} (len: {password.Length})");
 
 			var reply = await client.SendLoginRequest(username, password);
-			if ((AuthResult)reply.Status == AuthResult.Normal)
+			if ((AuthResult)reply.Status == AuthResult.SUCCESS)
 			{
 				bool isLocalhost = client.Ip == "127.0.0.1";
 				Debug.Assert(reply.AuthKey.Length == 32);

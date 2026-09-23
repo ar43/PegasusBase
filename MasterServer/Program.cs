@@ -1,10 +1,11 @@
 using MasterServer.Channel;
 using MasterServer.DB;
+using MasterServer.Helpers;
 using MasterServer.Services;
 using MasterServer.Sync;
+using Microsoft.AspNetCore.RateLimiting;
 using Serilog;
 using System.Threading.RateLimiting;
-using Microsoft.AspNetCore.RateLimiting;
 
 namespace MasterServer
 {
@@ -24,6 +25,7 @@ namespace MasterServer
 			builder.Configuration.AddJsonFile("chatsettings.json", optional: false, reloadOnChange: true);
 			builder.Host.UseSerilog();
 			builder.Services.AddGrpc();
+			builder.Services.AddSingleton<LoginCooldownTracker>();
 			builder.Services.AddSingleton<DatabaseManager>();
 			builder.Services.AddSingleton<ChannelManager>();
 			builder.Services.AddSingleton<SyncManager>();
