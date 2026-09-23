@@ -76,7 +76,7 @@
     foreach (JsonNode? pktNode in packets)
     {
         string packetName = pktNode!["name"]!.GetValue<string>();
-        string opcode     = pktNode["opcode"]!.GetValue<string>();
+        string opcode     = pktNode["name"]!.GetValue<string>().ToUpperInvariant();;
         JsonArray dirs    = pktNode["directions"]!.AsArray();
 
         foreach (JsonNode? dirNode in dirs)

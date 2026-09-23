@@ -5,7 +5,6 @@
 	"packets": [
 		{
 			"name": "CheckVersion",
-			"opcode": "CHECKVERSION",
 			"directions": [
 				{
 					"direction": "C2S",
@@ -32,7 +31,6 @@
 		},
 		{
 			"name": "AuthAccount",
-			"opcode": "AUTHACCOUNT",
 			"directions": [
 				{
 					"direction": "C2S",
@@ -73,7 +71,6 @@
 		},
 		{
 			"name": "ServerState",
-			"opcode": "SERVERSTATE",
 			"directions": [
 				{
 					"direction": "S2C",
@@ -89,8 +86,7 @@
 			]
 		},
 		{
-			"name": "Connect2Svr",
-			"opcode": "CONNECT2SVR",
+			"name": "ConnectServer",
 			"directions": [
 				{
 					"direction": "C2S",

@@ -8,7 +8,7 @@ using Nito.Collections;
 
 namespace LibPegasus.Packets.Login.C2S
 {
-	public class REQ_Connect2Svr<ClientClass> : Packet<ClientClass>
+	public class REQ_ConnectServer<ClientClass> : Packet<ClientClass>
 	{
 		// ── Fields ──────────────────────────────────────────────────────────
 		private byte[]? _clientNonce;
@@ -18,8 +18,8 @@ namespace LibPegasus.Packets.Login.C2S
 		public static Action<ClientClass, byte[], byte[]>? OnServerConnectionHandler;
 
 		// ── Deserialising constructor (reads from wire) ──────────────────────
-		public REQ_Connect2Svr(Queue<byte> data)
-			: base((UInt16)OpcodeLogin.CONNECT2SVR, data) { }
+		public REQ_ConnectServer(Queue<byte> data)
+			: base((UInt16)OpcodeLogin.CONNECTSERVER, data) { }
 
 		public override bool ReadPayload(Queue<Action<ClientClass>> actions)
 		{
@@ -41,8 +41,8 @@ namespace LibPegasus.Packets.Login.C2S
 		}
 
 		// ── Serialising constructor (writes to wire) ─────────────────────────
-		public REQ_Connect2Svr(byte[] clientNonce, byte[] clientPublicKey)
-			: base((UInt16)OpcodeLogin.CONNECT2SVR)
+		public REQ_ConnectServer(byte[] clientNonce, byte[] clientPublicKey)
+			: base((UInt16)OpcodeLogin.CONNECTSERVER)
 		{
 			_clientNonce = clientNonce;
 			_clientPublicKey = clientPublicKey;

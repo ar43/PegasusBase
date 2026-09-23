@@ -20,7 +20,7 @@ namespace LoginServer.Packets
 
 		public PacketManager()
 		{
-			REQ_Connect2Svr<Client>.OnServerConnectionHandler = Connection.OnServerConnection;
+			REQ_ConnectServer<Client>.OnServerConnectionHandler = Connection.OnServerConnection;
 			REQ_AuthAccount<Client>.OnAuthAccountHandler = Connection.OnAuthAccount;
 			REQ_CheckVersion<Client>.OnCheckVersionHandler = Connection.OnCheckVersion;
 			REQ_VerifyLinks<Client>.OnVerifyLinksHandler = Connection.OnVerifyLinks;
@@ -52,7 +52,7 @@ namespace LoginServer.Packets
 		{
 			return opcode switch
 			{
-				OpcodeLogin.CONNECT2SVR => new REQ_Connect2Svr<Client>(data),
+				OpcodeLogin.CONNECTSERVER => new REQ_ConnectServer<Client>(data),
 				OpcodeLogin.CHECKVERSION => new REQ_CheckVersion<Client>(data),
 				OpcodeLogin.AUTHACCOUNT => new REQ_AuthAccount<Client>(data),
 				OpcodeLogin.VERIFYLINKS => new REQ_VerifyLinks<Client>(data),

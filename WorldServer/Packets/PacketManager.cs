@@ -20,7 +20,7 @@ namespace WorldServer.Packets
 
 		public PacketManager()
 		{
-			REQ_Connect2Svr<Client>.OnServerConnectionHandler = Connection.OnServerConnection;
+			REQ_ConnectServer<Client>.OnServerConnectionHandler = Connection.OnServerConnection;
 		}
 
 		public void EnqueuePacket(UInt16 opcode, Queue<byte> packet)
@@ -49,7 +49,7 @@ namespace WorldServer.Packets
 		{
 			return opcode switch
 			{
-				OpcodeWorld.CONNECT2SVR => new REQ_Connect2Svr<Client>(data),
+				OpcodeWorld.CONNECTSERVER => new REQ_ConnectServer<Client>(data),
 				_ => throw new NotImplementedException($"unimplemented opcode {opcode}"),
 			}; ;
 		}
@@ -75,7 +75,7 @@ namespace WorldServer.Packets
 					continue;
 				}
 
-				if (!isAuthenticated && (OpcodeWorld)opcodeNum != OpcodeWorld.CONNECT2SVR)
+				if (!isAuthenticated && (OpcodeWorld)opcodeNum != OpcodeWorld.CONNECTSERVER)
 				{
 					Log.Warning($"Received opcode {opcodeNum}(len={dataQueue.Count}) while unauthenticated");
 					_recvCounter++;

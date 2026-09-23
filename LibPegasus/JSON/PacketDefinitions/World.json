@@ -4,8 +4,7 @@
 	"outputPath": "../../Packets/World",
 	"packets": [
 		{
-			"name": "Connect2Svr",
-			"opcode": "CONNECT2SVR",
+			"name": "ConnectServer",
 			"directions": [
 				{
 					"direction": "C2S",

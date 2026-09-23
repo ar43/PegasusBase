@@ -25,7 +25,7 @@ namespace LoginServer.Logic.Delegates
 
 			client.Encryption.GenerateSessionKey(client.ClientInfo.ServerNonce, clientNonce, clientPublicKey);
 
-			var packet = new RSP_Connect2Svr<Client>(client.ClientInfo.AuthKey, client.ClientInfo.UserId, 
+			var packet = new RSP_ConnectServer<Client>(client.ClientInfo.AuthKey, client.ClientInfo.UserId, 
 				client.ClientInfo.ServerNonce, client.Encryption.KeyPair.PublicKey);
 			client.PacketManager.Send(packet);
 		}

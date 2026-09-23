@@ -21,7 +21,7 @@ namespace WorldServer.Logic.Delegates
 
 			if (clientVersion != WorldPacketVersion.Revision)
 			{
-				var packetFail = new RSP_Connect2Svr<Client>((Byte)ConnectionResult.VERSION_MISMATCH, 
+				var packetFail = new RSP_ConnectServer<Client>((Byte)ConnectionResult.VERSION_MISMATCH, 
 					client.ConnectionInfo.AuthKey, 0, client.ConnectionInfo.ServerNonce, client.Encryption.KeyPair.PublicKey);
 				client.PacketManager.Send(packetFail);
 				client.Disconnect($"version mismatch, client: {clientVersion} server: {WorldPacketVersion.Revision}", ConnState.ERROR);
@@ -30,7 +30,7 @@ namespace WorldServer.Logic.Delegates
 
 			client.ConnectionInfo.ConnState = Enums.ConnState.AWAITING;
 
-			var packet = new RSP_Connect2Svr<Client>((Byte)ConnectionResult.SUCCESS, 
+			var packet = new RSP_ConnectServer<Client>((Byte)ConnectionResult.SUCCESS, 
 				client.ConnectionInfo.AuthKey, client.ConnectionInfo.UserId,
 				client.ConnectionInfo.ServerNonce, client.Encryption.KeyPair.PublicKey);
 			client.PacketManager.Send(packet);
