@@ -185,7 +185,7 @@ namespace WorldServer.Logic
 						Disconnect("Disconnect - cannot send data", ConnState.DISCONNECTED);
 					}
 					
-					//PrintByteArray(send, send.Length, "encrypted sent");
+					//Utility.PrintByteArray(send, send.Length, "encrypted sent");
 				}
 			}
 

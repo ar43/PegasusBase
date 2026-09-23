@@ -75,12 +75,7 @@ namespace MasterServer.Services
 					Status = (uint)AuthResult.TOO_MANY_FAIL,
 					AccountId = 0,
 					ServerCount = (uint)0,
-					SubPassSet = false, //TODO
 					CharData = ByteString.Empty,
-					PremServId = 0,
-					PremServExpired = 0,
-					Language = 0,
-					AuthKey = "46385170829535025841897130667207"
 				};
 			}
 
@@ -118,12 +113,7 @@ namespace MasterServer.Services
 				Status = (uint)status,
 				AccountId = accountId,
 				ServerCount = (uint)serverCount,
-				SubPassSet = false, //TODO
 				CharData = ByteString.CopyFrom(serverData),
-				PremServId = 0,
-				PremServExpired = 0,
-				Language = 0,
-				AuthKey = "46385170829535025841897130667207"
 			};
 		}
 	}

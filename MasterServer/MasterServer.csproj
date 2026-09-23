@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Enums\**" />
+    <Content Remove="Enums\**" />
+    <EmbeddedResource Remove="Enums\**" />
+    <None Remove="Enums\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="DB\AccountManager.cs~RF83a2293f.TMP" />
   </ItemGroup>
 
@@ -23,7 +30,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Enums\" />
     <Folder Include="Protos\" />
   </ItemGroup>
 

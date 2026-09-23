@@ -17,17 +17,21 @@ namespace WorldServer.Logic.Delegates
 				return;
 			}
 
+			client.Encryption.GenerateSessionKey(client.ConnectionInfo.ServerNonce, clientNonce, clientPublicKey);
+
 			if (clientVersion != WorldPacketVersion.Revision)
 			{
+				var packetFail = new RSP_Connect2Svr<Client>((Byte)ConnectionResult.VERSION_MISMATCH, 
+					client.ConnectionInfo.AuthKey, 0, client.ConnectionInfo.ServerNonce, client.Encryption.KeyPair.PublicKey);
+				client.PacketManager.Send(packetFail);
 				client.Disconnect($"version mismatch, client: {clientVersion} server: {WorldPacketVersion.Revision}", ConnState.ERROR);
 				return;
 			}
 
 			client.ConnectionInfo.ConnState = Enums.ConnState.AWAITING;
 
-			client.Encryption.GenerateSessionKey(client.ConnectionInfo.ServerNonce, clientNonce, clientPublicKey);
-
-			var packet = new RSP_Connect2Svr<Client>(client.ConnectionInfo.AuthKey, client.ConnectionInfo.UserId,
+			var packet = new RSP_Connect2Svr<Client>((Byte)ConnectionResult.SUCCESS, 
+				client.ConnectionInfo.AuthKey, client.ConnectionInfo.UserId,
 				client.ConnectionInfo.ServerNonce, client.Encryption.KeyPair.PublicKey);
 			client.PacketManager.Send(packet);
 		}

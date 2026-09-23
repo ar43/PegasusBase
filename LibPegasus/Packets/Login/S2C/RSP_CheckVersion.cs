@@ -11,10 +11,10 @@ namespace LibPegasus.Packets.Login.S2C
 	public class RSP_CheckVersion<ClientClass> : Packet<ClientClass>
 	{
 		// ── Fields ──────────────────────────────────────────────────────────
-		private UInt32 _serverVersion;
+		private Byte _versionOk;
 
 		// ── Handler ─────────────────────────────────────────────────────────
-		public static Action<ClientClass, UInt32>? OnCheckVersionHandler;
+		public static Action<ClientClass, Byte>? OnCheckVersionHandler;
 
 		// ── Deserialising constructor (reads from wire) ──────────────────────
 		public RSP_CheckVersion(Queue<byte> data)
@@ -24,7 +24,7 @@ namespace LibPegasus.Packets.Login.S2C
 		{
 			try
 			{
-				_serverVersion = PacketReader.ReadUInt32(_data);
+				_versionOk = PacketReader.ReadByte(_data);
 			}
 			catch (IndexOutOfRangeException)
 			{
@@ -34,20 +34,20 @@ namespace LibPegasus.Packets.Login.S2C
 			if (OnCheckVersionHandler == null)
 				return false;
 
-			actions.Enqueue((x) => OnCheckVersionHandler?.Invoke(x, _serverVersion));
+			actions.Enqueue((x) => OnCheckVersionHandler?.Invoke(x, _versionOk));
 			return true;
 		}
 
 		// ── Serialising constructor (writes to wire) ─────────────────────────
-		public RSP_CheckVersion(UInt32 serverVersion)
+		public RSP_CheckVersion(Byte versionOk)
 			: base((UInt16)OpcodeLogin.CHECKVERSION)
 		{
-			_serverVersion = serverVersion;
+			_versionOk = versionOk;
 		}
 
 		public override void WritePayload(Deque<byte> data)
 		{
-			PacketWriter.WriteUInt32(data, _serverVersion);
+			PacketWriter.WriteByte(data, _versionOk);
 		}
 	}
 }

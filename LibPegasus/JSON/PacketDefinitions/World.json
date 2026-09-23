@@ -33,6 +33,10 @@
 					"handlerName": "OnServerConnectionHandler",
 					"fields": [
 						{
+							"name": "ConnectionResult",
+							"type": "byte"
+						},
+						{
 							"name": "AuthKey",
 							"type": "UInt32"
 						},

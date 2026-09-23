@@ -23,8 +23,8 @@
 					"handlerName": "OnCheckVersionHandler",
 					"fields": [
 						{
-							"name": "ServerVersion",
-							"type": "UInt32"
+							"name": "VersionOk",
+							"type": "byte"
 						}
 					]
 				}

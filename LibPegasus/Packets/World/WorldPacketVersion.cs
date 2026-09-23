@@ -5,6 +5,6 @@ namespace LibPegasus.Packets.World
 {
 	public static class WorldPacketVersion
 	{
-		public const int Revision = 2;
+		public const int Revision = 3;
 	}
 }

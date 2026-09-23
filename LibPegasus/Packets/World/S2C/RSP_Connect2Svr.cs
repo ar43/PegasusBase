@@ -11,13 +11,14 @@ namespace LibPegasus.Packets.World.S2C
 	public class RSP_Connect2Svr<ClientClass> : Packet<ClientClass>
 	{
 		// ── Fields ──────────────────────────────────────────────────────────
+		private Byte _connectionResult;
 		private UInt32 _authKey;
 		private UInt16 _userIdx;
 		private byte[]? _serverNonce;
 		private byte[]? _publicServerKey;
 
 		// ── Handler ─────────────────────────────────────────────────────────
-		public static Action<ClientClass, UInt32, UInt16, byte[], byte[]>? OnServerConnectionHandler;
+		public static Action<ClientClass, Byte, UInt32, UInt16, byte[], byte[]>? OnServerConnectionHandler;
 
 		// ── Deserialising constructor (reads from wire) ──────────────────────
 		public RSP_Connect2Svr(Queue<byte> data)
@@ -27,6 +28,7 @@ namespace LibPegasus.Packets.World.S2C
 		{
 			try
 			{
+				_connectionResult = PacketReader.ReadByte(_data);
 				_authKey = PacketReader.ReadUInt32(_data);
 				_userIdx = PacketReader.ReadUInt16(_data);
 				_serverNonce = PacketReader.ReadArray(_data, 8);
@@ -40,14 +42,15 @@ namespace LibPegasus.Packets.World.S2C
 			if (OnServerConnectionHandler == null)
 				return false;
 
-			actions.Enqueue((x) => OnServerConnectionHandler?.Invoke(x, _authKey, _userIdx, _serverNonce, _publicServerKey));
+			actions.Enqueue((x) => OnServerConnectionHandler?.Invoke(x, _connectionResult, _authKey, _userIdx, _serverNonce, _publicServerKey));
 			return true;
 		}
 
 		// ── Serialising constructor (writes to wire) ─────────────────────────
-		public RSP_Connect2Svr(UInt32 authKey, UInt16 userIdx, byte[] serverNonce, byte[] publicServerKey)
+		public RSP_Connect2Svr(Byte connectionResult, UInt32 authKey, UInt16 userIdx, byte[] serverNonce, byte[] publicServerKey)
 			: base((UInt16)OpcodeWorld.CONNECT2SVR)
 		{
+			_connectionResult = connectionResult;
 			_authKey = authKey;
 			_userIdx = userIdx;
 			_serverNonce = serverNonce;
@@ -56,6 +59,7 @@ namespace LibPegasus.Packets.World.S2C
 
 		public override void WritePayload(Deque<byte> data)
 		{
+			PacketWriter.WriteByte(data, _connectionResult);
 			PacketWriter.WriteUInt32(data, _authKey);
 			PacketWriter.WriteUInt16(data, _userIdx);
 			PacketWriter.WriteArray(data, _serverNonce); // 8 byte

@@ -43,7 +43,8 @@ namespace LoginServer.Logic.Delegates
 
 			if (clientVersion != expectedVersion && serverConfig.GeneralSettings.VerifyClientVersion)
 			{
-				Serilog.Log.Debug($"OnCheckVersion: received version from client: {clientVersion}, expected {expectedVersion}");
+				var packetFail = new RSP_CheckVersion<Client>(0);
+				client.PacketManager.Send(packetFail);
 				client.Disconnect("invalid version");
 				return;
 			}
@@ -53,7 +54,7 @@ namespace LoginServer.Logic.Delegates
 
 			Serilog.Log.Debug($"OnCheckVersion: received version from client: {clientVersion}");
 
-			var packet = new RSP_CheckVersion<Client>((uint)expectedVersion);
+			var packet = new RSP_CheckVersion<Client>(1);
 			client.PacketManager.Send(packet);
 		}
 
@@ -72,7 +73,6 @@ namespace LoginServer.Logic.Delegates
 			if ((AuthResult)reply.Status == AuthResult.SUCCESS)
 			{
 				bool isLocalhost = client.Ip == "127.0.0.1";
-				Debug.Assert(reply.AuthKey.Length == 32);
 				var replyServerState = await client.GetServerState(isLocalhost);
 
 				var loginAccountReplyBytes = reply.ToByteArray();
