@@ -8,7 +8,7 @@ namespace WorldServer.Logic.Delegates
 {
 	internal static class Connection
 	{
-		internal static void OnServerConnection(Client client, UInt32 clientVersion, byte[] clientNonce, byte[] clientPublicKey)
+		internal static void ConnectServerHandler(Client client, UInt32 clientVersion, byte[] clientNonce, byte[] clientPublicKey)
 		{
 			var cfg = ServerConfig.Get();
 			if (client.ConnectionInfo.ConnState != ConnState.INITIAL)

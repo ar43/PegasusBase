@@ -17,7 +17,7 @@ namespace LibPegasus.Packets.Login.S2C
 		private byte[]? _publicServerKey;
 
 		// ── Handler ─────────────────────────────────────────────────────────
-		public static Action<ClientClass, UInt32, UInt16, byte[], byte[]>? OnServerConnectionHandler;
+		public static Action<ClientClass, UInt32, UInt16, byte[], byte[]>? ConnectServerHandler;
 
 		// ── Deserialising constructor (reads from wire) ──────────────────────
 		public RSP_ConnectServer(Queue<byte> data)
@@ -37,10 +37,10 @@ namespace LibPegasus.Packets.Login.S2C
 				return false;
 			}
 
-			if (OnServerConnectionHandler == null)
+			if (ConnectServerHandler == null)
 				return false;
 
-			actions.Enqueue((x) => OnServerConnectionHandler?.Invoke(x, _authKey, _userIdx, _serverNonce, _publicServerKey));
+			actions.Enqueue((x) => ConnectServerHandler?.Invoke(x, _authKey, _userIdx, _serverNonce, _publicServerKey));
 			return true;
 		}
 

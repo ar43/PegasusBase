@@ -5,6 +5,6 @@ namespace LibPegasus.Packets.Login
 {
 	public static class LoginPacketVersion
 	{
-		public const int Revision = 6;
+		public const int Revision = 7;
 	}
 }

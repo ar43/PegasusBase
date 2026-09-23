@@ -14,7 +14,7 @@ namespace LibPegasus.Packets.Login.S2C
 		private byte[]? _authAccountReply;
 
 		// ── Handler ─────────────────────────────────────────────────────────
-		public static Action<ClientClass, byte[]>? OnAuthAccountHandler;
+		public static Action<ClientClass, byte[]>? AuthAccountHandler;
 
 		// ── Deserialising constructor (reads from wire) ──────────────────────
 		public RSP_AuthAccount(Queue<byte> data)
@@ -31,10 +31,10 @@ namespace LibPegasus.Packets.Login.S2C
 				return false;
 			}
 
-			if (OnAuthAccountHandler == null)
+			if (AuthAccountHandler == null)
 				return false;
 
-			actions.Enqueue((x) => OnAuthAccountHandler?.Invoke(x, _authAccountReply));
+			actions.Enqueue((x) => AuthAccountHandler?.Invoke(x, _authAccountReply));
 			return true;
 		}
 

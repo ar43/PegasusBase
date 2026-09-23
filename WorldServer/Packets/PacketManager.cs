@@ -20,7 +20,7 @@ namespace WorldServer.Packets
 
 		public PacketManager()
 		{
-			REQ_ConnectServer<Client>.OnServerConnectionHandler = Connection.OnServerConnection;
+			REQ_ConnectServer<Client>.ConnectServerHandler = Connection.ConnectServerHandler;
 		}
 
 		public void EnqueuePacket(UInt16 opcode, Queue<byte> packet)

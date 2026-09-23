@@ -20,10 +20,10 @@ namespace LoginServer.Packets
 
 		public PacketManager()
 		{
-			REQ_ConnectServer<Client>.OnServerConnectionHandler = Connection.OnServerConnection;
-			REQ_AuthAccount<Client>.OnAuthAccountHandler = Connection.OnAuthAccount;
-			REQ_CheckVersion<Client>.OnCheckVersionHandler = Connection.OnCheckVersion;
-			REQ_VerifyLinks<Client>.OnVerifyLinksHandler = Connection.OnVerifyLinks;
+			REQ_ConnectServer<Client>.ConnectServerHandler = Connection.ConnectServerHandler;
+			REQ_AuthAccount<Client>.AuthAccountHandler = Connection.AuthAccountHandler;
+			REQ_CheckVersion<Client>.CheckVersionHandler = Connection.CheckVersionHandler;
+			REQ_VerifyLinks<Client>.VerifyLinksHandler = Connection.VerifyLinksHandler;
 		}
 
 		public void EnqueuePacket(UInt16 opcode, Queue<byte> packet)

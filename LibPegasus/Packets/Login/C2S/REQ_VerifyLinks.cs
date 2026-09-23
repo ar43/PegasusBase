@@ -5,7 +5,7 @@ namespace LibPegasus.Packets.Login.C2S
 {
 	public class REQ_VerifyLinks<ClientClass> : Packet<ClientClass>
 	{
-		public static Action<ClientClass, UInt32, UInt16, byte, byte, UInt32>? OnVerifyLinksHandler;
+		public static Action<ClientClass, UInt32, UInt16, byte, byte, UInt32>? VerifyLinksHandler;
 		public REQ_VerifyLinks(Queue<byte> data) : base((UInt16)OpcodeLogin.VERIFYLINKS, data)
 		{
 
@@ -32,10 +32,10 @@ namespace LibPegasus.Packets.Login.C2S
 				return false;
 			}
 
-			if (OnVerifyLinksHandler == null)
+			if (VerifyLinksHandler == null)
 				throw new InvalidOperationException("Handler not assigned");
 
-			actions.Enqueue((x) => OnVerifyLinksHandler?.Invoke(x, authKey, userId, channelId, serverId, clientMagicKey));
+			actions.Enqueue((x) => VerifyLinksHandler?.Invoke(x, authKey, userId, channelId, serverId, clientMagicKey));
 
 			return true;
 		}

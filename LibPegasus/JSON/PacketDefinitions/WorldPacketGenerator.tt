@@ -82,7 +82,7 @@
         foreach (JsonNode? dirNode in dirs)
         {
             string direction   = dirNode!["direction"]!.GetValue<string>();
-            string handlerName = dirNode["handlerName"]!.GetValue<string>();
+            string handlerName = pktNode!["name"]!.GetValue<string>() + "Handler";
             JsonArray fields   = dirNode["fields"]!.AsArray();
 
             bool isC2S = direction == "C2S";

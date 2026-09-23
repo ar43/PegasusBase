@@ -17,7 +17,7 @@ namespace LibPegasus.Packets.Login.C2S
 		private String? _password;
 
 		// ── Handler ─────────────────────────────────────────────────────────
-		public static Action<ClientClass, Byte, String, Byte, String>? OnAuthAccountHandler;
+		public static Action<ClientClass, Byte, String, Byte, String>? AuthAccountHandler;
 
 		// ── Deserialising constructor (reads from wire) ──────────────────────
 		public REQ_AuthAccount(Queue<byte> data)
@@ -37,10 +37,10 @@ namespace LibPegasus.Packets.Login.C2S
 				return false;
 			}
 
-			if (OnAuthAccountHandler == null)
+			if (AuthAccountHandler == null)
 				throw new InvalidOperationException("Handler not assigned");
 
-			actions.Enqueue((x) => OnAuthAccountHandler?.Invoke(x, _usernameLen, _username, _passwordLen, _password));
+			actions.Enqueue((x) => AuthAccountHandler?.Invoke(x, _usernameLen, _username, _passwordLen, _password));
 			return true;
 		}
 

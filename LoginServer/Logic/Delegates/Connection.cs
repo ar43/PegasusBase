@@ -11,7 +11,7 @@ namespace LoginServer.Logic.Delegates
 {
 	internal static class Connection
 	{
-		public static void OnServerConnection(Client client, byte[] clientNonce, byte[] clientPublicKey)
+		public static void ConnectServerHandler(Client client, byte[] clientNonce, byte[] clientPublicKey)
 		{
 			Serilog.Log.Debug("OnServerConnection called");
 
@@ -30,7 +30,7 @@ namespace LoginServer.Logic.Delegates
 			client.PacketManager.Send(packet);
 		}
 
-		public static void OnCheckVersion(Client client, UInt32 clientVersion)
+		public static void CheckVersionHandler(Client client, UInt32 clientVersion)
 		{
 			var serverConfig = ServerConfig.Get();
 			var expectedVersion = LibPegasus.Packets.Login.LoginPacketVersion.Revision;
@@ -58,7 +58,7 @@ namespace LoginServer.Logic.Delegates
 			client.PacketManager.Send(packet);
 		}
 
-		public static async void OnAuthAccount(Client client, byte usernameLen, string username, byte passwordLen, string password)
+		public static async void AuthAccountHandler(Client client, byte usernameLen, string username, byte passwordLen, string password)
 		{
 			if (client.ClientInfo.ConnState != Enums.ConnState.VERSION_CHECKED)
 			{
@@ -97,7 +97,7 @@ namespace LoginServer.Logic.Delegates
 			}
 		}
 
-		internal static async void OnVerifyLinks(Client client, UInt32 authKey, UInt16 userId, Byte channelId, Byte serverId, UInt32 clientMagicKey)
+		internal static async void VerifyLinksHandler(Client client, UInt32 authKey, UInt16 userId, Byte channelId, Byte serverId, UInt32 clientMagicKey)
 		{
 			var cfg = ServerConfig.Get();
 			if (client.ClientInfo.ConnState != Enums.ConnState.AUTH_ACCOUNT || client.ClientInfo.AccountId == 0)

@@ -14,7 +14,7 @@ namespace LibPegasus.Packets.Login.S2C
 		private Byte _versionOk;
 
 		// ── Handler ─────────────────────────────────────────────────────────
-		public static Action<ClientClass, Byte>? OnCheckVersionHandler;
+		public static Action<ClientClass, Byte>? CheckVersionHandler;
 
 		// ── Deserialising constructor (reads from wire) ──────────────────────
 		public RSP_CheckVersion(Queue<byte> data)
@@ -31,10 +31,10 @@ namespace LibPegasus.Packets.Login.S2C
 				return false;
 			}
 
-			if (OnCheckVersionHandler == null)
+			if (CheckVersionHandler == null)
 				return false;
 
-			actions.Enqueue((x) => OnCheckVersionHandler?.Invoke(x, _versionOk));
+			actions.Enqueue((x) => CheckVersionHandler?.Invoke(x, _versionOk));
 			return true;
 		}
 

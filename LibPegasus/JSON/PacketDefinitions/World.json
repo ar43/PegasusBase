@@ -8,7 +8,6 @@
 			"directions": [
 				{
 					"direction": "C2S",
-					"handlerName": "OnServerConnectionHandler",
 					"fields": [
 						{
 							"name": "ClientVersion",
@@ -29,7 +28,6 @@
 				{
 					"direction": "S2C",
 					"prefix": "RSP",
-					"handlerName": "OnServerConnectionHandler",
 					"fields": [
 						{
 							"name": "ConnectionResult",

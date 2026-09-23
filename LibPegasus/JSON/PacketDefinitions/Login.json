@@ -8,7 +8,6 @@
 			"directions": [
 				{
 					"direction": "C2S",
-					"handlerName": "OnCheckVersionHandler",
 					"fields": [
 						{
 							"name": "ClientVersion",
@@ -19,7 +18,6 @@
 				{
 					"direction": "S2C",
 					"prefix": "RSP",
-					"handlerName": "OnCheckVersionHandler",
 					"fields": [
 						{
 							"name": "VersionOk",
@@ -34,7 +32,6 @@
 			"directions": [
 				{
 					"direction": "C2S",
-					"handlerName": "OnAuthAccountHandler",
 					"fields": [
 						{
 							"name": "UsernameLen",
@@ -59,7 +56,6 @@
 				{
 					"direction": "S2C",
 					"prefix": "RSP",
-					"handlerName": "OnAuthAccountHandler",
 					"fields": [
 						{
 							"name": "AuthAccountReply",
@@ -75,7 +71,6 @@
 				{
 					"direction": "S2C",
 					"prefix": "NFY",
-					"handlerName": "OnServerStateHandler",
 					"fields": [
 						{
 							"name": "ServerStateReply",
@@ -90,7 +85,6 @@
 			"directions": [
 				{
 					"direction": "C2S",
-					"handlerName": "OnServerConnectionHandler",
 					"fields": [
 						{
 							"name": "ClientNonce",
@@ -107,7 +101,6 @@
 				{
 					"direction": "S2C",
 					"prefix": "RSP",
-					"handlerName": "OnServerConnectionHandler",
 					"fields": [
 						{
 							"name": "AuthKey",

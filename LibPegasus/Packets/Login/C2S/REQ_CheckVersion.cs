@@ -14,7 +14,7 @@ namespace LibPegasus.Packets.Login.C2S
 		private UInt32 _clientVersion;
 
 		// ── Handler ─────────────────────────────────────────────────────────
-		public static Action<ClientClass, UInt32>? OnCheckVersionHandler;
+		public static Action<ClientClass, UInt32>? CheckVersionHandler;
 
 		// ── Deserialising constructor (reads from wire) ──────────────────────
 		public REQ_CheckVersion(Queue<byte> data)
@@ -31,10 +31,10 @@ namespace LibPegasus.Packets.Login.C2S
 				return false;
 			}
 
-			if (OnCheckVersionHandler == null)
+			if (CheckVersionHandler == null)
 				throw new InvalidOperationException("Handler not assigned");
 
-			actions.Enqueue((x) => OnCheckVersionHandler?.Invoke(x, _clientVersion));
+			actions.Enqueue((x) => CheckVersionHandler?.Invoke(x, _clientVersion));
 			return true;
 		}
 

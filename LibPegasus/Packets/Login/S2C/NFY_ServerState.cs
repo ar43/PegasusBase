@@ -14,7 +14,7 @@ namespace LibPegasus.Packets.Login.S2C
 		private byte[]? _serverStateReply;
 
 		// ── Handler ─────────────────────────────────────────────────────────
-		public static Action<ClientClass, byte[]>? OnServerStateHandler;
+		public static Action<ClientClass, byte[]>? ServerStateHandler;
 
 		// ── Deserialising constructor (reads from wire) ──────────────────────
 		public NFY_ServerState(Queue<byte> data)
@@ -31,10 +31,10 @@ namespace LibPegasus.Packets.Login.S2C
 				return false;
 			}
 
-			if (OnServerStateHandler == null)
+			if (ServerStateHandler == null)
 				return false;
 
-			actions.Enqueue((x) => OnServerStateHandler?.Invoke(x, _serverStateReply));
+			actions.Enqueue((x) => ServerStateHandler?.Invoke(x, _serverStateReply));
 			return true;
 		}
 

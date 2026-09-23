@@ -16,7 +16,7 @@ namespace LibPegasus.Packets.World.C2S
 		private byte[]? _clientPublicKey;
 
 		// ── Handler ─────────────────────────────────────────────────────────
-		public static Action<ClientClass, UInt32, byte[], byte[]>? OnServerConnectionHandler;
+		public static Action<ClientClass, UInt32, byte[], byte[]>? ConnectServerHandler;
 
 		// ── Deserialising constructor (reads from wire) ──────────────────────
 		public REQ_ConnectServer(Queue<byte> data)
@@ -35,10 +35,10 @@ namespace LibPegasus.Packets.World.C2S
 				return false;
 			}
 
-			if (OnServerConnectionHandler == null)
+			if (ConnectServerHandler == null)
 				throw new InvalidOperationException("Handler not assigned");
 
-			actions.Enqueue((x) => OnServerConnectionHandler?.Invoke(x, _clientVersion, _clientNonce, _clientPublicKey));
+			actions.Enqueue((x) => ConnectServerHandler?.Invoke(x, _clientVersion, _clientNonce, _clientPublicKey));
 			return true;
 		}
 
