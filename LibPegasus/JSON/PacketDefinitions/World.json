@@ -54,6 +54,30 @@
 					]
 				}
 			]
+		},
+		{
+			"name": "DummyPacket",
+			"directions": [
+				{
+					"direction": "C2S",
+					"fields": [
+						{
+							"name": "Req",
+							"type": "byte[]"
+						}
+					]
+				},
+				{
+					"direction": "S2C",
+					"prefix": "RSP",
+					"fields": [
+						{
+							"name": "Response",
+							"type": "byte[]"
+						}
+					]
+				}
+			]
 		}
 	]
 }

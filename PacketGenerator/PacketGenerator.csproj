@@ -7,4 +7,27 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+	<ItemGroup>
+		<PacketDefinition Include="..\LibPegasus\JSON\PacketDefinitions\Login.json">
+			<OutputFile>$(MSBuildThisFileDirectory)..\LibPegasus\Packets\Login\LoginPacketVersion.cs</OutputFile>
+		</PacketDefinition>
+		<PacketDefinition Include="..\LibPegasus\JSON\PacketDefinitions\World.json">
+			<OutputFile>$(MSBuildThisFileDirectory)..\LibPegasus\Packets\World\WorldPacketVersion.cs</OutputFile>
+		</PacketDefinition>
+	</ItemGroup>
+
+	<!-- VS fast up-to-date check: one set per definition -->
+	<ItemGroup>
+		<UpToDateCheckInput Include="..\LibPegasus\JSON\PacketDefinitions\Login.json" Set="PacketGenLogin" />
+		<UpToDateCheckBuilt Include="..\LibPegasus\Packets\Login\LoginPacketVersion.cs" Set="PacketGenLogin" />
+		<UpToDateCheckInput Include="..\LibPegasus\JSON\PacketDefinitions\World.json" Set="PacketGenWorld" />
+		<UpToDateCheckBuilt Include="..\LibPegasus\Packets\World\WorldPacketVersion.cs" Set="PacketGenWorld" />
+	</ItemGroup>
+
+	<Target Name="RunPacketGenerator" AfterTargets="Build"
+					Inputs="%(PacketDefinition.FullPath);$(TargetPath)"
+					Outputs="%(PacketDefinition.OutputFile)">
+		<Exec Command="dotnet &quot;$(TargetPath)&quot; &quot;%(PacketDefinition.FullPath)&quot;" />
+	</Target>
+
 </Project>

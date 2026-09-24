@@ -1,38 +1,36 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFrameworks>net8.0;netstandard2.0</TargetFrameworks>
+	<PropertyGroup>
+		<TargetFrameworks>net8.0;netstandard2.0</TargetFrameworks>
 		<LangVersion>latest</LangVersion>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Nito.Collections.Deque" Version="1.2.1" />
-    <PackageReference Include="Serilog" Version="3.1.1" />
-    <PackageReference Include="Sodium.Core" Version="1.4.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Packets\World\C2S\" />
-    <Folder Include="Packets\World\S2C\" />
-  </ItemGroup>
-
-	<Target Name="CopyToUnity" AfterTargets="Build" Condition="'$(TargetFramework)' == 'netstandard2.0'">
-		<Copy SourceFiles="$(OutputPath)LibPegasus.dll" DestinationFolder="D:\Coding\Eclipse_Client\Eclipse\Assets\Plugins" SkipUnchangedFiles="true" />
-	</Target>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
 
 	<ItemGroup>
-		<PacketDefinition Include="JSON/PacketDefinitions/Login.json" OutputVersion="Packets/Login/LoginPacketVersion.cs" />
-		<PacketDefinition Include="JSON/PacketDefinitions/World.json" OutputVersion="Packets/World/WorldPacketVersion.cs" />
+		<PackageReference Include="Nito.Collections.Deque" Version="1.2.1" />
+		<PackageReference Include="Serilog" Version="3.1.1" />
+		<PackageReference Include="Sodium.Core" Version="1.4.1" />
 	</ItemGroup>
 
-	<Target Name="GeneratePackets" BeforeTargets="BeforeCompile" Inputs="@(PacketDefinition)" Outputs="%(PacketDefinition.OutputVersion)">
-		<Exec Command="dotnet run --project ../PacketGenerator/PacketGenerator.csproj -- %(PacketDefinition.Identity)" />
+	<ItemGroup>
+		<Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\PacketGenerator\PacketGenerator.csproj"
+											ReferenceOutputAssembly="false"
+											SkipGetTargetFrameworkProperties="true"
+											SetTargetFramework="TargetFramework=net8.0" />
+	</ItemGroup>
+
+	<!-- Copy to Unity -->
+	<Target Name="CopyToUnity"
+          AfterTargets="Build"
+          Condition="'$(TargetFramework)' == 'netstandard2.0'"
+          Inputs="$(TargetPath)"
+          Outputs="D:\Coding\Eclipse_Client\Eclipse\Assets\Plugins\LibPegasus.dll">
+		<Copy SourceFiles="$(TargetPath)" DestinationFolder="D:\Coding\Eclipse_Client\Eclipse\Assets\Plugins" SkipUnchangedFiles="true" />
 	</Target>
 
 </Project>

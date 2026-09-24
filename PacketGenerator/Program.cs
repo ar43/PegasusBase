@@ -52,7 +52,7 @@ if (currentHash != storedHash)
 {
 	revision++;
 	string revisionJson = JsonSerializer.Serialize(new { revision, hash = currentHash }, new JsonSerializerOptions { WriteIndented = true });
-	File.WriteAllText(revisionPath, revisionJson, Encoding.UTF8);
+	WriteFileIfChanged(revisionPath, revisionJson);
 }
 
 // ── Emit Revision File ───────────────────────────────────────────────────────
@@ -68,7 +68,7 @@ revSb.AppendLine($"\t\tpublic const int Revision = {revision};");
 revSb.AppendLine("\t}");
 revSb.AppendLine("}");
 
-File.WriteAllText(Path.Combine(targetOutputDir, $"{jsonFileName}PacketVersion.cs"), revSb.ToString(), Encoding.UTF8);
+WriteFileIfChanged(Path.Combine(targetOutputDir, $"{jsonFileName}PacketVersion.cs"), revSb.ToString());
 
 // ── Generate Packets ────────────────────────────────────────────────────────
 int filesWritten = 1;
@@ -169,12 +169,13 @@ foreach (JsonNode? pktNode in packets)
 
 		string outDir = Path.Combine(targetOutputDir, nsDir);
 		Directory.CreateDirectory(outDir);
-		File.WriteAllText(Path.Combine(outDir, $"{className}.cs"), sb.ToString(), Encoding.UTF8);
+		WriteFileIfChanged(Path.Combine(outDir, $"{className}.cs"), sb.ToString());
 		filesWritten++;
 	}
 }
 
 Console.WriteLine($"Generated {filesWritten} file(s) for {jsonFileName}.");
+File.SetLastWriteTimeUtc(Path.Combine(targetOutputDir, $"{jsonFileName}PacketVersion.cs"), DateTime.UtcNow);
 
 // ── Local Helpers ────────────────────────────────────────────────────────────
 static string CsType(string t) => t switch
@@ -216,3 +217,16 @@ static string ActionType(string clientClass, JsonArray fields)
 }
 
 static string FieldMember(string name) => "_" + char.ToLower(name[0]) + name[1..];
+
+static void WriteFileIfChanged(string path, string newContent)
+{
+	if (File.Exists(path))
+	{
+		string existingContent = File.ReadAllText(path);
+		if (existingContent == newContent)
+			return; // Skip writing to preserve the file timestamp!
+	}
+
+	Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+	File.WriteAllText(path, newContent, Encoding.UTF8);
+}
