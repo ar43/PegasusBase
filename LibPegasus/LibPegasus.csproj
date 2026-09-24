@@ -8,7 +8,9 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Google.Protobuf" Version="3.26.1" />
 		<PackageReference Include="Nito.Collections.Deque" Version="1.2.1" />
+		<PackageReference Include="Grpc.Tools" Version="2.62.0" PrivateAssets="All" />
 		<PackageReference Include="Serilog" Version="3.1.1" />
 		<PackageReference Include="Sodium.Core" Version="1.4.1" />
 	</ItemGroup>
@@ -18,18 +20,17 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\PacketGenerator\PacketGenerator.csproj"
-											ReferenceOutputAssembly="false"
-											SkipGetTargetFrameworkProperties="true"
-											SetTargetFramework="TargetFramework=net8.0" />
+		<!-- Explicitly compile login.proto and world.proto -->
+		<Protobuf Include="Protos/login.proto" GrpcServices="None" />
+		<Protobuf Include="Protos/world.proto" GrpcServices="None" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\PacketGenerator\PacketGenerator.csproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" SetTargetFramework="TargetFramework=net8.0" />
 	</ItemGroup>
 
 	<!-- Copy to Unity -->
-	<Target Name="CopyToUnity"
-          AfterTargets="Build"
-          Condition="'$(TargetFramework)' == 'netstandard2.0'"
-          Inputs="$(TargetPath)"
-          Outputs="D:\Coding\Eclipse_Client\Eclipse\Assets\Plugins\LibPegasus.dll">
+	<Target Name="CopyToUnity" AfterTargets="Build" Condition="'$(TargetFramework)' == 'netstandard2.0'" Inputs="$(TargetPath)" Outputs="D:\Coding\Eclipse_Client\Eclipse\Assets\Plugins\LibPegasus.dll">
 		<Copy SourceFiles="$(TargetPath)" DestinationFolder="D:\Coding\Eclipse_Client\Eclipse\Assets\Plugins" SkipUnchangedFiles="true" />
 	</Target>
 

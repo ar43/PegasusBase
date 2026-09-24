@@ -2,6 +2,7 @@
 using LibPegasus.Enums;
 using LibPegasus.Utils;
 using LibPegasus.Packets.Login.S2C;
+using LibPegasus.Protobuf.Login;
 using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
@@ -11,7 +12,7 @@ namespace LoginServer.Logic.Delegates
 {
 	internal static class Connection
 	{
-		public static void ConnectServerHandler(Client client, byte[] clientNonce, byte[] clientPublicKey)
+		public static void ConnectServerHandler(Client client, ConnectServerReq req)
 		{
 			Serilog.Log.Debug("OnServerConnection called");
 
@@ -23,14 +24,19 @@ namespace LoginServer.Logic.Delegates
 
 			client.ClientInfo.ConnState = Enums.ConnState.CONNECTED;
 
-			client.Encryption.GenerateSessionKey(client.ClientInfo.ServerNonce, clientNonce, clientPublicKey);
+			client.Encryption.GenerateSessionKey(client.ClientInfo.ServerNonce, req.ClientNonce.ToByteArray(), req.ClientPublicKey.ToByteArray());
 
-			var packet = new RSP_ConnectServer<Client>(client.ClientInfo.AuthKey, client.ClientInfo.UserId, 
-				client.ClientInfo.ServerNonce, client.Encryption.KeyPair.PublicKey);
+			var packet = new RSP_ConnectServer<Client>(new ConnectServerRsp
+			{
+				AuthKey = client.ClientInfo.AuthKey,
+				UserIdx = client.ClientInfo.UserId,
+				ServerNonce = ByteString.CopyFrom(client.ClientInfo.ServerNonce),
+				PublicServerKey = ByteString.CopyFrom(client.Encryption.KeyPair.PublicKey)
+			});
 			client.PacketManager.Send(packet);
 		}
 
-		public static void CheckVersionHandler(Client client, UInt32 clientVersion)
+		public static void CheckVersionHandler(Client client, CheckVersionReq req)
 		{
 			var serverConfig = ServerConfig.Get();
 			var expectedVersion = LibPegasus.Packets.Login.LoginPacketVersion.Revision;
@@ -41,9 +47,12 @@ namespace LoginServer.Logic.Delegates
 				throw new NotImplementedException();
 			}
 
-			if (clientVersion != expectedVersion && serverConfig.GeneralSettings.VerifyClientVersion)
+			if (req.ClientVersion != expectedVersion && serverConfig.GeneralSettings.VerifyClientVersion)
 			{
-				var packetFail = new RSP_CheckVersion<Client>(0);
+				var packetFail = new RSP_CheckVersion<Client>(new CheckVersionRsp
+				{
+					VersionOk = 0
+				});
 				client.PacketManager.Send(packetFail);
 				client.Disconnect("invalid version");
 				return;
@@ -52,13 +61,16 @@ namespace LoginServer.Logic.Delegates
 			if (client.ClientInfo.ConnState != Enums.ConnState.AUTH_ACCOUNT)
 				client.ClientInfo.ConnState = Enums.ConnState.VERSION_CHECKED;
 
-			Serilog.Log.Debug($"OnCheckVersion: received version from client: {clientVersion}");
+			Serilog.Log.Debug($"OnCheckVersion: received version from client: {req.ClientVersion}");
 
-			var packet = new RSP_CheckVersion<Client>(1);
+			var packet = new RSP_CheckVersion<Client>(new CheckVersionRsp
+			{
+				VersionOk = 1
+			});
 			client.PacketManager.Send(packet);
 		}
 
-		public static async void AuthAccountHandler(Client client, byte usernameLen, string username, byte passwordLen, string password)
+		public static async void AuthAccountHandler(Client client, AuthAccountReq req)
 		{
 			if (client.ClientInfo.ConnState != Enums.ConnState.VERSION_CHECKED)
 			{
@@ -66,10 +78,10 @@ namespace LoginServer.Logic.Delegates
 				throw new NotImplementedException();
 			}
 
-			Serilog.Log.Debug($"username extracted: {username} (len: {username.Length})");
-			Serilog.Log.Debug($"password extracted: {password} (len: {password.Length})");
+			Serilog.Log.Debug($"username extracted: {req.Username}");
+			Serilog.Log.Debug($"password extracted: {req.Password}");
 
-			var reply = await client.SendLoginRequest(username, password);
+			var reply = await client.SendLoginRequest(req.Username, req.Password);
 			if ((AuthResult)reply.Status == AuthResult.SUCCESS)
 			{
 				bool isLocalhost = client.Ip == "127.0.0.1";
@@ -78,22 +90,31 @@ namespace LoginServer.Logic.Delegates
 				var loginAccountReplyBytes = reply.ToByteArray();
 				var serverStateReplyBytes = replyServerState.ToByteArray();
 
-				var packetServerState = new NFY_ServerState<Client>(serverStateReplyBytes);
+				var packetServerState = new NFY_ServerState<Client>(new ServerStateNfy 
+				{ 
+					ServerStateReply = ByteString.CopyFrom(serverStateReplyBytes)
+				});
 				client.PacketManager.Send(packetServerState);
 
-				var packetAuth = new RSP_AuthAccount<Client>(loginAccountReplyBytes);
+				var packetAuth = new RSP_AuthAccount<Client>(new AuthAccountRsp
+				{
+					AuthAccountReply = ByteString.CopyFrom(loginAccountReplyBytes)
+				});
 				client.PacketManager.Send(packetAuth);
 
 				client.ClientInfo.ConnState = Enums.ConnState.AUTH_ACCOUNT;
 				client.ClientInfo.AccountId = reply.AccountId;
 
-				Serilog.Log.Debug($"{username} logged in");
+				Serilog.Log.Debug($"{req.Username} logged in");
 			}
 			else
 			{
-				var packet = new RSP_AuthAccount<Client>(reply.ToByteArray());
+				var packet = new RSP_AuthAccount<Client>(new AuthAccountRsp
+				{
+					AuthAccountReply = ByteString.CopyFrom(reply.ToByteArray())
+				});
 				client.PacketManager.Send(packet);
-				client.Disconnect($"{username} bad auth");
+				client.Disconnect($"{req.Username} bad auth");
 			}
 		}
 

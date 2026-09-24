@@ -1,0 +1,18 @@
+﻿syntax = "proto3";
+option csharp_namespace = "LibPegasus.Protobuf.World";
+
+package LibPegasus.Protobuf.World;
+
+message ConnectServerReq {
+	uint32 ClientVersion = 1;
+	bytes ClientNonce = 2;
+	bytes ClientPublicKey = 3;
+}
+
+message ConnectServerRsp {
+	uint32 ConnectionResult = 1;
+	uint32 AuthKey = 2;
+	uint32 UserIdx = 3;
+	bytes ServerNonce = 4;
+	bytes PublicServerKey = 5;
+}

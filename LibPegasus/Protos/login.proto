@@ -1,0 +1,41 @@
+﻿syntax = "proto3";
+option csharp_namespace = "LibPegasus.Protobuf.Login";
+
+package LibPegasus.Protobuf.Login;
+
+// CheckVersion
+message CheckVersionReq {
+  uint32 clientVersion = 1;
+}
+
+message CheckVersionRsp {
+  uint32 versionOk = 1; // or bool
+}
+
+// AuthAccount
+message AuthAccountReq {
+  string username = 1; // Protobuf handles length prefix automatically!
+  string password = 2;
+}
+
+message AuthAccountRsp {
+  bytes authAccountReply = 1;
+}
+
+// ServerState
+message ServerStateNfy {
+  bytes serverStateReply = 1;
+}
+
+// ConnectServer
+message ConnectServerReq {
+  bytes clientNonce = 1;
+  bytes clientPublicKey = 2;
+}
+
+message ConnectServerRsp {
+  uint32 authKey = 1;
+  uint32 userIdx = 2;
+  bytes serverNonce = 3;
+  bytes publicServerKey = 4;
+}

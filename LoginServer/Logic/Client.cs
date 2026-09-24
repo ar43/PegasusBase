@@ -12,6 +12,7 @@ using LibPegasus.Packets.Login.C2S;
 using LibPegasus.Packets.Login.S2C;
 using Google.Protobuf;
 using System.Diagnostics;
+using LibPegasus.Protobuf.Login;
 
 namespace LoginServer.Logic
 {
@@ -243,7 +244,10 @@ namespace LoginServer.Logic
 				var server = replyServerState.Servers[0];
 
 				//TODO: FIXME
-				var packetServerState = new NFY_ServerState<Client>(replyServerState.ToByteArray());
+				var packetServerState = new NFY_ServerState<Client>(new ServerStateNfy
+				{
+					ServerStateReply = ByteString.CopyFrom(replyServerState.ToByteArray())
+				});
 				PacketManager.Send(packetServerState);
 			}
 			else

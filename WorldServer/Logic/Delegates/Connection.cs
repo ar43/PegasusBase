@@ -1,14 +1,16 @@
-﻿using LibPegasus.Crypt;
+﻿using Google.Protobuf;
+using LibPegasus.Crypt;
 using LibPegasus.Enums;
 using LibPegasus.Packets.World;
 using LibPegasus.Packets.World.S2C;
+using LibPegasus.Protobuf.World;
 using WorldServer.Enums;
 
 namespace WorldServer.Logic.Delegates
 {
 	internal static class Connection
 	{
-		internal static void ConnectServerHandler(Client client, UInt32 clientVersion, byte[] clientNonce, byte[] clientPublicKey)
+		internal static void ConnectServerHandler(Client client, ConnectServerReq req)
 		{
 			var cfg = ServerConfig.Get();
 			if (client.ConnectionInfo.ConnState != ConnState.INITIAL)
@@ -17,22 +19,34 @@ namespace WorldServer.Logic.Delegates
 				return;
 			}
 
-			client.Encryption.GenerateSessionKey(client.ConnectionInfo.ServerNonce, clientNonce, clientPublicKey);
+			client.Encryption.GenerateSessionKey(client.ConnectionInfo.ServerNonce, 
+				req.ClientNonce.ToByteArray(), req.ClientPublicKey.ToByteArray());
 
-			if (clientVersion != WorldPacketVersion.Revision)
+			if (req.ClientVersion != WorldPacketVersion.Revision)
 			{
-				var packetFail = new RSP_ConnectServer<Client>((Byte)ConnectionResult.VERSION_MISMATCH, 
-					client.ConnectionInfo.AuthKey, 0, client.ConnectionInfo.ServerNonce, client.Encryption.KeyPair.PublicKey);
+				var packetFail = new RSP_ConnectServer<Client>(new ConnectServerRsp
+				{
+					ConnectionResult = (Byte)ConnectionResult.VERSION_MISMATCH,
+					AuthKey = client.ConnectionInfo.AuthKey,
+					UserIdx = 0,
+					ServerNonce = ByteString.CopyFrom(client.ConnectionInfo.ServerNonce),
+					PublicServerKey = ByteString.CopyFrom(client.Encryption.KeyPair.PublicKey)
+				});
 				client.PacketManager.Send(packetFail);
-				client.Disconnect($"version mismatch, client: {clientVersion} server: {WorldPacketVersion.Revision}", ConnState.ERROR);
+				client.Disconnect($"version mismatch, client: {req.ClientVersion} server: {WorldPacketVersion.Revision}", ConnState.ERROR);
 				return;
 			}
 
 			client.ConnectionInfo.ConnState = Enums.ConnState.AWAITING;
 
-			var packet = new RSP_ConnectServer<Client>((Byte)ConnectionResult.SUCCESS, 
-				client.ConnectionInfo.AuthKey, client.ConnectionInfo.UserId,
-				client.ConnectionInfo.ServerNonce, client.Encryption.KeyPair.PublicKey);
+			var packet = new RSP_ConnectServer<Client>(new ConnectServerRsp
+			{
+				ConnectionResult = (Byte)ConnectionResult.SUCCESS,
+				AuthKey = client.ConnectionInfo.AuthKey,
+				UserIdx = client.ConnectionInfo.UserId,
+				ServerNonce = ByteString.CopyFrom(client.ConnectionInfo.ServerNonce),
+				PublicServerKey = ByteString.CopyFrom(client.Encryption.KeyPair.PublicKey)
+			});
 			client.PacketManager.Send(packet);
 		}
 

@@ -1,0 +1,26 @@
+﻿namespace: LibPegasus.Packets.Login
+opcodeEnum: OpcodeLogin
+outputPath: ../../Packets/Login
+packets:
+  CheckVersion:
+    C2S:
+      proto: LibPegasus.Protobuf.Login.CheckVersionReq
+    S2C:
+      prefix: RSP
+      proto: LibPegasus.Protobuf.Login.CheckVersionRsp
+  AuthAccount:
+    C2S:
+      proto: LibPegasus.Protobuf.Login.AuthAccountReq
+    S2C:
+      prefix: RSP
+      proto: LibPegasus.Protobuf.Login.AuthAccountRsp
+  ServerState:
+    S2C:
+      prefix: NFY
+      proto: LibPegasus.Protobuf.Login.ServerStateNfy
+  ConnectServer:
+    C2S:
+      proto: LibPegasus.Protobuf.Login.ConnectServerReq
+    S2C:
+      prefix: RSP
+      proto: LibPegasus.Protobuf.Login.ConnectServerRsp
