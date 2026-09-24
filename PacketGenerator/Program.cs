@@ -116,6 +116,7 @@ foreach (var (packetName, packetSpec) in config.Packets)
 		sb.AppendLine("using LibPegasus.Packets;");
 		sb.AppendLine("using Nito.Collections;");
 		sb.AppendLine("using System;");
+		sb.AppendLine("using System.Buffers;");
 		sb.AppendLine("using System.Collections.Generic;");
 		sb.AppendLine();
 		sb.AppendLine($"namespace {fullNs}");
@@ -148,14 +149,23 @@ foreach (var (packetName, packetSpec) in config.Packets)
 		// ReadPayload Method
 		sb.AppendLine("\t\tpublic override bool ReadPayload(Queue<Action<ClientClass>> actions)");
 		sb.AppendLine("\t\t{");
+		sb.AppendLine("\t\t\tint payloadSize = _data.Count;");
+		sb.AppendLine("\t\t\tif (payloadSize == 0) return false;");
+		sb.AppendLine();
+		sb.AppendLine("\t\t\tbyte[] buffer = ArrayPool<byte>.Shared.Rent(payloadSize);");
 		sb.AppendLine("\t\t\ttry");
 		sb.AppendLine("\t\t\t{");
-		sb.AppendLine("\t\t\t\tbyte[] payloadBytes = PacketReader.ReadArray(_data);");
-		sb.AppendLine($"\t\t\t\tBody = {protoType}.Parser.ParseFrom(payloadBytes);");
+		sb.AppendLine("\t\t\t\tSpan<byte> span = buffer.AsSpan(0, payloadSize);");
+		sb.AppendLine("\t\t\t\tPacketReader.ReadSpan(_data, span);");
+		sb.AppendLine($"\t\t\t\tBody = {protoType}.Parser.ParseFrom(span);");
 		sb.AppendLine("\t\t\t}");
-		sb.AppendLine("\t\t\tcatch (Exception)");
+		sb.AppendLine("\t\t\tcatch (InvalidProtocolBufferException)");
 		sb.AppendLine("\t\t\t{");
 		sb.AppendLine("\t\t\t\treturn false;");
+		sb.AppendLine("\t\t\t}");
+		sb.AppendLine("\t\t\tfinally");
+		sb.AppendLine("\t\t\t{");
+		sb.AppendLine("\t\t\t\tArrayPool<byte>.Shared.Return(buffer, clearArray: false);");
 		sb.AppendLine("\t\t\t}");
 		sb.AppendLine();
 		sb.AppendLine($"\t\t\tif ({handlerName} == null)");
@@ -169,8 +179,22 @@ foreach (var (packetName, packetSpec) in config.Packets)
 		// WritePayload Method
 		sb.AppendLine("\t\tpublic override void WritePayload(Deque<byte> data)");
 		sb.AppendLine("\t\t{");
-		sb.AppendLine("\t\t\tbyte[] payloadBytes = Body.ToByteArray();");
-		sb.AppendLine("\t\t\tPacketWriter.WriteArray(data, payloadBytes);");
+		sb.AppendLine("\t\t\tif (Body == null) return;");
+		sb.AppendLine();
+		sb.AppendLine("\t\t\tint size = Body.CalculateSize();");
+		sb.AppendLine("\t\t\tif (size == 0) return;");
+		sb.AppendLine();
+		sb.AppendLine("\t\t\tbyte[] buffer = ArrayPool<byte>.Shared.Rent(size);");
+		sb.AppendLine("\t\t\ttry");
+		sb.AppendLine("\t\t\t{");
+		sb.AppendLine("\t\t\t\tSpan<byte> span = buffer.AsSpan(0, size);");
+		sb.AppendLine("\t\t\t\tBody.WriteTo(span);");
+		sb.AppendLine("\t\t\t\tPacketWriter.WriteArray(data, span);");
+		sb.AppendLine("\t\t\t}");
+		sb.AppendLine("\t\t\tfinally");
+		sb.AppendLine("\t\t\t{");
+		sb.AppendLine("\t\t\t\tArrayPool<byte>.Shared.Return(buffer, clearArray: false);");
+		sb.AppendLine("\t\t\t}");
 		sb.AppendLine("\t\t}");
 
 		sb.AppendLine("\t}");

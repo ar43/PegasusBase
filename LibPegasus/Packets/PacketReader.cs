@@ -157,6 +157,24 @@
 			return output;
 		}
 
+		public static int ReadSpan(Queue<byte> data, Span<byte> destination)
+		{
+			if (data.Count == 0)
+			{
+				throw new IndexOutOfRangeException("Data queue is empty");
+			}
+
+			// Determine how many bytes we can safely read
+			int bytesToRead = Math.Min(data.Count, destination.Length);
+
+			for (int i = 0; i < bytesToRead; i++)
+			{
+				destination[i] = ReadByte(data); // Dequeues/reads directly into Span memory
+			}
+
+			return bytesToRead; // Returns how many bytes were actually written
+		}
+
 		public static byte[] ReadArray(Queue<byte> data, int len)
 		{
 			if (data.Count == 0)

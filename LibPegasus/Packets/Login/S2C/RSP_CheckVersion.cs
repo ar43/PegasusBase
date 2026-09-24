@@ -7,6 +7,7 @@ using LibPegasus.Enums;
 using LibPegasus.Packets;
 using Nito.Collections;
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 
 namespace LibPegasus.Packets.Login.S2C
@@ -29,14 +30,23 @@ namespace LibPegasus.Packets.Login.S2C
 
 		public override bool ReadPayload(Queue<Action<ClientClass>> actions)
 		{
+			int payloadSize = _data.Count;
+			if (payloadSize == 0) return false;
+
+			byte[] buffer = ArrayPool<byte>.Shared.Rent(payloadSize);
 			try
 			{
-				byte[] payloadBytes = PacketReader.ReadArray(_data);
-				Body = LibPegasus.Protobuf.Login.CheckVersionRsp.Parser.ParseFrom(payloadBytes);
+				Span<byte> span = buffer.AsSpan(0, payloadSize);
+				PacketReader.ReadSpan(_data, span);
+				Body = LibPegasus.Protobuf.Login.CheckVersionRsp.Parser.ParseFrom(span);
 			}
-			catch (Exception)
+			catch (InvalidProtocolBufferException)
 			{
 				return false;
+			}
+			finally
+			{
+				ArrayPool<byte>.Shared.Return(buffer, clearArray: false);
 			}
 
 			if (CheckVersionHandler == null)
@@ -48,8 +58,22 @@ namespace LibPegasus.Packets.Login.S2C
 
 		public override void WritePayload(Deque<byte> data)
 		{
-			byte[] payloadBytes = Body.ToByteArray();
-			PacketWriter.WriteArray(data, payloadBytes);
+			if (Body == null) return;
+
+			int size = Body.CalculateSize();
+			if (size == 0) return;
+
+			byte[] buffer = ArrayPool<byte>.Shared.Rent(size);
+			try
+			{
+				Span<byte> span = buffer.AsSpan(0, size);
+				Body.WriteTo(span);
+				PacketWriter.WriteArray(data, span);
+			}
+			finally
+			{
+				ArrayPool<byte>.Shared.Return(buffer, clearArray: false);
+			}
 		}
 	}
 }

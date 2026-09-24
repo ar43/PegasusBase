@@ -1,4 +1,5 @@
-﻿using Nito.Collections;
+﻿using Google.Protobuf;
+using Nito.Collections;
 using System.Text;
 
 namespace LibPegasus.Packets
@@ -131,6 +132,25 @@ namespace LibPegasus.Packets
 		public static void WriteArray(Deque<byte> data, byte[]? input)
 		{
 			if(input != null)
+			{
+				for (int i = 0; i < input.Length; i++)
+				{
+					data.AddToBack(input[i]);
+				}
+			}
+		}
+
+		public static void WriteArray(Deque<byte> data, ReadOnlySpan<byte> input)
+		{
+			for (int i = 0; i < input.Length; i++)
+			{
+				data.AddToBack(input[i]);
+			}
+		}
+
+		public static void WriteArray(Deque<byte> data, ByteString? input)
+		{
+			if (input != null)
 			{
 				for (int i = 0; i < input.Length; i++)
 				{
