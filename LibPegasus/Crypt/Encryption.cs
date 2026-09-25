@@ -22,11 +22,15 @@ namespace LibPegasus.Crypt
 			KeyPair = keyPair;
 		}
 
-		public int GetPacketSize(Span<byte> encryptedData)
+		public int GetPacketSize(ReadOnlySpan<byte> encryptedData)
 		{
-			var span = new Span<byte>(encryptedData.ToArray(), 0, 4);
-			UInt32 decryptedValue = BinaryPrimitives.ReadUInt32LittleEndian(span);
-			return (int)decryptedValue;
+			if (encryptedData.Length < 4)
+			{
+				throw new ArgumentException("Data span must contain at least 4 bytes to read packet size.", nameof(encryptedData));
+			}
+
+			// Direct zero-allocation slice of the existing span
+			return (int)BinaryPrimitives.ReadUInt32LittleEndian(encryptedData.Slice(0, 4));
 		}
 
 		public byte[] Encrypt(Deque<byte> byteQueue)
@@ -45,8 +49,6 @@ namespace LibPegasus.Crypt
 			{
 				if (_sessionKey == null)
 					throw new NullReferenceException();
-
-				
 
 				var toEncryptSpan = new Span<byte>(fullArray, UNENCRYPTED_SIZE, fullArray.Length - UNENCRYPTED_SIZE);
 				var encrypted = SecretAeadChaCha20Poly1305.Encrypt(toEncryptSpan.ToArray(), BitConverter.GetBytes(counter), _sessionKey);

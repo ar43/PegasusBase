@@ -107,7 +107,7 @@ namespace LibPegasus.Packets
 			return data;
 		}
 
-		public virtual void WritePayload(Deque<byte> data)
+		public virtual int WritePayload(Deque<byte> data)
 		{
 			throw new NotImplementedException();
 		}

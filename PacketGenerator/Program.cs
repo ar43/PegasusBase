@@ -177,12 +177,12 @@ foreach (var (packetName, packetSpec) in config.Packets)
 		sb.AppendLine();
 
 		// WritePayload Method
-		sb.AppendLine("\t\tpublic override void WritePayload(Deque<byte> data)");
+		sb.AppendLine("\t\tpublic override int WritePayload(Deque<byte> data)");
 		sb.AppendLine("\t\t{");
-		sb.AppendLine("\t\t\tif (Body == null) return;");
+		sb.AppendLine("\t\t\tif (Body == null) return 0;");
 		sb.AppendLine();
 		sb.AppendLine("\t\t\tint size = Body.CalculateSize();");
-		sb.AppendLine("\t\t\tif (size == 0) return;");
+		sb.AppendLine("\t\t\tif (size == 0) return 0;");
 		sb.AppendLine();
 		sb.AppendLine("\t\t\tbyte[] buffer = ArrayPool<byte>.Shared.Rent(size);");
 		sb.AppendLine("\t\t\ttry");
@@ -195,6 +195,7 @@ foreach (var (packetName, packetSpec) in config.Packets)
 		sb.AppendLine("\t\t\t{");
 		sb.AppendLine("\t\t\t\tArrayPool<byte>.Shared.Return(buffer, clearArray: false);");
 		sb.AppendLine("\t\t\t}");
+		sb.AppendLine("\t\t\treturn size;");
 		sb.AppendLine("\t\t}");
 
 		sb.AppendLine("\t}");

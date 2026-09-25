@@ -56,12 +56,12 @@ namespace LibPegasus.Packets.Login.C2S
 			return true;
 		}
 
-		public override void WritePayload(Deque<byte> data)
+		public override int WritePayload(Deque<byte> data)
 		{
-			if (Body == null) return;
+			if (Body == null) return 0;
 
 			int size = Body.CalculateSize();
-			if (size == 0) return;
+			if (size == 0) return 0;
 
 			byte[] buffer = ArrayPool<byte>.Shared.Rent(size);
 			try
@@ -74,6 +74,7 @@ namespace LibPegasus.Packets.Login.C2S
 			{
 				ArrayPool<byte>.Shared.Return(buffer, clearArray: false);
 			}
+			return size;
 		}
 	}
 }

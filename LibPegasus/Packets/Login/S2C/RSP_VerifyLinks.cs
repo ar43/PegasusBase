@@ -15,11 +15,12 @@ namespace LibPegasus.Packets.Login.S2C
 			_isVerified = isVerified;
 		}
 
-		public override void WritePayload(Deque<byte> data)
+		public override int WritePayload(Deque<byte> data)
 		{
 			PacketWriter.WriteByte(data, _channelId);
 			PacketWriter.WriteByte(data, _serverId);
 			PacketWriter.WriteByte(data, Convert.ToByte(_isVerified));
+			return 3;
 		}
 	}
 }
