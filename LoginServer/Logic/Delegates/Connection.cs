@@ -98,12 +98,13 @@ namespace LoginServer.Logic.Delegates
 
 				var packetAuth = new RSP_AuthAccount<Client>(new AuthAccountRsp
 				{
-					AuthAccountReply = ByteString.CopyFrom(loginAccountReplyBytes)
+					Status = reply.Status
 				});
 				client.PacketManager.Send(packetAuth);
 
 				client.ClientInfo.ConnState = Enums.ConnState.AUTH_ACCOUNT;
 				client.ClientInfo.AccountId = reply.AccountId;
+				client.ClientInfo.Username = req.Username;
 
 				Serilog.Log.Debug($"{req.Username} logged in");
 			}
@@ -111,14 +112,14 @@ namespace LoginServer.Logic.Delegates
 			{
 				var packet = new RSP_AuthAccount<Client>(new AuthAccountRsp
 				{
-					AuthAccountReply = ByteString.CopyFrom(reply.ToByteArray())
+					Status = reply.Status
 				});
 				client.PacketManager.Send(packet);
 				client.Disconnect($"{req.Username} bad auth");
 			}
 		}
 
-		internal static async void VerifyLinksHandler(Client client, UInt32 authKey, UInt16 userId, Byte channelId, Byte serverId, UInt32 clientMagicKey)
+		internal static async void VerifyLinksHandler(Client client, VerifyLinksReq req)
 		{
 			var cfg = ServerConfig.Get();
 			if (client.ClientInfo.ConnState != Enums.ConnState.AUTH_ACCOUNT || client.ClientInfo.AccountId == 0)
@@ -129,21 +130,24 @@ namespace LoginServer.Logic.Delegates
 
 			client.ClientInfo.ConnState = Enums.ConnState.VERIFYING;
 			//TODO: check if authKey expired (5 sec?)
-			var reply = await client.SendSessionRequest(authKey, userId, channelId, serverId);
+			var reply = await client.SendSessionRequest(req.AuthKey, (UInt16)req.UserId, (Byte)req.ChannelId, (Byte)req.ServerId);
 			bool success = reply.Result == (uint)SessionResult.OK || reply.Result == (uint)SessionResult.REPLACED;
-			var packet = new RSP_VerifyLinks<Client>(channelId, serverId, success);
+			var packet = new RSP_VerifyLinks<Client>(new VerifyLinksRsp
+			{
+				ChannelId = (UInt16)req.ChannelId,
+				SessionResult = reply.Result,
+				ServerId = (UInt16)req.ServerId,
+			});
 			client.PacketManager.Send(packet);
 
 			if (success)
 			{
 				client.ClientInfo.ConnState = Enums.ConnState.VERIFIED;
-				client.Disconnect("Linked - success");
-
-				//TODO: disconnect??
+				client.Disconnect("Posted link to world server");
 			}
 			else
 			{
-				client.Disconnect("Linked - fail");
+				throw new NotImplementedException();
 			}
 
 		}

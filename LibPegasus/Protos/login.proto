@@ -5,37 +5,50 @@ package LibPegasus.Protobuf.Login;
 
 // CheckVersion
 message CheckVersionReq {
-  uint32 clientVersion = 1;
+	uint32 clientVersion = 1;
 }
 
 message CheckVersionRsp {
-  uint32 versionOk = 1; // or bool
+	uint32 versionOk = 1; // or bool
 }
 
 // AuthAccount
 message AuthAccountReq {
-  string username = 1; // Protobuf handles length prefix automatically!
-  string password = 2;
+	string username = 1; // Protobuf handles length prefix automatically!
+	string password = 2;
 }
 
 message AuthAccountRsp {
-  bytes authAccountReply = 1;
+	uint32 status = 1;
 }
 
 // ServerState
 message ServerStateNfy {
-  bytes serverStateReply = 1;
+	bytes serverStateReply = 1;
 }
 
 // ConnectServer
 message ConnectServerReq {
-  bytes clientNonce = 1;
-  bytes clientPublicKey = 2;
+	bytes clientNonce = 1;
+	bytes clientPublicKey = 2;
 }
 
 message ConnectServerRsp {
-  uint32 authKey = 1;
-  uint32 userIdx = 2;
-  bytes serverNonce = 3;
-  bytes publicServerKey = 4;
+	uint32 authKey = 1;
+	uint32 userIdx = 2;
+	bytes serverNonce = 3;
+	bytes publicServerKey = 4;
+}
+
+message VerifyLinksReq {
+	uint32 authKey = 1;
+	uint32 userId = 2;
+	uint32 channelId = 3;
+	uint32 serverId = 4;
+}
+
+message VerifyLinksRsp {
+	uint32 channelId = 1;
+	uint32 serverId = 2;
+	uint32 sessionResult = 3;
 }

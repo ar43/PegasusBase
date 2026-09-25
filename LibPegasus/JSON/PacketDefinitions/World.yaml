@@ -2,9 +2,9 @@
 opcodeEnum: OpcodeWorld
 outputPath: ../../Packets/World
 packets:
-  ConnectServer:
-    C2S:
-      proto: LibPegasus.Protobuf.World.ConnectServerReq
-    S2C:
-      prefix: RSP
-      proto: LibPegasus.Protobuf.World.ConnectServerRsp
+    ConnectServer:
+        C2S:
+            proto: LibPegasus.Protobuf.World.ConnectServerReq
+        S2C:
+            prefix: RSP
+            proto: LibPegasus.Protobuf.World.ConnectServerRsp

@@ -200,6 +200,7 @@ namespace WorldServer.Logic
 			}
 			if (ConnectionInfo.ConnState == Enums.ConnState.AWAITING)
 			{
+				Log.Debug($"Logged in account {accountId}");
 				ConnectionInfo.SetAccountId(accountId);
 				ConnectionInfo.ConnState = Enums.ConnState.CONNECTED;
 				return;
