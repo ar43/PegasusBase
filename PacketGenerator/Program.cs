@@ -44,6 +44,19 @@ Directory.CreateDirectory(targetOutputDir);
 string yamlFileName = Path.GetFileNameWithoutExtension(yamlPath);
 string revisionPath = Path.Combine(yamlDir, $"{yamlFileName}Version.json");
 
+string protoPath = Path.GetFullPath(
+	Path.Combine(yamlDir, "../../Protos", $"{yamlFileName}.proto"));
+
+if (!File.Exists(protoPath))
+{
+	Console.WriteLine($"Error: Proto file not found: {protoPath}");
+	return;
+}
+
+string protoText = File.ReadAllText(protoPath)
+	.Replace('\u00A0', ' ')
+	.Replace("\r\n", "\n");
+
 int revision = 0;
 string storedHash = "";
 
@@ -54,21 +67,32 @@ if (File.Exists(revisionPath))
 		using var doc = System.Text.Json.JsonDocument.Parse(File.ReadAllText(revisionPath));
 		var revRoot = doc.RootElement;
 		revision = revRoot.GetProperty("revision").GetInt32();
-		storedHash = revRoot.TryGetProperty("hash", out var h) ? h.GetString() ?? "" : "";
+		storedHash = revRoot.TryGetProperty("hash", out var h)
+			? h.GetString() ?? ""
+			: "";
 	}
 	catch { }
 }
 
-byte[] hashBytes = MD5.HashData(Encoding.UTF8.GetBytes(yamlText));
+string revisionInput = yamlText + "\n---PROTO---\n" + protoText;
+
+byte[] hashBytes = MD5.HashData(
+	Encoding.UTF8.GetBytes(revisionInput));
+
 string currentHash = Convert.ToHexString(hashBytes).ToLowerInvariant();
 
 if (currentHash != storedHash)
 {
 	revision++;
+
 	string revisionJson = System.Text.Json.JsonSerializer.Serialize(
 		new { revision, hash = currentHash },
-		new System.Text.Json.JsonSerializerOptions { WriteIndented = true }
+		new System.Text.Json.JsonSerializerOptions
+		{
+			WriteIndented = true
+		}
 	);
+
 	WriteFileIfChanged(revisionPath, revisionJson);
 }
 

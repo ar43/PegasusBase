@@ -16,3 +16,6 @@ message ConnectServerRsp {
 	bytes ServerNonce = 4;
 	bytes PublicServerKey = 5;
 }
+
+message LinkSuccessNfy {
+}
