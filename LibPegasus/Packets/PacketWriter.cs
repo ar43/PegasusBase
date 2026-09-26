@@ -6,57 +6,30 @@ namespace LibPegasus.Packets
 {
 	public static class PacketWriter
 	{
-		public static void WriteByte(Deque<byte> data, byte val)
+		public static void WriteUInt32(byte[] data, int offset, uint val)
 		{
-			data.AddToBack(val);
+			data[offset] = (byte)(val & 0xFF);
+			data[offset + 1] = (byte)((val >> 8) & 0xFF);
+			data[offset + 2] = (byte)((val >> 16) & 0xFF);
+			data[offset + 3] = (byte)((val >> 24) & 0xFF);
 		}
 
-		public static void WriteHeaderUInt16(Deque<byte> data, UInt16 val)
+		public static void WriteUInt16(byte[] data, int offset, UInt16 val)
 		{
-			var a = val & 0xFF;
-			var b = (val & 0xFF00) >> 8;
-			data.AddToFront((byte)b);
-			data.AddToFront((byte)a);
+			data[offset] = (byte)(val & 0xFF);
+			data[offset + 1] = (byte)((val >> 8) & 0xFF);
 		}
 
-		public static void WriteHeaderUInt32(Deque<byte> data, UInt32 val)
+		public static void WriteUInt64(byte[] data, int offset, ulong val)
 		{
-			var a = val & 0xFF;
-			var b = (val & 0xFF00) >> 8;
-			var c = (val & 0xFF0000) >> 16;
-			var d = (val & 0xFF000000) >> 24;
-			data.AddToFront((byte)d);
-			data.AddToFront((byte)c);
-			data.AddToFront((byte)b);
-			data.AddToFront((byte)a);
-		}
-
-		public static void WriteHeaderUInt64(Deque<byte> data, UInt64 val)
-		{
-			var a = val & 0xFF;
-			var b = (val & 0xFF00) >> 8;
-			var c = (val & 0xFF0000) >> 16;
-			var d = (val & 0xFF000000) >> 24;
-			var e = (val & 0xFF00000000) >> 32;
-			var f = (val & 0xFF0000000000) >> 40;
-			var g = (val & 0xFF000000000000) >> 48;
-			var h = (val & 0xFF00000000000000) >> 56;
-			data.AddToFront((byte)h);
-			data.AddToFront((byte)g);
-			data.AddToFront((byte)f);
-			data.AddToFront((byte)e);
-			data.AddToFront((byte)d);
-			data.AddToFront((byte)c);
-			data.AddToFront((byte)b);
-			data.AddToFront((byte)a);
-		}
-
-		public static void WriteArray(Deque<byte> data, ReadOnlySpan<byte> input)
-		{
-			for (int i = 0; i < input.Length; i++)
-			{
-				data.AddToBack(input[i]);
-			}
+			data[offset] = (byte)(val & 0xFF);
+			data[offset + 1] = (byte)((val >> 8) & 0xFF);
+			data[offset + 2] = (byte)((val >> 16) & 0xFF);
+			data[offset + 3] = (byte)((val >> 24) & 0xFF);
+			data[offset + 4] = (byte)((val >> 32) & 0xFF);
+			data[offset + 5] = (byte)((val >> 40) & 0xFF);
+			data[offset + 6] = (byte)((val >> 48) & 0xFF);
+			data[offset + 7] = (byte)((val >> 56) & 0xFF);
 		}
 	}
 }

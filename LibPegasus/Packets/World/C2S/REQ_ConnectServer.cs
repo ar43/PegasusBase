@@ -56,25 +56,21 @@ namespace LibPegasus.Packets.World.C2S
 			return true;
 		}
 
-		public override int WritePayload(Deque<byte> data)
+		public override byte[] WritePayload()
 		{
-			if (Body == null) return 0;
+			if (Body == null)
+				return new byte[HEADER_SIZE];
 
 			int size = Body.CalculateSize();
-			if (size == 0) return 0;
+			byte[] output = new byte[HEADER_SIZE + size];
 
-			byte[] buffer = ArrayPool<byte>.Shared.Rent(size);
-			try
+			if (size > 0)
 			{
-				Span<byte> span = buffer.AsSpan(0, size);
+				Span<byte> span = output.AsSpan(HEADER_SIZE, size);
 				Body.WriteTo(span);
-				PacketWriter.WriteArray(data, span);
 			}
-			finally
-			{
-				ArrayPool<byte>.Shared.Return(buffer, clearArray: false);
-			}
-			return size;
+
+			return output;
 		}
 	}
 }

@@ -12,7 +12,7 @@ namespace WorldServer.Packets
 	internal class PacketManager
 	{
 		private Queue<Tuple<UInt16, Queue<byte>>> _decryptedInboundPackets = new();
-		private Queue<Deque<byte>> _decryptedOutboundPackets = new();
+		private Queue<byte[]> _decryptedOutboundPackets = new();
 		public DanglingPacket? DanglingPacket = null;
 
 		private UInt64 _sendCounter = 0;
@@ -28,7 +28,7 @@ namespace WorldServer.Packets
 			_decryptedInboundPackets.Enqueue(new Tuple<UInt16, Queue<byte>>(opcode, packet));
 		}
 
-		public Deque<byte> GetOutboundPacket()
+		public byte[] GetOutboundPacket()
 		{
 			return _decryptedOutboundPackets.Dequeue();
 		}

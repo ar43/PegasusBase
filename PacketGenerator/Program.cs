@@ -177,25 +177,21 @@ foreach (var (packetName, packetSpec) in config.Packets)
 		sb.AppendLine();
 
 		// WritePayload Method
-		sb.AppendLine("\t\tpublic override int WritePayload(Deque<byte> data)");
+		sb.AppendLine("\t\tpublic override byte[] WritePayload()");
 		sb.AppendLine("\t\t{");
-		sb.AppendLine("\t\t\tif (Body == null) return 0;");
+		sb.AppendLine("\t\t\tif (Body == null)");
+		sb.AppendLine("\t\t\t\treturn new byte[HEADER_SIZE];");
 		sb.AppendLine();
 		sb.AppendLine("\t\t\tint size = Body.CalculateSize();");
-		sb.AppendLine("\t\t\tif (size == 0) return 0;");
+		sb.AppendLine("\t\t\tbyte[] output = new byte[HEADER_SIZE + size];");
 		sb.AppendLine();
-		sb.AppendLine("\t\t\tbyte[] buffer = ArrayPool<byte>.Shared.Rent(size);");
-		sb.AppendLine("\t\t\ttry");
+		sb.AppendLine("\t\t\tif (size > 0)");
 		sb.AppendLine("\t\t\t{");
-		sb.AppendLine("\t\t\t\tSpan<byte> span = buffer.AsSpan(0, size);");
+		sb.AppendLine("\t\t\t\tSpan<byte> span = output.AsSpan(HEADER_SIZE, size);");
 		sb.AppendLine("\t\t\t\tBody.WriteTo(span);");
-		sb.AppendLine("\t\t\t\tPacketWriter.WriteArray(data, span);");
 		sb.AppendLine("\t\t\t}");
-		sb.AppendLine("\t\t\tfinally");
-		sb.AppendLine("\t\t\t{");
-		sb.AppendLine("\t\t\t\tArrayPool<byte>.Shared.Return(buffer, clearArray: false);");
-		sb.AppendLine("\t\t\t}");
-		sb.AppendLine("\t\t\treturn size;");
+		sb.AppendLine();
+		sb.AppendLine("\t\t\treturn output;");
 		sb.AppendLine("\t\t}");
 
 		sb.AppendLine("\t}");

@@ -33,10 +33,9 @@ namespace LibPegasus.Crypt
 			return (int)BinaryPrimitives.ReadUInt32LittleEndian(encryptedData.Slice(0, 4));
 		}
 
-		public byte[] Encrypt(Deque<byte> byteQueue)
+		public byte[] Encrypt(byte[] fullArray)
 		{
-			var packetLen = byteQueue.Count;
-			byte[] fullArray = byteQueue.ToArray();
+			var packetLen = fullArray.Length;
 			var counterSpan = new Span<byte>(fullArray, 4, 8);
 			var headerSpan = new Span<byte>(fullArray, 0, UNENCRYPTED_SIZE);
 			var counter = BinaryPrimitives.ReadUInt64LittleEndian(counterSpan);
@@ -48,7 +47,7 @@ namespace LibPegasus.Crypt
 			else
 			{
 				if (_sessionKey == null)
-					throw new NullReferenceException();
+					throw new NullReferenceException("Session key is not initialized.");
 
 				var toEncryptSpan = new Span<byte>(fullArray, UNENCRYPTED_SIZE, fullArray.Length - UNENCRYPTED_SIZE);
 				var encrypted = SecretAeadChaCha20Poly1305.Encrypt(toEncryptSpan.ToArray(), BitConverter.GetBytes(counter), _sessionKey);

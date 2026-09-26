@@ -87,27 +87,26 @@ namespace LibPegasus.Packets
 			throw new NotImplementedException();
 		}
 
-		private void WriteHeader(Deque<byte> data, UInt64 counter)
+		private void WriteHeader(byte[] data, UInt64 counter)
 		{
-			// in reverse order
-			var size = (UInt16)(HEADER_SIZE + data.Count);
-			PacketWriter.WriteHeaderUInt16(data, (UInt16)_id);
-			PacketWriter.WriteHeaderUInt64(data, (UInt64)counter);
-			if(counter == 0)
-				PacketWriter.WriteHeaderUInt32(data, size);
+			var size = (UInt32)(data.Length);
+			if (counter == 0)
+				PacketWriter.WriteUInt32(data, 0, size); //for first unencrypted packet
 			else
-				PacketWriter.WriteHeaderUInt32(data, size+(uint)16);
+				PacketWriter.WriteUInt32(data, 0, size + (uint)16); //for encrypted packets
+
+			PacketWriter.WriteUInt64(data, 4, counter);
+			PacketWriter.WriteUInt16(data, 12, _id);
 		}
 
-		public Deque<byte> Send(UInt64 counter)
+		public byte[] Send(UInt64 counter)
 		{
-			Deque<byte> data = new();
-			WritePayload(data);
+			byte[] data = WritePayload();
 			WriteHeader(data, counter);
 			return data;
 		}
 
-		public virtual int WritePayload(Deque<byte> data)
+		public virtual byte[] WritePayload()
 		{
 			throw new NotImplementedException();
 		}
