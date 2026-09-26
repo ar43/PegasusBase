@@ -35,7 +35,6 @@ namespace LibPegasus.Crypt
 
 		public byte[] Encrypt(byte[] fullArray)
 		{
-			var packetLen = fullArray.Length;
 			var counterSpan = new Span<byte>(fullArray, 4, 8);
 			var headerSpan = new Span<byte>(fullArray, 0, UNENCRYPTED_SIZE);
 			var counter = BinaryPrimitives.ReadUInt64LittleEndian(counterSpan);
@@ -60,7 +59,6 @@ namespace LibPegasus.Crypt
 
 		public UInt16 Decrypt(ref byte[] data)
 		{
-			var packetLen = data.Length;
 			byte[] fullArray = data;
 			var counterSpan = new Span<byte>(fullArray, 4, 8);
 			var headerSpan = new Span<byte>(fullArray, 0, UNENCRYPTED_SIZE);
@@ -75,7 +73,7 @@ namespace LibPegasus.Crypt
 			else
 			{
 				if (_sessionKey == null)
-					throw new NullReferenceException();
+					throw new NullReferenceException("null session Key");
 
 				var encrypted = new Span<byte>(data, UNENCRYPTED_SIZE, data.Length - UNENCRYPTED_SIZE);
 				var decrypted = SecretAeadChaCha20Poly1305.Decrypt(encrypted.ToArray(), BitConverter.GetBytes(counter), _sessionKey);

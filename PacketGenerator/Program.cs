@@ -133,7 +133,7 @@ foreach (var (packetName, packetSpec) in config.Packets)
 		sb.AppendLine();
 
 		// Inbound / Queue Constructor
-		sb.AppendLine($"\t\tpublic {className}(Queue<byte> data) : base((UInt16){opcodeEnum}.{opcode}, data)");
+		sb.AppendLine($"\t\tpublic {className}(byte[] data) : base((UInt16){opcodeEnum}.{opcode}, data)");
 		sb.AppendLine("\t\t{");
 		sb.AppendLine($"\t\t\tBody = new {protoType}();");
 		sb.AppendLine("\t\t}");
@@ -149,23 +149,24 @@ foreach (var (packetName, packetSpec) in config.Packets)
 		// ReadPayload Method
 		sb.AppendLine("\t\tpublic override bool ReadPayload(Queue<Action<ClientClass>> actions)");
 		sb.AppendLine("\t\t{");
-		sb.AppendLine("\t\t\tint payloadSize = _data.Count;");
-		sb.AppendLine("\t\t\tif (payloadSize == 0) return false;");
+		sb.AppendLine("\t\t\tif (_data == null)");
+		sb.AppendLine("\t\t\t\tthrow new NullReferenceException(\"null _data\");");
 		sb.AppendLine();
-		sb.AppendLine("\t\t\tbyte[] buffer = ArrayPool<byte>.Shared.Rent(payloadSize);");
+		sb.AppendLine("\t\t\tif (_data.Length < HEADER_SIZE)");
+		sb.AppendLine("\t\t\t\treturn false;");
+		sb.AppendLine();
+		sb.AppendLine("\t\t\tReadOnlySpan<byte> span = _data.AsSpan(HEADER_SIZE);");
+		sb.AppendLine("\t\t\tif (span.IsEmpty)");
+		sb.AppendLine("\t\t\t\treturn true;");
+		sb.AppendLine();
 		sb.AppendLine("\t\t\ttry");
 		sb.AppendLine("\t\t\t{");
-		sb.AppendLine("\t\t\t\tSpan<byte> span = buffer.AsSpan(0, payloadSize);");
-		sb.AppendLine("\t\t\t\tPacketReader.ReadSpan(_data, span);");
 		sb.AppendLine($"\t\t\t\tBody = {protoType}.Parser.ParseFrom(span);");
 		sb.AppendLine("\t\t\t}");
-		sb.AppendLine("\t\t\tcatch (InvalidProtocolBufferException)");
+		sb.AppendLine("\t\t\tcatch (InvalidProtocolBufferException ex)");
 		sb.AppendLine("\t\t\t{");
+		sb.AppendLine("\t\t\t\tSerilog.Log.Debug($\"{ex}\");");
 		sb.AppendLine("\t\t\t\treturn false;");
-		sb.AppendLine("\t\t\t}");
-		sb.AppendLine("\t\t\tfinally");
-		sb.AppendLine("\t\t\t{");
-		sb.AppendLine("\t\t\t\tArrayPool<byte>.Shared.Return(buffer, clearArray: false);");
 		sb.AppendLine("\t\t\t}");
 		sb.AppendLine();
 		sb.AppendLine($"\t\t\tif ({handlerName} == null)");
@@ -175,6 +176,7 @@ foreach (var (packetName, packetSpec) in config.Packets)
 		sb.AppendLine("\t\t\treturn true;");
 		sb.AppendLine("\t\t}");
 		sb.AppendLine();
+
 
 		// WritePayload Method
 		sb.AppendLine("\t\tpublic override byte[] WritePayload()");

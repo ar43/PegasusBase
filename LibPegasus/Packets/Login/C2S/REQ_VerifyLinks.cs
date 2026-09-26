@@ -18,7 +18,7 @@ namespace LibPegasus.Packets.Login.C2S
 
 		public static Action<ClientClass, LibPegasus.Protobuf.Login.VerifyLinksReq>? VerifyLinksHandler;
 
-		public REQ_VerifyLinks(Queue<byte> data) : base((UInt16)OpcodeLogin.VERIFYLINKS, data)
+		public REQ_VerifyLinks(byte[] data) : base((UInt16)OpcodeLogin.VERIFYLINKS, data)
 		{
 			Body = new LibPegasus.Protobuf.Login.VerifyLinksReq();
 		}
@@ -30,23 +30,24 @@ namespace LibPegasus.Packets.Login.C2S
 
 		public override bool ReadPayload(Queue<Action<ClientClass>> actions)
 		{
-			int payloadSize = _data.Count;
-			if (payloadSize == 0) return false;
+			if (_data == null)
+				throw new NullReferenceException("null _data");
 
-			byte[] buffer = ArrayPool<byte>.Shared.Rent(payloadSize);
+			if (_data.Length < HEADER_SIZE)
+				return false;
+
+			ReadOnlySpan<byte> span = _data.AsSpan(HEADER_SIZE);
+			if (span.IsEmpty)
+				return true;
+
 			try
 			{
-				Span<byte> span = buffer.AsSpan(0, payloadSize);
-				PacketReader.ReadSpan(_data, span);
 				Body = LibPegasus.Protobuf.Login.VerifyLinksReq.Parser.ParseFrom(span);
 			}
-			catch (InvalidProtocolBufferException)
+			catch (InvalidProtocolBufferException ex)
 			{
+				Serilog.Log.Debug($"{ex}");
 				return false;
-			}
-			finally
-			{
-				ArrayPool<byte>.Shared.Return(buffer, clearArray: false);
 			}
 
 			if (VerifyLinksHandler == null)

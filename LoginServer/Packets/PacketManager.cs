@@ -11,7 +11,7 @@ namespace LoginServer.Packets
 {
 	internal class PacketManager
 	{
-		private Queue<Tuple<UInt16, Queue<byte>>> _decryptedInboundPackets = new();
+		private Queue<Tuple<UInt16, byte[]>> _decryptedInboundPackets = new();
 		private Queue<byte[]> _decryptedOutboundPackets = new();
 		public DanglingPacket? DanglingPacket = null;
 
@@ -26,9 +26,9 @@ namespace LoginServer.Packets
 			REQ_VerifyLinks<Client>.VerifyLinksHandler = Connection.VerifyLinksHandler;
 		}
 
-		public void EnqueuePacket(UInt16 opcode, Queue<byte> packet)
+		public void EnqueuePacket(UInt16 opcode, byte[] packet)
 		{
-			_decryptedInboundPackets.Enqueue(new Tuple<UInt16, Queue<byte>>(opcode, packet));
+			_decryptedInboundPackets.Enqueue(new Tuple<UInt16, byte[]>(opcode, packet));
 		}
 
 		public byte[] GetOutboundPacket()
@@ -48,7 +48,7 @@ namespace LoginServer.Packets
 			_sendCounter++;
 		}
 
-		private Packet<Client> GetPacket(OpcodeLogin opcode, Queue<byte> data)
+		private Packet<Client> GetPacket(OpcodeLogin opcode, byte[] data)
 		{
 			return opcode switch
 			{
@@ -71,17 +71,17 @@ namespace LoginServer.Packets
 
 				var packetInfo = _decryptedInboundPackets.Dequeue();
 				var opcodeNum = packetInfo.Item1;
-				var dataQueue = packetInfo.Item2;
+				var data = packetInfo.Item2;
 
 				bool opcodeDefined = Enum.IsDefined(typeof(OpcodeLogin), opcodeNum);
 				if (!opcodeDefined)
 				{
-					Log.Warning($"Received undefined opcode {opcodeNum}(len={dataQueue.Count})");
+					Log.Warning($"Received undefined opcode {opcodeNum}");
 					_recvCounter++;
 					continue;
 				}
 
-				var packet = GetPacket((OpcodeLogin)opcodeNum, dataQueue);
+				var packet = GetPacket((OpcodeLogin)opcodeNum, data);
 				Log.Debug($"Processing opcode {opcodeNum}");
 
 				bool verifyHeader = packet.ReadHeader(_recvCounter);
@@ -96,13 +96,6 @@ namespace LoginServer.Packets
 				if (!ok)
 				{
 					Log.Warning($"Invalid payload data during opcode {opcodeNum}");
-					continue;
-				}
-
-				bool verifyReceived = packet.Verify();
-				if (!verifyReceived)
-				{
-					Log.Warning($"Data of opcode {opcodeNum} was not fully read");
 					continue;
 				}
 			}

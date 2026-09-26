@@ -108,7 +108,7 @@ namespace WorldServer.Logic
 							Array.Copy(PacketManager.DanglingPacket.DanglingData, 0, packetBytes, 0, packetLen);
 							var opcode = Encryption.Decrypt(ref packetBytes);
 
-							PacketManager.EnqueuePacket(opcode, new Queue<byte>(packetBytes));
+							PacketManager.EnqueuePacket(opcode, packetBytes);
 
 							PacketManager.DanglingPacket = null;
 							Utility.PrintByteArray(packetBytes, packetLen, "received decrypted (COMPOSED)");
@@ -153,7 +153,7 @@ namespace WorldServer.Logic
 
 							var opcode = Encryption.Decrypt(ref packetBytes);
 
-							PacketManager.EnqueuePacket(opcode, new Queue<byte>(packetBytes));
+							PacketManager.EnqueuePacket(opcode, packetBytes);
 
 							//Utility.PrintByteArray(packetBytes, packetLen, "decrypted");
 						}

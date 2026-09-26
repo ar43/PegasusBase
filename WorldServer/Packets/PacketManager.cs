@@ -11,7 +11,7 @@ namespace WorldServer.Packets
 {
 	internal class PacketManager
 	{
-		private Queue<Tuple<UInt16, Queue<byte>>> _decryptedInboundPackets = new();
+		private Queue<Tuple<UInt16, byte[]>> _decryptedInboundPackets = new();
 		private Queue<byte[]> _decryptedOutboundPackets = new();
 		public DanglingPacket? DanglingPacket = null;
 
@@ -23,9 +23,9 @@ namespace WorldServer.Packets
 			REQ_ConnectServer<Client>.ConnectServerHandler = Connection.ConnectServerHandler;
 		}
 
-		public void EnqueuePacket(UInt16 opcode, Queue<byte> packet)
+		public void EnqueuePacket(UInt16 opcode, byte[] packet)
 		{
-			_decryptedInboundPackets.Enqueue(new Tuple<UInt16, Queue<byte>>(opcode, packet));
+			_decryptedInboundPackets.Enqueue(new Tuple<UInt16, byte[]>(opcode, packet));
 		}
 
 		public byte[] GetOutboundPacket()
@@ -45,7 +45,7 @@ namespace WorldServer.Packets
 			_sendCounter++;
 		}
 
-		private Packet<Client> GetPacket(OpcodeWorld opcode, Queue<byte> data)
+		private Packet<Client> GetPacket(OpcodeWorld opcode, byte[] data)
 		{
 			return opcode switch
 			{
@@ -65,24 +65,24 @@ namespace WorldServer.Packets
 
 				var packetInfo = _decryptedInboundPackets.Dequeue();
 				var opcodeNum = packetInfo.Item1;
-				var dataQueue = packetInfo.Item2;
+				var data = packetInfo.Item2;
 
 				bool opcodeDefined = Enum.IsDefined(typeof(OpcodeWorld), opcodeNum);
 				if (!opcodeDefined)
 				{
-					Log.Warning($"Received undefined opcode {opcodeNum}(len={dataQueue.Count})");
+					Log.Warning($"Received undefined opcode {opcodeNum}(len={data.Length})");
 					_recvCounter++;
 					continue;
 				}
 
 				if (!isAuthenticated && (OpcodeWorld)opcodeNum != OpcodeWorld.CONNECTSERVER)
 				{
-					Log.Warning($"Received opcode {opcodeNum}(len={dataQueue.Count}) while unauthenticated");
+					Log.Warning($"Received opcode {opcodeNum}(len={data.Length}) while unauthenticated");
 					_recvCounter++;
 					continue;
 				}
 
-				var packet = GetPacket((OpcodeWorld)opcodeNum, dataQueue);
+				var packet = GetPacket((OpcodeWorld)opcodeNum, data);
 				Log.Debug($"Processing opcode {opcodeNum}");
 
 				bool verifyHeader = packet.ReadHeader(_recvCounter);
@@ -97,13 +97,6 @@ namespace WorldServer.Packets
 				if (!ok)
 				{
 					Log.Warning($"Invalid payload data during opcode {opcodeNum}");
-					continue;
-				}
-
-				bool verifyReceived = packet.Verify();
-				if (!verifyReceived)
-				{
-					Log.Warning($"Data of opcode {opcodeNum} was not fully read");
 					continue;
 				}
 			}
