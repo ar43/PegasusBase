@@ -15,10 +15,12 @@
 		<PacketDefinition Include="..\LibPegasus\JSON\PacketDefinitions\Login.yaml">
 			<OutputFile>$(MSBuildThisFileDirectory)..\LibPegasus\Packets\Login\LoginPacketVersion.cs</OutputFile>
 			<ProtoFile>$(MSBuildThisFileDirectory)..\LibPegasus\Protos\Login.proto</ProtoFile>
+			<EnumFile>$(MSBuildThisFileDirectory)..\LibPegasus\Enums\OpcodeLogin.cs</EnumFile>
 		</PacketDefinition>
 		<PacketDefinition Include="..\LibPegasus\JSON\PacketDefinitions\World.yaml">
 			<OutputFile>$(MSBuildThisFileDirectory)..\LibPegasus\Packets\World\WorldPacketVersion.cs</OutputFile>
 			<ProtoFile>$(MSBuildThisFileDirectory)..\LibPegasus\Protos\World.proto</ProtoFile>
+			<EnumFile>$(MSBuildThisFileDirectory)..\LibPegasus\Enums\OpcodeWorld.cs</EnumFile>
 		</PacketDefinition>
 	</ItemGroup>
 
@@ -27,15 +29,17 @@
 		<UpToDateCheckInput Include="..\LibPegasus\JSON\PacketDefinitions\Login.yaml" Set="PacketGenLogin" />
 		<UpToDateCheckInput Include="..\LibPegasus\Protos\Login.proto" Set="PacketGenLogin" />
 		<UpToDateCheckBuilt Include="..\LibPegasus\Packets\Login\LoginPacketVersion.cs" Set="PacketGenLogin" />
+		<UpToDateCheckBuilt Include="..\LibPegasus\Enums\OpcodeLogin.cs" Set="PacketGenLogin" />
 
 		<UpToDateCheckInput Include="..\LibPegasus\JSON\PacketDefinitions\World.yaml" Set="PacketGenWorld" />
 		<UpToDateCheckInput Include="..\LibPegasus\Protos\World.proto" Set="PacketGenWorld" />
 		<UpToDateCheckBuilt Include="..\LibPegasus\Packets\World\WorldPacketVersion.cs" Set="PacketGenWorld" />
+		<UpToDateCheckBuilt Include="..\LibPegasus\Enums\OpcodeWorld.cs" Set="PacketGenWorld" />
 	</ItemGroup>
 
 	<Target Name="RunPacketGenerator" AfterTargets="Build"
         Inputs="%(PacketDefinition.FullPath);%(PacketDefinition.ProtoFile);$(TargetPath)"
-        Outputs="%(PacketDefinition.OutputFile)">
+        Outputs="%(PacketDefinition.OutputFile);%(PacketDefinition.EnumFile)">
 		<Exec Command="dotnet &quot;$(TargetPath)&quot; &quot;%(PacketDefinition.FullPath)&quot;" />
 	</Target>
 
