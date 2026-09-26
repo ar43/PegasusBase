@@ -35,57 +35,97 @@ namespace LibPegasus.Crypt
 
 		public byte[] Encrypt(byte[] fullArray)
 		{
-			var counterSpan = new Span<byte>(fullArray, 4, 8);
-			var headerSpan = new Span<byte>(fullArray, 0, UNENCRYPTED_SIZE);
-			var counter = BinaryPrimitives.ReadUInt64LittleEndian(counterSpan);
+			if (fullArray.Length < UNENCRYPTED_SIZE)
+				throw new ArgumentException("Packet is too small.", nameof(fullArray));
+
+			var counter = BinaryPrimitives.ReadUInt64LittleEndian(
+				fullArray.AsSpan(4, 8));
 
 			if (counter == 0)
-			{
 				return fullArray;
-			}
-			else
-			{
-				if (_sessionKey == null)
-					throw new NullReferenceException("Session key is not initialized.");
 
-				var toEncryptSpan = new Span<byte>(fullArray, UNENCRYPTED_SIZE, fullArray.Length - UNENCRYPTED_SIZE);
-				var encrypted = SecretAeadChaCha20Poly1305.Encrypt(toEncryptSpan.ToArray(), BitConverter.GetBytes(counter), _sessionKey);
-				byte[] result = new byte[encrypted.Length + UNENCRYPTED_SIZE];
-				headerSpan.CopyTo(result);
-				encrypted.CopyTo(result, headerSpan.Length);
-				return result;
-			}
+			if (_sessionKey == null)
+				throw new InvalidOperationException("Session key is not initialized.");
+
+			int payloadLength = fullArray.Length - UNENCRYPTED_SIZE;
+
+			byte[] result = new byte[
+				UNENCRYPTED_SIZE + payloadLength + ChaCha20Poly1305.TagSize];
+
+			// Copy unencrypted header
+			fullArray.AsSpan(0, UNENCRYPTED_SIZE)
+				.CopyTo(result.AsSpan(0, UNENCRYPTED_SIZE));
+
+			// Existing 8-byte counter is already your nonce
+			ReadOnlySpan<byte> nonce = fullArray.AsSpan(4, 8);
+
+			ReadOnlySpan<byte> plaintext =
+				fullArray.AsSpan(UNENCRYPTED_SIZE, payloadLength);
+
+			Span<byte> ciphertext =
+				result.AsSpan(UNENCRYPTED_SIZE, payloadLength + ChaCha20Poly1305.TagSize);
+
+			ChaCha20Poly1305.Encrypt(
+				plaintext,
+				nonce,
+				_sessionKey,
+				ciphertext);
+
+			return result;
 		}
 
-		public UInt16 Decrypt(ref byte[] data)
+		public ushort Decrypt(ref byte[] data)
 		{
-			byte[] fullArray = data;
-			var counterSpan = new Span<byte>(fullArray, 4, 8);
-			var headerSpan = new Span<byte>(fullArray, 0, UNENCRYPTED_SIZE);
-			var counter = BinaryPrimitives.ReadUInt64LittleEndian(counterSpan);
+			if (data == null)
+				throw new ArgumentNullException(nameof(data));
+
+			if (data.Length < UNENCRYPTED_SIZE)
+				throw new ArgumentException("Packet is too small.", nameof(data));
+
+			var counter = BinaryPrimitives.ReadUInt64LittleEndian(
+				data.AsSpan(4, 8));
 
 			if (counter == 0)
 			{
-				var span = new Span<byte>(data, UNENCRYPTED_SIZE, 2);
-				var opcode = BinaryPrimitives.ReadUInt16LittleEndian(span);
-				return opcode;
+				return BinaryPrimitives.ReadUInt16LittleEndian(
+					data.AsSpan(UNENCRYPTED_SIZE, 2));
 			}
-			else
-			{
-				if (_sessionKey == null)
-					throw new NullReferenceException("null session Key");
 
-				var encrypted = new Span<byte>(data, UNENCRYPTED_SIZE, data.Length - UNENCRYPTED_SIZE);
-				var decrypted = SecretAeadChaCha20Poly1305.Decrypt(encrypted.ToArray(), BitConverter.GetBytes(counter), _sessionKey);
-				byte[] result = new byte[decrypted.Length + UNENCRYPTED_SIZE];
-				headerSpan.CopyTo(result);
-				decrypted.CopyTo(result, headerSpan.Length);
-				data = result;
+			if (_sessionKey == null)
+				throw new InvalidOperationException("Session key is not initialized.");
 
-				var span = new Span<byte>(data, UNENCRYPTED_SIZE, 2);
-				var opcode = BinaryPrimitives.ReadUInt16LittleEndian(span);
-				return opcode;
-			}
+			int encryptedLength = data.Length - UNENCRYPTED_SIZE;
+
+			if (encryptedLength < ChaCha20Poly1305.TagSize)
+				throw new ArgumentException("Encrypted packet is too small.", nameof(data));
+
+			int plaintextLength = encryptedLength - ChaCha20Poly1305.TagSize;
+
+			byte[] result = new byte[UNENCRYPTED_SIZE + plaintextLength];
+
+			// Preserve unencrypted header.
+			data.AsSpan(0, UNENCRYPTED_SIZE)
+				.CopyTo(result.AsSpan(0, UNENCRYPTED_SIZE));
+
+			// Existing counter is the 8-byte nonce.
+			ReadOnlySpan<byte> nonce = data.AsSpan(4, 8);
+
+			ReadOnlySpan<byte> ciphertext =
+				data.AsSpan(UNENCRYPTED_SIZE, encryptedLength);
+
+			Span<byte> plaintext =
+				result.AsSpan(UNENCRYPTED_SIZE, plaintextLength);
+
+			ChaCha20Poly1305.Decrypt(
+				ciphertext,
+				nonce,
+				_sessionKey,
+				plaintext);
+
+			data = result;
+
+			return BinaryPrimitives.ReadUInt16LittleEndian(
+				result.AsSpan(UNENCRYPTED_SIZE, 2));
 		}
 
 		private bool TestEncryption()
@@ -97,16 +137,27 @@ namespace LibPegasus.Crypt
 			var nonce = BitConverter.GetBytes(tempCounter);
 			Debug.Assert(nonce.Length == 8);
 			byte[] plaintext = SodiumCore.GetRandomBytes(10);
+			byte[] encrypted = new byte[plaintext.Length + ChaCha20Poly1305.TagSize];
+			byte[] decrypted = new byte[plaintext.Length];
 
-			var encrypted = SecretAeadChaCha20Poly1305.Encrypt(plaintext, nonce, _sessionKey);
-			var decrypted = SecretAeadChaCha20Poly1305.Decrypt(encrypted, nonce, _sessionKey);
+			//var encrypted = SecretAeadChaCha20Poly1305.Encrypt(plaintext, nonce, _sessionKey);
+			ChaCha20Poly1305.Encrypt(
+				plaintext,
+				nonce,
+				_sessionKey,
+				encrypted);
 
-			if(plaintext.SequenceEqual(decrypted))
+			ChaCha20Poly1305.Decrypt(
+				encrypted,
+				nonce,
+				_sessionKey,
+				decrypted);
+			
+			if (plaintext.SequenceEqual(decrypted))
 			{
-				Log.Debug("Sequences match");
 				if(plaintext.Length == 10 && encrypted.Length == 26 && decrypted.Length == 10)
 				{
-					Log.Debug("Lenghts are as expected");
+					Log.Debug("TestEncryption passed");
 					return true;
 				}
 			}
@@ -122,10 +173,12 @@ namespace LibPegasus.Crypt
 			_sessionKey = GenericHash.Hash(sharedSecret, combinedNonce, 32);
 			//Utility.PrintByteArray(combinedNonce, combinedNonce.Length, "combinedNonce");
 			//Utility.PrintByteArray(_sessionKey, _sessionKey.Length, "sessionKey");
+#if DEBUG
 			var pass = TestEncryption();
 
 			if (!pass)
 				throw new Exception("Encryption test failed");
+#endif
 		}
 	}
 }
