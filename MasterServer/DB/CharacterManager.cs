@@ -17,21 +17,23 @@ namespace MasterServer.DB
 
 		public async Task<Dictionary<int, int>> GetCharacterCount(int accountId)
 		{
-			using var conn = await _dataSource.OpenConnectionAsync();
+			await using var conn = await _dataSource.OpenConnectionAsync();
+
 			var dict = new Dictionary<int, int>();
 
-			await using (var cmd = new NpgsqlCommand("SELECT server_id FROM main.characters WHERE account_id=@p", conn))
+			await using var cmd = new NpgsqlCommand("SELECT server_id, COUNT(*) FROM main.characters " +
+				"WHERE account_id = @accountId GROUP BY server_id", conn);
+
+			cmd.Parameters.AddWithValue("accountId", accountId);
+
+			await using var reader = await cmd.ExecuteReaderAsync();
+
+			while (await reader.ReadAsync())
 			{
-				cmd.Parameters.AddWithValue("p", accountId);
-				await using (var reader = await cmd.ExecuteReaderAsync())
-				{
-					while (await reader.ReadAsync())
-					{
-						var serverId = reader.GetInt32(0);
-						dict.TryGetValue(serverId, out Int32 currentCount);
-						dict[serverId] = currentCount + 1;
-					}
-				}
+				var serverId = reader.GetInt32(0);
+				var count = reader.GetInt32(1);
+
+				dict[serverId] = count;
 			}
 
 			return dict;

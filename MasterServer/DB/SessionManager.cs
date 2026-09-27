@@ -11,33 +11,45 @@ namespace MasterServer.DB
 		{
 			_dataSource = dataSource;
 		}
-		public async Task<SessionResult> Create(UInt32 authKey, UInt16 userId, Byte channelId, Byte serverId, UInt32 accountId)
+		public async Task<SessionResult> Create(uint authKey, ushort userId, byte channelId, byte serverId, uint accountId)
 		{
-			using var conn = await _dataSource.OpenConnectionAsync();
-			var result = SessionResult.OK;
-			await using (var cmd = new NpgsqlCommand("DELETE FROM main.sessions WHERE account_id=@p RETURNING *", conn))
+			await using var conn = await _dataSource.OpenConnectionAsync();
+			await using var tx = await conn.BeginTransactionAsync();
+
+			SessionResult result = SessionResult.OK;
+
+			await using (var delete = new NpgsqlCommand("""
+				DELETE FROM main.sessions
+				WHERE account_id = @accountId
+				RETURNING 1
+				""", conn, tx))
 			{
-				cmd.Parameters.AddWithValue("p", (int)accountId);
-				var output = await cmd.ExecuteScalarAsync();
-				if (output != null)
-				{
-					var outputInt = (int)output;
-					if (outputInt != 0)
-					{
-						result = SessionResult.REPLACED;
-					}
-				}
+				delete.Parameters.AddWithValue("accountId", (long)accountId);
+
+				var deleted = await delete.ExecuteScalarAsync();
+
+				if (deleted != null)
+					result = SessionResult.REPLACED;
 			}
 
-			await using (var cmd = new NpgsqlCommand("INSERT INTO main.sessions VALUES (@a, @b, @c, @d, @e)", conn))
+			await using (var insert = new NpgsqlCommand("""
+				INSERT INTO main.sessions
+					(auth_key, user_id, channel_id, server_id, account_id)
+				VALUES
+					(@authKey, @userId, @channelId, @serverId, @accountId)
+				""", conn, tx))
 			{
-				cmd.Parameters.AddWithValue("a", (int)authKey);
-				cmd.Parameters.AddWithValue("b", (int)userId);
-				cmd.Parameters.AddWithValue("c", (int)channelId);
-				cmd.Parameters.AddWithValue("d", (int)serverId);
-				cmd.Parameters.AddWithValue("e", (int)accountId);
-				await cmd.ExecuteNonQueryAsync();
+				insert.Parameters.AddWithValue("authKey", (long)authKey);
+				insert.Parameters.AddWithValue("userId", (int)userId);
+				insert.Parameters.AddWithValue("channelId", (int)channelId);
+				insert.Parameters.AddWithValue("serverId", (int)serverId);
+				insert.Parameters.AddWithValue("accountId", (long)accountId);
+
+				await insert.ExecuteNonQueryAsync();
 			}
+
+			await tx.CommitAsync();
+
 			return result;
 		}
 	}
