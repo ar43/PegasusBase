@@ -22,15 +22,17 @@ namespace MasterServer.Services
 			_cooldownTracker = cooldownTracker;
 		}
 
-		public override Task<RegisterAccountReply> Register(RegisterAccountRequest request, ServerCallContext context)
+		public override async Task<RegisterAccountReply> Register(RegisterAccountRequest request, ServerCallContext context)
 		{
-			Serilog.Log.Information("Called Register");
-			var code = _databaseManager.AccountManager.RequestRegister(request.Username, request.Password);
-			Serilog.Log.Information("Registration return code: " + code.Result);
-			return Task.FromResult(new RegisterAccountReply
+			//todo: filter usernames and limit password len
+			//todo: rate limit
+			Serilog.Log.Information($"Called Register for username {request.Username}");
+			var code = await _databaseManager.AccountManager.RequestRegister(request.Username, request.Password);
+			Serilog.Log.Information("Registration return code: " + code);
+			return new RegisterAccountReply
 			{
-				InfoCode = (uint)code.Result
-			});
+				InfoCode = (uint)code
+			};
 		}
 
 		public override Task<SessionReply> CreateSession(SessionRequest request, ServerCallContext context)

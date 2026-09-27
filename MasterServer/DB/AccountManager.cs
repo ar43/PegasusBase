@@ -13,28 +13,6 @@ namespace MasterServer.DB
 		{
 			_dataSource = dataSource;
 		}
-		private async Task<bool> AccountExists(string username)
-		{
-			using var conn = await _dataSource.OpenConnectionAsync();
-
-			await using (var cmd = new NpgsqlCommand("SELECT EXISTS(SELECT 1 FROM main.accounts WHERE username=@p)", conn))
-			{
-				cmd.Parameters.AddWithValue("p", username);
-				await using (var reader = await cmd.ExecuteReaderAsync())
-				{
-					bool found = await reader.ReadAsync();
-					if (found)
-					{
-						bool output = reader.GetBoolean(0);
-						return output;
-					}
-					else
-					{
-						return false;
-					}
-				}
-			}
-		}
 		private async Task<(string hash, uint accountId)> GetAccountInfo(string username)
 		{
 			await using var conn = await _dataSource.OpenConnectionAsync();
@@ -53,47 +31,28 @@ namespace MasterServer.DB
 
 			return (String.Empty, 0);
 		}
-		private async Task<bool> RegisterAccount(string username, string password)
-		{
-			var hashPassword = Task.Factory.StartNew(() =>
-			{
-				string passwordHash = BCrypt.Net.BCrypt.HashPassword(password);
-				return passwordHash;
-			});
-
-			using var conn = await _dataSource.OpenConnectionAsync();
-
-			await using (var cmd = new NpgsqlCommand("INSERT INTO main.accounts VALUES (DEFAULT, @u, @p)", conn))
-			{
-				cmd.Parameters.AddWithValue("u", username);
-				cmd.Parameters.AddWithValue("p", hashPassword.Result);
-				await cmd.ExecuteNonQueryAsync();
-				return true;
-			}
-		}
 		public async Task<InfoCodeLS> RequestRegister(string username, string password)
 		{
-			// TODO
+			var passwordHash = await Task.Run(() =>
+				BCrypt.Net.BCrypt.HashPassword(password));
 
-			bool exists = await AccountExists(username);
+			try
+			{
+				await using var conn = await _dataSource.OpenConnectionAsync();
 
-			if (exists)
+				await using var cmd = new NpgsqlCommand("INSERT INTO main.accounts (id, username, password) VALUES (DEFAULT, @username, @password)", conn);
+
+				cmd.Parameters.AddWithValue("username", username);
+				cmd.Parameters.AddWithValue("password", passwordHash);
+
+				await cmd.ExecuteNonQueryAsync();
+
+				Log.Information("Registered account with username {Username}", username);
+				return InfoCodeLS.REGISTRATION_OK;
+			}
+			catch (PostgresException ex) when (ex.SqlState == "23505") //unique violation
 			{
 				return InfoCodeLS.REGISTRATION_USEREXISTS;
-			}
-			else
-			{
-				bool accountRegistered = await RegisterAccount(username, password);
-
-				if (accountRegistered)
-				{
-					Log.Information($"Registered account with username {username}");
-					return InfoCodeLS.REGISTRATION_OK;
-				}
-				else
-				{
-					return InfoCodeLS.REGISTRATION_FAILED;
-				}
 			}
 		}
 		public async Task<UInt32> RequestLogin(string username, string password)
