@@ -137,7 +137,7 @@ namespace LoginServer.Logic
 							throw new NotImplementedException("packetLen > DanglingPacket.MAX_C2S_PACKET_LEN");
 						}
 
-						if (packetLen < Encryption.C2S_HEADER_SIZE)
+						if (packetLen < Encryption.HEADER_SIZE)
 						{
 							throw new NotImplementedException("packetLen < Encryption.C2S_HEADER_SIZE");
 						}

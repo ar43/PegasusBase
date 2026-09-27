@@ -12,8 +12,8 @@ namespace LibPegasus.Crypt
 {
 	public class Encryption
 	{
-		public static readonly UInt16 C2S_HEADER_SIZE = 14;
-		public static readonly UInt16 UNENCRYPTED_SIZE = 12;
+		public static readonly UInt16 HEADER_SIZE = 14;
+		public static readonly UInt16 SIZE_OF_UNENCRYPTED_HEADER = 12;
 		public readonly KeyPair KeyPair;
 		private byte[]? _sessionKey;
 
@@ -35,7 +35,7 @@ namespace LibPegasus.Crypt
 
 		public byte[] Encrypt(byte[] fullArray)
 		{
-			if (fullArray.Length < UNENCRYPTED_SIZE)
+			if (fullArray.Length < SIZE_OF_UNENCRYPTED_HEADER)
 				throw new ArgumentException("Packet is too small.", nameof(fullArray));
 
 			var counter = BinaryPrimitives.ReadUInt64LittleEndian(
@@ -47,23 +47,23 @@ namespace LibPegasus.Crypt
 			if (_sessionKey == null)
 				throw new InvalidOperationException("Session key is not initialized.");
 
-			int payloadLength = fullArray.Length - UNENCRYPTED_SIZE;
+			int payloadLength = fullArray.Length - SIZE_OF_UNENCRYPTED_HEADER;
 
 			byte[] result = new byte[
-				UNENCRYPTED_SIZE + payloadLength + ChaCha20Poly1305.TagSize];
+				SIZE_OF_UNENCRYPTED_HEADER + payloadLength + ChaCha20Poly1305.TagSize];
 
 			// Copy unencrypted header
-			fullArray.AsSpan(0, UNENCRYPTED_SIZE)
-				.CopyTo(result.AsSpan(0, UNENCRYPTED_SIZE));
+			fullArray.AsSpan(0, SIZE_OF_UNENCRYPTED_HEADER)
+				.CopyTo(result.AsSpan(0, SIZE_OF_UNENCRYPTED_HEADER));
 
 			// Existing 8-byte counter is already your nonce
 			ReadOnlySpan<byte> nonce = fullArray.AsSpan(4, 8);
 
 			ReadOnlySpan<byte> plaintext =
-				fullArray.AsSpan(UNENCRYPTED_SIZE, payloadLength);
+				fullArray.AsSpan(SIZE_OF_UNENCRYPTED_HEADER, payloadLength);
 
 			Span<byte> ciphertext =
-				result.AsSpan(UNENCRYPTED_SIZE, payloadLength + ChaCha20Poly1305.TagSize);
+				result.AsSpan(SIZE_OF_UNENCRYPTED_HEADER, payloadLength + ChaCha20Poly1305.TagSize);
 
 			ChaCha20Poly1305.Encrypt(
 				plaintext,
@@ -79,7 +79,7 @@ namespace LibPegasus.Crypt
 			if (data == null)
 				throw new ArgumentNullException(nameof(data));
 
-			if (data.Length < UNENCRYPTED_SIZE)
+			if (data.Length < SIZE_OF_UNENCRYPTED_HEADER)
 				throw new ArgumentException("Packet is too small.", nameof(data));
 
 			var counter = BinaryPrimitives.ReadUInt64LittleEndian(
@@ -88,33 +88,33 @@ namespace LibPegasus.Crypt
 			if (counter == 0)
 			{
 				return BinaryPrimitives.ReadUInt16LittleEndian(
-					data.AsSpan(UNENCRYPTED_SIZE, 2));
+					data.AsSpan(SIZE_OF_UNENCRYPTED_HEADER, 2));
 			}
 
 			if (_sessionKey == null)
 				throw new InvalidOperationException("Session key is not initialized.");
 
-			int encryptedLength = data.Length - UNENCRYPTED_SIZE;
+			int encryptedLength = data.Length - SIZE_OF_UNENCRYPTED_HEADER;
 
 			if (encryptedLength < ChaCha20Poly1305.TagSize)
 				throw new ArgumentException("Encrypted packet is too small.", nameof(data));
 
 			int plaintextLength = encryptedLength - ChaCha20Poly1305.TagSize;
 
-			byte[] result = new byte[UNENCRYPTED_SIZE + plaintextLength];
+			byte[] result = new byte[SIZE_OF_UNENCRYPTED_HEADER + plaintextLength];
 
 			// Preserve unencrypted header.
-			data.AsSpan(0, UNENCRYPTED_SIZE)
-				.CopyTo(result.AsSpan(0, UNENCRYPTED_SIZE));
+			data.AsSpan(0, SIZE_OF_UNENCRYPTED_HEADER)
+				.CopyTo(result.AsSpan(0, SIZE_OF_UNENCRYPTED_HEADER));
 
 			// Existing counter is the 8-byte nonce.
 			ReadOnlySpan<byte> nonce = data.AsSpan(4, 8);
 
 			ReadOnlySpan<byte> ciphertext =
-				data.AsSpan(UNENCRYPTED_SIZE, encryptedLength);
+				data.AsSpan(SIZE_OF_UNENCRYPTED_HEADER, encryptedLength);
 
 			Span<byte> plaintext =
-				result.AsSpan(UNENCRYPTED_SIZE, plaintextLength);
+				result.AsSpan(SIZE_OF_UNENCRYPTED_HEADER, plaintextLength);
 
 			ChaCha20Poly1305.Decrypt(
 				ciphertext,
@@ -125,7 +125,7 @@ namespace LibPegasus.Crypt
 			data = result;
 
 			return BinaryPrimitives.ReadUInt16LittleEndian(
-				result.AsSpan(UNENCRYPTED_SIZE, 2));
+				result.AsSpan(SIZE_OF_UNENCRYPTED_HEADER, 2));
 		}
 
 		private bool TestEncryption()

@@ -51,7 +51,7 @@ namespace LibPegasus.Packets
 				}
 				else
 				{
-					if (len-16 != _packetLen)
+					if ((len - ChaCha20Poly1305.TagSize) != _packetLen)
 					{
 						Log.Error("packet len does not match");
 						return false;
@@ -90,7 +90,7 @@ namespace LibPegasus.Packets
 			if (counter == 0)
 				PacketWriter.WriteUInt32(data, 0, size); //for first unencrypted packet
 			else
-				PacketWriter.WriteUInt32(data, 0, size + (uint)16); //for encrypted packets
+				PacketWriter.WriteUInt32(data, 0, size + ChaCha20Poly1305.TagSize); //for encrypted packets
 
 			PacketWriter.WriteUInt64(data, 4, counter);
 			PacketWriter.WriteUInt16(data, 12, _id);
