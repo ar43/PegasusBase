@@ -3,7 +3,7 @@
 // </auto-generated>
 namespace LibPegasus.Enums
 {
-	public enum OpcodeLogin
+	public enum OpcodeLogin : UInt16
 	{
 		CHECKVERSION = 1,
 		AUTHACCOUNT = 2,

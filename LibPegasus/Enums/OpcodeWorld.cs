@@ -3,7 +3,7 @@
 // </auto-generated>
 namespace LibPegasus.Enums
 {
-	public enum OpcodeWorld
+	public enum OpcodeWorld : UInt16
 	{
 		CONNECTSERVER = 1,
 		LINKSUCCESS = 2,

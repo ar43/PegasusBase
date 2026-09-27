@@ -240,7 +240,7 @@ enumSb.AppendLine($"//    Generated from {Path.GetFileName(yamlPath)} — do NOT
 enumSb.AppendLine("// </auto-generated>");
 enumSb.AppendLine("namespace LibPegasus.Enums");
 enumSb.AppendLine("{");
-enumSb.AppendLine($"\tpublic enum {opcodeEnum}");
+enumSb.AppendLine($"\tpublic enum {opcodeEnum} : UInt16");
 enumSb.AppendLine("\t{");
 
 int opcodeId = 1;
