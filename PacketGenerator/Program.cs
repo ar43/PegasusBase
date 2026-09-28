@@ -180,12 +180,11 @@ foreach (var (packetName, packetSpec) in config.Packets)
 		sb.AppendLine("\t\t\t\treturn false;");
 		sb.AppendLine();
 		sb.AppendLine("\t\t\tReadOnlySpan<byte> span = _data.AsSpan(HEADER_SIZE);");
-		sb.AppendLine("\t\t\tif (span.IsEmpty)");
-		sb.AppendLine("\t\t\t\treturn true;");
 		sb.AppendLine();
 		sb.AppendLine("\t\t\ttry");
 		sb.AppendLine("\t\t\t{");
-		sb.AppendLine($"\t\t\t\tBody = {protoType}.Parser.ParseFrom(span);");
+		sb.AppendLine("\t\t\t\tif (!span.IsEmpty)");
+		sb.AppendLine($"\t\t\t\t\tBody = {protoType}.Parser.ParseFrom(span);");
 		sb.AppendLine("\t\t\t}");
 		sb.AppendLine("\t\t\tcatch (InvalidProtocolBufferException ex)");
 		sb.AppendLine("\t\t\t{");

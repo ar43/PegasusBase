@@ -1,6 +1,8 @@
 ﻿using Grpc.Net.Client;
 using LibPegasus.Crypt;
 using LibPegasus.Packets;
+using LibPegasus.Packets.World.S2C;
+using LibPegasus.Protobuf.World;
 using LibPegasus.Utils;
 using Serilog;
 using Shared.Protos;
@@ -192,22 +194,25 @@ namespace WorldServer.Logic
 
 		}
 
-		internal void OnLogin(UInt32 authKey, UInt32 accountId)
+		internal void Login(UInt32 authKey, UInt32 accountId)
 		{
 			if (authKey != ConnectionInfo.AuthKey)
 			{
-				throw new NotImplementedException("wrong auth key");
+				throw new Exception("wrong auth key");
 			}
 			if (ConnectionInfo.ConnState == Enums.ConnState.AWAITING)
 			{
 				Log.Debug($"Logged in account {accountId}");
 				ConnectionInfo.SetAccountId(accountId);
 				ConnectionInfo.ConnState = Enums.ConnState.CONNECTED;
+
+				var packet = new NFY_LinkSuccess<Client>(new LinkSuccessNfy{});
+				PacketManager.Send(packet);
 				return;
 			}
 		}
 
-		internal void OnLogout(UInt32 authKey, UInt32 accountId)
+		internal void Logout(UInt32 authKey, UInt32 accountId)
 		{
 			if (authKey != ConnectionInfo.AuthKey || accountId != ConnectionInfo.AccountId)
 			{

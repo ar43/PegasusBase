@@ -37,12 +37,11 @@ namespace LibPegasus.Packets.World.S2C
 				return false;
 
 			ReadOnlySpan<byte> span = _data.AsSpan(HEADER_SIZE);
-			if (span.IsEmpty)
-				return true;
 
 			try
 			{
-				Body = LibPegasus.Protobuf.World.ConnectServerRsp.Parser.ParseFrom(span);
+				if (!span.IsEmpty)
+					Body = LibPegasus.Protobuf.World.ConnectServerRsp.Parser.ParseFrom(span);
 			}
 			catch (InvalidProtocolBufferException ex)
 			{

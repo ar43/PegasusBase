@@ -220,11 +220,11 @@ namespace WorldServer
 						var accountId = Convert.ToUInt32(sessionChanges.data.account_id);
 						if (login)
 						{
-							client.OnLogin(authKey, accountId);
+							client.Login(authKey, accountId);
 						}
 						else
 						{
-							client.OnLogout(authKey, accountId);
+							client.Logout(authKey, accountId);
 						}
 					}
 				}

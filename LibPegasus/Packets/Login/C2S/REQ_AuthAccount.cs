@@ -37,12 +37,11 @@ namespace LibPegasus.Packets.Login.C2S
 				return false;
 
 			ReadOnlySpan<byte> span = _data.AsSpan(HEADER_SIZE);
-			if (span.IsEmpty)
-				return true;
 
 			try
 			{
-				Body = LibPegasus.Protobuf.Login.AuthAccountReq.Parser.ParseFrom(span);
+				if (!span.IsEmpty)
+					Body = LibPegasus.Protobuf.Login.AuthAccountReq.Parser.ParseFrom(span);
 			}
 			catch (InvalidProtocolBufferException ex)
 			{
