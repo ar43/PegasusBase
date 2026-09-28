@@ -254,6 +254,7 @@ enumSb.AppendLine("}");
 
 Directory.CreateDirectory(Path.GetDirectoryName(enumOutputPath)!);
 WriteFileIfChanged(enumOutputPath, enumSb.ToString());
+File.SetLastWriteTimeUtc(enumOutputPath, DateTime.UtcNow);
 
 Console.WriteLine($"Generated {filesWritten} file(s) for {yamlFileName}.");
 File.SetLastWriteTimeUtc(Path.Combine(targetOutputDir, $"{yamlFileName}PacketVersion.cs"), DateTime.UtcNow);
