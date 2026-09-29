@@ -50,34 +50,16 @@ namespace WorldServer.Logic.Delegates
 			client.PacketManager.Send(packet);
 		}
 
-		//internal async static void OnVerifyLinks(Client client, UInt32 authKey, UInt16 userId, Byte channelId, Byte serverId, UInt32 clientMagicKey)
-		//{
-		//	var cfg = ServerConfig.Get();
-		//	//TODO: FIX THIS! STUDY HOW THIS WORKS! IT CHANGES!
-		//	//if (clientMagicKey != cfg.GeneralSettings.ClientMagicKey)
-		//	//{
-		//	//	//TODO: Close connection
-		//	//	throw new NotImplementedException();
-		//	//}
+		internal static async void LinkBackHandler(Client client, LinkBackReq req)
+		{
+			var reply = await client.SendLoginSessionRequest(req.AuthKey, (UInt16)req.UserId, 0, 0);
+			var packet = new RSP_LinkBack<Client>(new LinkBackRsp
+			{
+				SessionResult = reply.Result,
+			});
+			client.PacketManager.Send(packet);
 
-		//	client.ConnectionInfo.ConnState = ConnState.AWAITING_LINK_REPLY;
-		//	//TODO: check if authKey expired (5 sec?)
-		//	var reply = await client.SendLoginSessionRequest(authKey, userId, channelId, serverId);
-		//	bool success = reply.Result == (uint)SessionResult.OK || reply.Result == (uint)SessionResult.REPLACED;
-		//	var packet = new RSP_VerifyLinks(channelId, serverId, success);
-		//	client.PacketManager.Send(packet);
-
-		//	if (success)
-		//	{
-		//		//client.ClientInfo.ConnState = Enums.ConnState.VERIFIED;
-		//		client.Disconnect("Linked - success", ConnState.LINK_EXIT);
-
-		//		//TODO: disconnect??
-		//	}
-		//	else
-		//	{
-		//		client.Disconnect("Linked - fail", ConnState.ERROR);
-		//	}
-		//}
+			client.Disconnect("Posted link to loginm server", ConnState.LINK_EXIT);
+		}
 	}
 }

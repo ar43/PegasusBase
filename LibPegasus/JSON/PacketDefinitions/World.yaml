@@ -12,3 +12,9 @@ packets:
         S2C:
             prefix: NFY
             proto: LibPegasus.Protobuf.World.LinkSuccessNfy
+    LinkBack:
+        C2S:
+            proto: LibPegasus.Protobuf.World.LinkBackReq
+        S2C:
+            prefix: RSP
+            proto: LibPegasus.Protobuf.World.LinkBackRsp

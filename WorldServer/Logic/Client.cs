@@ -66,11 +66,10 @@ namespace WorldServer.Logic
 			World = world;
 		}
 
-		internal void OnClientAccept(UInt16 userIndex)
+		internal void ClientAccept(UInt16 userIndex, UInt32 authKey)
 		{
 			timeClientAccepted = DateTime.UtcNow;
-			UInt32 unixTime = (UInt32)((DateTimeOffset)timeClientAccepted).ToUnixTimeSeconds();
-			ConnectionInfo = new(userIndex, unixTime);
+			ConnectionInfo = new(userIndex, authKey);
 		}
 
 		internal void ReceiveData()

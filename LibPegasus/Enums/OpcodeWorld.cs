@@ -7,5 +7,6 @@ namespace LibPegasus.Enums
 	{
 		CONNECTSERVER = 1,
 		LINKSUCCESS = 2,
+		LINKBACK = 3,
 	}
 }

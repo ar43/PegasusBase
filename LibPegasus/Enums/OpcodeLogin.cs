@@ -10,5 +10,6 @@ namespace LibPegasus.Enums
 		SERVERSTATE = 3,
 		CONNECTSERVER = 4,
 		VERIFYLINKS = 5,
+		LINKSUCCESS = 6,
 	}
 }

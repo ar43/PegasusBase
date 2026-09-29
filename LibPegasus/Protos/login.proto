@@ -52,3 +52,6 @@ message VerifyLinksRsp {
 	uint32 serverId = 2;
 	uint32 sessionResult = 3;
 }
+
+message LinkSuccessNfy {
+}

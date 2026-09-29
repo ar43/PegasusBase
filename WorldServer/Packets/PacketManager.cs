@@ -21,6 +21,7 @@ namespace WorldServer.Packets
 		public PacketManager()
 		{
 			REQ_ConnectServer<Client>.ConnectServerHandler = Connection.ConnectServerHandler;
+			REQ_LinkBack<Client>.LinkBackHandler = Connection.LinkBackHandler;
 		}
 
 		public void EnqueuePacket(UInt16 opcode, byte[] packet)
@@ -50,6 +51,7 @@ namespace WorldServer.Packets
 			return opcode switch
 			{
 				OpcodeWorld.CONNECTSERVER => new REQ_ConnectServer<Client>(data),
+				OpcodeWorld.LINKBACK => new REQ_LinkBack<Client>(data),
 				_ => throw new NotImplementedException($"unimplemented opcode {opcode}"),
 			}; ;
 		}

@@ -12,7 +12,6 @@ namespace LoginServer.Logic
 			UserId = userId;
 			AuthKey = authKey;
 			ConnState = ConnState.INITIAL;
-			RSA = RSA.Create(RSA_KEY_SIZE);
 			Username = "";
 			AccountId = 0;
 			ServerNonce = RandomNumberGenerator.GetBytes(8);
@@ -22,7 +21,6 @@ namespace LoginServer.Logic
 		public UInt32 AuthKey { get; private set; }
 		public string Username;
 		public ConnState ConnState;
-		public RSA RSA { get; private set; }
 		public byte[] ServerNonce { get; private set; }
 
 		public UInt32 AccountId;

@@ -19,3 +19,12 @@ message ConnectServerRsp {
 
 message LinkSuccessNfy {
 }
+
+message LinkBackReq {
+	uint32 authKey = 1;
+	uint32 userId = 2;
+}
+
+message LinkBackRsp {
+	uint32 sessionResult = 3;
+}

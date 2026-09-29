@@ -40,6 +40,8 @@ namespace WorldServer
 
 		KeyPair _keyPair;
 
+		private UInt32 _nextAuthKey = (UInt32)Random.Shared.Next();
+
 		public Server()
 		{
 			var cfg = ServerConfig.Get("world1");
@@ -301,9 +303,14 @@ namespace WorldServer
 				{
 					Log.Debug("Added Client from awaiting to non-awaiting");
 					_clients.Add(client);
-					client.OnClientAccept(GetAvailableUserIndex());
+					client.ClientAccept(GetAvailableUserIndex(), CreateAuthKey());
 				}
 			}
+		}
+
+		public UInt32 CreateAuthKey()
+		{
+			return (UInt32)Interlocked.Increment(ref _nextAuthKey);
 		}
 
 		private void Quit()

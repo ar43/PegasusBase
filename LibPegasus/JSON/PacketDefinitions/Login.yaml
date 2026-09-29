@@ -30,3 +30,7 @@ packets:
         S2C:
             prefix: RSP
             proto: LibPegasus.Protobuf.Login.VerifyLinksRsp
+    LinkSuccess:
+        S2C:
+            prefix: NFY
+            proto: LibPegasus.Protobuf.Login.LinkSuccessNfy

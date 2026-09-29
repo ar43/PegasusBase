@@ -13,6 +13,7 @@ using LibPegasus.Packets.Login.S2C;
 using Google.Protobuf;
 using System.Diagnostics;
 using LibPegasus.Protobuf.Login;
+using System.Security.Cryptography;
 
 namespace LoginServer.Logic
 {
@@ -55,11 +56,10 @@ namespace LoginServer.Logic
 			Log.Debug(Ip);
 		}
 
-		internal void OnConnect(UInt16 userIndex)
+		internal void AcceptConnect(UInt16 userIndex, UInt32 authKey)
 		{
 			timeConnected = DateTime.UtcNow;
-			UInt32 unixTime = (UInt32)((DateTimeOffset)timeConnected).ToUnixTimeSeconds();
-			ClientInfo = new(userIndex, unixTime);
+			ClientInfo = new(userIndex, authKey);
 		}
 
 		internal async Task<LoginAccountReply> SendLoginRequest(string username, string password)
@@ -231,7 +231,7 @@ namespace LoginServer.Logic
 		{
 			if (authKey != ClientInfo.AuthKey)
 			{
-				throw new NotImplementedException("wrong auth key");
+				throw new Exception("wrong auth key");
 			}
 			if (ClientInfo.ConnState == Enums.ConnState.VERSION_CHECKED)
 			{
@@ -241,18 +241,19 @@ namespace LoginServer.Logic
 				bool isLocalhost = Ip == "127.0.0.1";
 				var replyServerState = await GetServerState(isLocalhost);
 
-				var server = replyServerState.Servers[0];
+				var packetSuccess = new NFY_LinkSuccess<Client>(new LinkSuccessNfy { });
+				PacketManager.Send(packetSuccess);
 
-				//TODO: FIXME
 				var packetServerState = new NFY_ServerState<Client>(new ServerStateNfy
 				{
 					ServerStateReply = ByteString.CopyFrom(replyServerState.ToByteArray())
 				});
 				PacketManager.Send(packetServerState);
+				Log.Information($"Link logged in accountId {accountId}");
 			}
 			else
 			{
-				throw new NotImplementedException("LinkedLogin without version check");
+				throw new Exception("LinkedLogin without version check");
 			}
 		}
 

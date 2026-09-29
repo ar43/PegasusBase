@@ -5,6 +5,7 @@
 		NONE = 0,
 		SUCCESS,
 		INCORRECT,
-		TOO_MANY_FAIL
+		TOO_MANY_FAIL,
+		LINKED
 	}
 }

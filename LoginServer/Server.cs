@@ -29,6 +29,8 @@ namespace LoginServer
 
 		bool[] _clientIndexSpace = new bool[UInt16.MaxValue + 1];
 
+		private UInt32 _nextAuthKey = (UInt32)Random.Shared.Next();
+
 		KeyPair _keyPair;
 
 		public Server()
@@ -235,7 +237,7 @@ namespace LoginServer
 				{
 					Log.Debug("Added Client from awaiting to non-awaiting");
 					_clients.Add(client);
-					client.OnConnect(GetAvailableUserIndex());
+					client.AcceptConnect(GetAvailableUserIndex(), CreateAuthKey());
 				}
 			}
 		}
@@ -243,6 +245,11 @@ namespace LoginServer
 		private void Quit()
 		{
 			_listener.Stop();
+		}
+
+		public UInt32 CreateAuthKey()
+		{
+			return (UInt32)Interlocked.Increment(ref _nextAuthKey);
 		}
 	}
 }
