@@ -27,7 +27,9 @@ namespace LoginServer
 		List<Client> _clients = new();
 		ConcurrentQueue<SessionChangeData> _pendingSessionChanges = new();
 
-		bool[] _clientIndexSpace = new bool[UInt16.MaxValue + 1];
+		private readonly Queue<uint> _freeUserIndexes = new();
+		private uint _nextUserIndex;
+		private const uint MaxUserIndexes = 1000000;
 
 		private UInt32 _nextAuthKey = (UInt32)Random.Shared.Next();
 
@@ -63,23 +65,24 @@ namespace LoginServer
 			_listener = new(ipEndPoint);
 		}
 
-		UInt16 GetAvailableUserIndex()
+		uint GetAvailableUserIndex()
 		{
-			for (int i = 0; i < _clientIndexSpace.Length; i++)
+			if (_freeUserIndexes.Count > 0)
 			{
-				if (_clientIndexSpace[i] == false)
-				{
-					_clientIndexSpace[i] = true;
-					return (UInt16)i;
-				}
+				uint index = _freeUserIndexes.Dequeue();
+				return index;
 			}
 
-			throw new Exception("Server full");
+			if (_nextUserIndex == MaxUserIndexes)
+				throw new NotImplementedException("server full");
+
+			return _nextUserIndex++;
 		}
 
-		void FreeUserIndex(UInt16 index)
+
+		void FreeUserIndex(uint index)
 		{
-			_clientIndexSpace[(int)index] = false;
+			_freeUserIndexes.Enqueue(index);
 		}
 
 		void AcceptNewConnections()

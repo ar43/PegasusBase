@@ -56,7 +56,7 @@ namespace LoginServer.Logic
 			Log.Debug(Ip);
 		}
 
-		internal void AcceptConnect(UInt16 userIndex, UInt32 authKey)
+		internal void AcceptConnect(UInt32 userIndex, UInt32 authKey)
 		{
 			timeConnected = DateTime.UtcNow;
 			ClientInfo = new(userIndex, authKey);
@@ -186,7 +186,6 @@ namespace LoginServer.Logic
 
 
 		}
-
 		internal void Update()
 		{
 			if (_busy || Dropped)

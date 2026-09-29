@@ -66,7 +66,7 @@ namespace WorldServer.Logic
 			World = world;
 		}
 
-		internal void ClientAccept(UInt16 userIndex, UInt32 authKey)
+		internal void ClientAccept(UInt32 userIndex, UInt32 authKey)
 		{
 			timeClientAccepted = DateTime.UtcNow;
 			ConnectionInfo = new(userIndex, authKey);

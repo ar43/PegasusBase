@@ -7,7 +7,7 @@ namespace LoginServer.Logic
 	{
 		public static readonly int RSA_KEY_SIZE = 2048;
 
-		public ClientInfo(UInt16 userId, UInt32 authKey)
+		public ClientInfo(UInt32 userId, UInt32 authKey)
 		{
 			UserId = userId;
 			AuthKey = authKey;
@@ -17,7 +17,7 @@ namespace LoginServer.Logic
 			ServerNonce = RandomNumberGenerator.GetBytes(8);
 		}
 
-		public UInt16 UserId { get; private set; }
+		public UInt32 UserId { get; private set; }
 		public UInt32 AuthKey { get; private set; }
 		public string Username;
 		public ConnState ConnState;

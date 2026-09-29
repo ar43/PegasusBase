@@ -5,7 +5,7 @@ namespace WorldServer.Logic.ClientData
 {
 	internal class ConnectionInfo
 	{
-		public ConnectionInfo(UInt16 userId, UInt32 authKey)
+		public ConnectionInfo(UInt32 userId, UInt32 authKey)
 		{
 			UserId = userId;
 			AuthKey = authKey;
@@ -14,7 +14,7 @@ namespace WorldServer.Logic.ClientData
 			ServerNonce = RandomNumberGenerator.GetBytes(8);
 		}
 
-		public UInt16 UserId { get; private set; }
+		public UInt32 UserId { get; private set; }
 		public UInt32 AuthKey { get; private set; }
 
 		public bool IsAuthenticated()
