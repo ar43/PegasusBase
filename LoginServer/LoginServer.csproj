@@ -22,7 +22,12 @@
     <PackageReference Include="Serilog.Sinks.Console" Version="5.0.1" />
   </ItemGroup>
 
+	<ItemGroup>
+		<None Include="$(SolutionDir)Config\LoginServer\**\*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+	</ItemGroup>
+
   <ItemGroup>
+    <Folder Include="DB\" />
     <Folder Include="Protos\" />
   </ItemGroup>
 

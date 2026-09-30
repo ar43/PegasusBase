@@ -12,11 +12,7 @@ namespace WorldServer
 		{
 			if (_instance == null)
 			{
-				string workingDirectory = Environment.CurrentDirectory;
-				string projectDirectory = Directory.GetParent(workingDirectory).Parent.FullName;
-
-				string configFile = projectDirectory + "\\" + configName + ".json";
-				string jsonString = File.ReadAllText(configFile);
+				string jsonString = File.ReadAllText(configName + ".json");
 
 				_instance = JsonSerializer.Deserialize<Config>(jsonString)!;
 			}

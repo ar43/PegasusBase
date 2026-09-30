@@ -20,6 +20,25 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataTools", "DataTools\Data
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PacketGenerator", "PacketGenerator\PacketGenerator.csproj", "{A5DBB636-E5DF-4D49-A857-F8CE5258CCCA}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Config", "Config", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MasterServer", "MasterServer", "{6B77F403-E3D9-4B4C-B586-5461C1BB5F29}"
+	ProjectSection(SolutionItems) = preProject
+		Config\MasterServer\appsettings.Development.json = Config\MasterServer\appsettings.Development.json
+		Config\MasterServer\appsettings.json = Config\MasterServer\appsettings.json
+		Config\MasterServer\dbsettings.json = Config\MasterServer\dbsettings.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WorldServer", "WorldServer", "{18FB13BE-5C59-43B9-90C9-31981AAABB0B}"
+	ProjectSection(SolutionItems) = preProject
+		Config\WorldServer\world1.json = Config\WorldServer\world1.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LoginServer", "LoginServer", "{9B5272E8-8037-4BE5-A7AE-71C49A6DE080}"
+	ProjectSection(SolutionItems) = preProject
+		Config\LoginServer\config.json = Config\LoginServer\config.json
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,6 +72,11 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6B77F403-E3D9-4B4C-B586-5461C1BB5F29} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{18FB13BE-5C59-43B9-90C9-31981AAABB0B} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{9B5272E8-8037-4BE5-A7AE-71C49A6DE080} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {17E1078A-F6EB-4F97-A4C1-F8461342D517}

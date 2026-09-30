@@ -1,7 +1,6 @@
 ﻿using Grpc.Net.Client;
 using LibPegasus.Crypt;
 using LibPegasus.JSON;
-using LoginServer.DB;
 using LoginServer.Logic;
 using Npgsql;
 using Serilog;

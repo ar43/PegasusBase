@@ -1,0 +1,19 @@
+{
+  "GeneralSettings": 
+  {
+    "ServerId": 1,
+    "ChannelId": 1
+  },
+  "ConnectionSettings": 
+  {
+    "Port": 49090
+  },
+  "DatabaseSettings": 
+  {
+    "ConnString": "Host=localhost;Username=postgres;Password=pass;Database=e_world",
+    "EnableDbSync": true
+  },
+  "GameSettings": 
+  {
+  }
+}

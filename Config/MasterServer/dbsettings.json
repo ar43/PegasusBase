@@ -1,0 +1,5 @@
+{
+	"ServerData": "1,0",
+	"ConnStringAuth": "Host=localhost;Username=postgres;Password=pass;Database=e_auth",
+	"ConnStringWorld": "Host=localhost;Username=postgres;Password=pass;Database=e_world"
+}

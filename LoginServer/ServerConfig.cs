@@ -16,7 +16,7 @@ namespace LoginServer
 				string projectDirectory = Directory.GetParent(workingDirectory).Parent.FullName;
 
 				string configFile = projectDirectory + "\\config.json";
-				string jsonString = File.ReadAllText(configFile);
+				string jsonString = File.ReadAllText("config.json");
 
 				_instance = JsonSerializer.Deserialize<Config>(jsonString)!;
 			}

@@ -33,6 +33,12 @@
     <Folder Include="Protos\" />
   </ItemGroup>
 
+	<ItemGroup>
+		<None Include="$(SolutionDir)Config\MasterServer\**\*"
+					CopyToOutputDirectory="PreserveNewest"
+					CopyToPublishDirectory="PreserveNewest" />
+	</ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\LibPegasus\LibPegasus.csproj" />
   </ItemGroup>

@@ -13,6 +13,12 @@
     <None Remove="JSON\**" />
   </ItemGroup>
 
+	<ItemGroup>
+		<None Include="$(SolutionDir)Config\WorldServer\**\*"
+					CopyToOutputDirectory="PreserveNewest"
+					CopyToPublishDirectory="PreserveNewest" />
+	</ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Google.Protobuf" Version="3.26.1" />
     <PackageReference Include="Grpc.Net.Client" Version="2.62.0" />

@@ -18,11 +18,14 @@ namespace MasterServer
 			Log.Logger = log;
 			Log.Information("Starting Pegasus MasterServer...");
 
-			var builder = WebApplication.CreateBuilder(args);
+			var builder = WebApplication.CreateBuilder(new WebApplicationOptions
+			{
+				Args = args,
+				ContentRootPath = AppContext.BaseDirectory
+			});
 
 			// Add services to the container.
 			builder.Configuration.AddJsonFile("dbsettings.json", optional: false, reloadOnChange: true);
-			builder.Configuration.AddJsonFile("chatsettings.json", optional: false, reloadOnChange: true);
 			builder.Host.UseSerilog();
 			builder.Services.AddGrpc();
 			builder.Services.AddSingleton<LoginCooldownTracker>();
@@ -54,7 +57,7 @@ namespace MasterServer
 			app.MapGrpcService<ChannelMasterService>();
 			app.MapGrpcService<AuthMasterService>();
 			app.MapGrpcService<CharacterMasterService>();
-			app.MapGet("/", () => "PegasusCabal MasterServer");
+			app.MapGet("/", () => "PegasusBase MasterServer");
 			
 
 			app.Run();
