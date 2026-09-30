@@ -30,6 +30,10 @@
 		<ProjectReference Include="..\PacketGenerator\PacketGenerator.csproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" SetTargetFramework="TargetFramework=net8.0" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Data\" />
+	</ItemGroup>
+
 	<!-- Copy to Unity -->
 	<Target Name="CopyToUnity" AfterTargets="Build" Condition="'$(TargetFramework)' == 'netstandard2.0'" Inputs="$(TargetPath)" Outputs="D:\Coding\Eclipse_Client\Eclipse\Assets\Plugins\LibPegasus.dll">
 		<Copy SourceFiles="$(TargetPath)" DestinationFolder="D:\Coding\Eclipse_Client\Eclipse\Assets\Plugins" SkipUnchangedFiles="true" />
