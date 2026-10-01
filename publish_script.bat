@@ -1,0 +1,1 @@
+dotnet msbuild Publish.proj -t:PublishAll -p:Configuration=Debug -restore

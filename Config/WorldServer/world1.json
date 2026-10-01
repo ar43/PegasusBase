@@ -6,7 +6,7 @@
   },
   "ConnectionSettings": 
   {
-    "Port": 49090
+    "Port": 39090
   },
   "DatabaseSettings": {
     "ConnString": "Host=localhost;Username=postgres;Password=pass;Database=pegasus_eclipse",

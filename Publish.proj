@@ -1,0 +1,42 @@
+<Project>
+
+  <PropertyGroup>
+    <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
+    <PublishRoot>$(MSBuildThisFileDirectory)artifacts\publish\</PublishRoot>
+  </PropertyGroup>
+
+  <Target Name="PublishAll">
+
+    <!-- Remove previous deployment output -->
+    <RemoveDir Directories="
+      $(PublishRoot)MasterServer;
+      $(PublishRoot)LoginServer;
+      $(PublishRoot)WorldServer" />
+
+    <!-- Publish MasterServer -->
+    <MSBuild
+      Projects="MasterServer\MasterServer.csproj"
+      Targets="Publish"
+      Properties="
+        Configuration=$(Configuration);
+        PublishDir=$(PublishRoot)MasterServer\" />
+
+    <!-- Publish LoginServer -->
+    <MSBuild
+      Projects="LoginServer\LoginServer.csproj"
+      Targets="Publish"
+      Properties="
+        Configuration=$(Configuration);
+        PublishDir=$(PublishRoot)LoginServer\" />
+
+    <!-- Publish WorldServer -->
+    <MSBuild
+      Projects="WorldServer\WorldServer.csproj"
+      Targets="Publish"
+      Properties="
+        Configuration=$(Configuration);
+        PublishDir=$(PublishRoot)WorldServer\" />
+
+  </Target>
+
+</Project>
