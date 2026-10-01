@@ -8,9 +8,8 @@
   {
     "Port": 49090
   },
-  "DatabaseSettings": 
-  {
-    "ConnString": "Host=localhost;Username=postgres;Password=pass;Database=e_world",
+  "DatabaseSettings": {
+    "ConnString": "Host=localhost;Username=postgres;Password=pass;Database=pegasus_eclipse",
     "EnableDbSync": true
   },
   "GameSettings": 

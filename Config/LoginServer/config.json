@@ -7,8 +7,7 @@
 	{
 		"Port": 49080
 	},
-	"DatabaseSettings": 
-	{
-		"ConnString": "Host=localhost;Username=postgres;Password=pass;Database=e_auth"
+	"DatabaseSettings": {
+		"ConnString": "Host=localhost;Username=postgres;Password=pass;Database=pegasus_eclipse"
 	}
 }

@@ -17,7 +17,7 @@ namespace MasterServer.DB
 		{
 			await using var conn = await _dataSource.OpenConnectionAsync();
 
-			await using var cmd = new NpgsqlCommand("SELECT password, id FROM main.accounts WHERE username=@p", conn);
+			await using var cmd = new NpgsqlCommand("SELECT password, id FROM auth.accounts WHERE username=@p", conn);
 			cmd.Parameters.AddWithValue("p", username);
 
 			await using var reader = await cmd.ExecuteReaderAsync();
@@ -40,7 +40,7 @@ namespace MasterServer.DB
 			{
 				await using var conn = await _dataSource.OpenConnectionAsync();
 
-				await using var cmd = new NpgsqlCommand("INSERT INTO main.accounts (id, username, password) VALUES (DEFAULT, @username, @password)", conn);
+				await using var cmd = new NpgsqlCommand("INSERT INTO auth.accounts (id, username, password) VALUES (DEFAULT, @username, @password)", conn);
 
 				cmd.Parameters.AddWithValue("username", username);
 				cmd.Parameters.AddWithValue("password", passwordHash);

@@ -11,15 +11,18 @@ namespace MasterServer.DB
 		{
 			_dataSource = dataSource;
 		}
-		public async Task<SessionResult> Create(uint authKey, ushort userId, byte channelId, byte serverId, uint accountId)
+		public async Task<SessionResult> Create(string schema, uint authKey, ushort userId, byte channelId, byte serverId, uint accountId)
 		{
 			await using var conn = await _dataSource.OpenConnectionAsync();
 			await using var tx = await conn.BeginTransactionAsync();
 
+			if (schema != "auth" && schema != "world")
+				throw new Exception("incorrect schema name");
+
 			SessionResult result = SessionResult.OK;
 
-			await using (var delete = new NpgsqlCommand("""
-				DELETE FROM main.sessions
+			await using (var delete = new NpgsqlCommand($"""
+				DELETE FROM {schema}.sessions
 				WHERE account_id = @accountId
 				RETURNING 1
 				""", conn, tx))
@@ -32,8 +35,8 @@ namespace MasterServer.DB
 					result = SessionResult.REPLACED;
 			}
 
-			await using (var insert = new NpgsqlCommand("""
-				INSERT INTO main.sessions
+			await using (var insert = new NpgsqlCommand($"""
+				INSERT INTO {schema}.sessions
 					(auth_key, user_id, channel_id, server_id, account_id)
 				VALUES
 					(@authKey, @userId, @channelId, @serverId, @accountId)

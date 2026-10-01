@@ -21,7 +21,7 @@ namespace MasterServer.DB
 
 			var dict = new Dictionary<int, int>();
 
-			await using var cmd = new NpgsqlCommand("SELECT server_id, COUNT(*) FROM main.characters " +
+			await using var cmd = new NpgsqlCommand("SELECT server_id, COUNT(*) FROM world.characters " +
 				"WHERE account_id = @accountId GROUP BY server_id", conn);
 
 			cmd.Parameters.AddWithValue("accountId", accountId);
@@ -99,7 +99,7 @@ namespace MasterServer.DB
 
 			GetMyCharactersReply reply = new GetMyCharactersReply();
 
-			await using (var cmd = new NpgsqlCommand("SELECT * FROM main.characters WHERE account_id=@p AND server_id=@g", conn))
+			await using (var cmd = new NpgsqlCommand("SELECT * FROM world.characters WHERE account_id=@p AND server_id=@g", conn))
 			{
 				cmd.Parameters.AddWithValue("p", (int)request.AccountId);
 				cmd.Parameters.AddWithValue("g", (int)request.ServerId);
@@ -181,7 +181,7 @@ namespace MasterServer.DB
 				return (0, CharCreateResult.DATABRK);
 			}
 
-			await using (var cmd = new NpgsqlCommand("INSERT INTO main.characters VALUES (@c1, @c2, @c3, @c4, @c5, @c6, @c7, @c8, @c9, @c10, @c11, @c12, @c13, @c14, @c15, @c16, @c17, @c18, @c19, @c20, @c21, @c22, @c23, @c24, @c25, @c26, @c27, @c28, @c29, @c30, @c31, @c32, @c33, @c34, @c35, @c36) RETURNING char_id", conn))
+			await using (var cmd = new NpgsqlCommand("INSERT INTO world.characters VALUES (@c1, @c2, @c3, @c4, @c5, @c6, @c7, @c8, @c9, @c10, @c11, @c12, @c13, @c14, @c15, @c16, @c17, @c18, @c19, @c20, @c21, @c22, @c23, @c24, @c25, @c26, @c27, @c28, @c29, @c30, @c31, @c32, @c33, @c34, @c35, @c36) RETURNING char_id", conn))
 			{
 				cmd.Parameters.AddWithValue("c1", (int)charId);
 				cmd.Parameters.AddWithValue("c2", (int)createCharacterRequest.AccountId);

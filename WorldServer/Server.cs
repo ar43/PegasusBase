@@ -186,7 +186,7 @@ namespace WorldServer
 			//e.Payload is string representation of JSON we constructed in NotifyOnDataChange() function
 			conn.Notification += (o, e) => SessionChangeHandler(e.Payload);
 
-			await using (var cmd = new NpgsqlCommand("LISTEN sessionchange;", conn))
+			await using (var cmd = new NpgsqlCommand("LISTEN worldsessionchange;", conn))
 				cmd.ExecuteNonQuery();
 
 			while (true)

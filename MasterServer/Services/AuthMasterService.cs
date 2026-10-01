@@ -38,7 +38,7 @@ namespace MasterServer.Services
 		public override async Task<SessionReply> CreateSession(SessionRequest request, ServerCallContext context)
 		{
 			Serilog.Log.Information("Called CreateSession");
-			var code = await _databaseManager.WorldSessionManager.Create(request.AuthKey, (UInt16)request.UserId, (byte)request.ChannelId, (byte)request.ServerId, request.AccountId);
+			var code = await _databaseManager.SessionManager.Create("world", request.AuthKey, (UInt16)request.UserId, (byte)request.ChannelId, (byte)request.ServerId, request.AccountId);
 			//Serilog.Log.Information("Registration return code: " + code.Result);
 			return new SessionReply
 			{
@@ -50,7 +50,7 @@ namespace MasterServer.Services
 		public override async Task<SessionReply> CreateLoginSession(SessionRequest request, ServerCallContext context)
 		{
 			Serilog.Log.Information("Called CreateLoginSession");
-			var code = await _databaseManager.LoginSessionManager.Create(request.AuthKey, (UInt16)request.UserId, (byte)request.ChannelId, (byte)request.ServerId, request.AccountId);
+			var code = await _databaseManager.SessionManager.Create("auth", request.AuthKey, (UInt16)request.UserId, (byte)request.ChannelId, (byte)request.ServerId, request.AccountId);
 			//Serilog.Log.Information("Registration return code: " + code.Result);
 			return new SessionReply
 			{
